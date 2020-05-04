@@ -16,9 +16,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Configure git credentials
+      uses: OleksiyRudenko/gha-git-credentials@v1
+      with:
+        token: '${{ secrets.GITHUB_TOKEN }}'
+    - name: Use Node.js
       uses: actions/setup-node@v1
-    - run: npm ci
-    - run: npm install
-    - run: npm run predeploy
-    - run: npm run deploy
+    - run: |
+        npm ci
+        npm install
+        npm run predeploy
+        npm run deploy
