@@ -16,10 +16,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Configure git credentials
-      uses: OleksiyRudenko/gha-git-credentials@v1
+    - uses: actions/labeler@v2
       with:
-        token: '${{ secrets.GITHUB_TOKEN }}'
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Configure git credentials
+      #  uses: OleksiyRudenko/gha-git-credentials@v1
+      #  with:
+      #    token: '${{ secrets.GITHUB_TOKEN }}'
     - name: Use Node.js
       uses: actions/setup-node@v1
     - run: |
