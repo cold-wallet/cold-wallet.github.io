@@ -16,10 +16,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        #- name: Configure git credentials
-        #  uses: OleksiyRudenko/gha-git-credentials@v1
-        #  with:
-        #    token: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Configure git credentials
+        uses: OleksiyRudenko/gha-git-credentials@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Use Node.js
         uses: actions/setup-node@v1
       - run: |
@@ -27,5 +27,5 @@ jobs:
           npm install
           npm run predeploy
           npm run deploy
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #env:
+      #  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
