@@ -15,18 +15,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/labeler@v2
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-      #- name: Configure git credentials
-      #  uses: OleksiyRudenko/gha-git-credentials@v1
-      #  with:
-      #    token: '${{ secrets.GITHUB_TOKEN }}'
-    - name: Use Node.js
-      uses: actions/setup-node@v1
-    - run: |
-        npm ci
-        npm install
-        npm run predeploy
-        npm run deploy
+      - uses: actions/checkout@v2
+        #- name: Configure git credentials
+        #  uses: OleksiyRudenko/gha-git-credentials@v1
+        #  with:
+        #    token: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+      - run: |
+          npm ci
+          npm install
+          npm run predeploy
+          npm run deploy
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
