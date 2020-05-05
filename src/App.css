@@ -1,7 +1,6 @@
-.assert-wrapper {
-
+.dashboard {
+  display: flex;
 }
-
 
 .App {
   text-align: center;

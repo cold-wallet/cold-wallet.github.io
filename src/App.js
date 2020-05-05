@@ -8,7 +8,6 @@ function App() {
         <div className="dashboard">
             <AssetsWrapper/>
             <ResultsWrapper/>
-            <button className="add-new-item">+</button>
         </div>
     );
 }
