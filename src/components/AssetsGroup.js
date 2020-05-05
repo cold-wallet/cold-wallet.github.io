@@ -9,7 +9,7 @@ function getDefaultCurrency(type) {
         case "crypto":
             return "BTC";
         case "cash":
-        case "non-cash" :
+        case "non-cash":
         default:
             return "USD";
     }
