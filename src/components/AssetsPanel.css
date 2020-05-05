@@ -1,3 +1,21 @@
+.assets-wrapper {
+    width: 25%;
+    background-color: #5d6c80;
+    padding: 0.5% 0.5%;
+}
+
+.assets-groups-wrapper {
+    height: 96%;
+    display: flex;
+    flex-direction: column;
+}
+
+.assets-wrapper-title {
+    background-color: #5d6c80;
+    text-align: center;
+    height: 4%;
+}
+
 .delete-asset-button {
     font-size: 20px;
     text-align: center;
@@ -19,3 +37,10 @@
 .delete-asset-button:active {
     padding: 0 2px 2px 0;
 }
+
+.assets-title {
+    text-align: center;
+    background-color: #8da7be;
+    padding: 2%;
+}
+

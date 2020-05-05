@@ -1,16 +1,22 @@
 import React from "react";
-import {AssetValue} from "./AssetValue";
-import {AssetCurrency} from "./AssetCurrency";
 import './Asset.css'
-import {DeleteAssetButton} from "./DeleteAssetButton";
 
 export class Asset extends React.Component {
     render() {
         return (
             <div className={"asset-item"}>
-                <AssetValue value={this.props.value}/>
-                <AssetCurrency currency={this.props.currency}/>
-                <DeleteAssetButton/>
+                <div className={"asset-item-value"}>
+                    <input
+                        className={"asset-item-value-input"}
+                        type="number"
+                        defaultValue={this.props.value}
+                        disabled={true}
+                    />
+                </div>
+                <div className={"asset-item-currency"}>
+                    <span className={"asset-item-currency-name"}>{this.props.currency}</span>
+                </div>
+                <button className={"delete-asset-button"}>x</button>
             </div>
         );
     }
