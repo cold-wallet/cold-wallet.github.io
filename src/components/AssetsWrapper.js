@@ -9,9 +9,9 @@ export class AssetsWrapper extends React.Component {
             <div className={"assets-wrapper"}>
                 <AssetsWrapperTitle value={"So you have:"}/>
                 <div className={"assets-groups-wrapper"}>
-                    <AssetsGroup type={"cash"}/>
-                    <AssetsGroup type={"non-cash"}/>
-                    <AssetsGroup type={"crypto"}/>
+                    <AssetsGroup group={this.props.savedState.cash}/>
+                    <AssetsGroup group={this.props.savedState.nonCash}/>
+                    <AssetsGroup group={this.props.savedState.crypto}/>
                 </div>
             </div>
         );

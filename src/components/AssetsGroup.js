@@ -4,25 +4,16 @@ import {Asset} from "./Asset";
 import './AssetsGroup.css';
 import {AddAssetButton} from "./AddAssetButton";
 
-function getDefaultCurrency(type) {
-    switch (type) {
-        case "crypto":
-            return "BTC";
-        case "cash":
-        case "non-cash":
-        default:
-            return "USD";
-    }
-}
-
 export class AssetsGroup extends React.Component {
     render() {
         return (
             <div className={"assets-group"}>
-                <AssetsGroupTitle value={this.props.type}/>
-                <div className={"assets"}>
-                    <Asset value={0} currency={getDefaultCurrency(this.props.type)}/>
-                </div>
+                <AssetsGroupTitle value={this.props.group.type}/>
+                <div className={"assets"}>{
+                    this.props.group.assets.map((asset, i) =>
+                        <Asset key={i} value={asset.amount} currency={asset.currency}/>
+                    )
+                }</div>
                 <AddAssetButton/>
             </div>
         );
