@@ -2,6 +2,7 @@ import React from "react";
 import {AssetValue} from "./AssetValue";
 import {AssetCurrency} from "./AssetCurrency";
 import './Asset.css'
+import {DeleteAssetButton} from "./DeleteAssetButton";
 
 export class Asset extends React.Component {
     render() {
@@ -9,6 +10,7 @@ export class Asset extends React.Component {
             <div className={"asset-item"}>
                 <AssetValue value={this.props.value}/>
                 <AssetCurrency currency={this.props.currency}/>
+                <DeleteAssetButton/>
             </div>
         );
     }
