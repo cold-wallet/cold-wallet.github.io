@@ -19,7 +19,9 @@ export class AssetsGroup extends React.Component {
         return (
             <div className={"assets-group"}>
                 <AssetsGroupTitle value={this.props.type}/>
-                <Asset value={0} currency={getDefaultCurrency(this.props.type)}/>
+                <div className={"assets"}>
+                    <Asset value={0} currency={getDefaultCurrency(this.props.type)}/>
+                </div>
                 <AddAssetButton/>
             </div>
         );

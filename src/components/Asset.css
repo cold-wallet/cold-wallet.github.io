@@ -2,3 +2,7 @@
     display: flex;
     padding: 1%;
 }
+
+.asset-item:hover {
+    background-color: #BFD0DF;
+}
