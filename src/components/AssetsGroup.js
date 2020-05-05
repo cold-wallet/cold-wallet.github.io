@@ -10,6 +10,7 @@ function getDefaultCurrency(type) {
             return "BTC";
         case "cash":
         case "non-cash" :
+        default:
             return "USD";
     }
 }
