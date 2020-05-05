@@ -6,7 +6,7 @@ export function NewAssetMenu({hideMenu}) {
         <div className={"new-asset-menu-wrapper"}>
             <div className={"new-asset-menu-shadow"} onClick={hideMenu}/>
             <div className={"new-asset-menu"}>
-                <div className={"close-new-asset-menu-button-wrapper"}>
+                <div className={"new-asset-menu-header"}>
                     <button className={"close-new-asset-menu-button"} onClick={hideMenu}>x</button>
                 </div>
             </div>

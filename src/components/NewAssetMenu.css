@@ -23,7 +23,7 @@
     opacity: 0.4;
 }
 
-.close-new-asset-menu-button-wrapper {
+.new-asset-menu-header {
     display: flex;
     flex-flow: row-reverse;
     height: 5%;
