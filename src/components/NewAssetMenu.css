@@ -9,6 +9,8 @@
     height: 62%;
     width: 50%;
     background-color: #F0F8FF;
+    display: flex;
+    flex-flow: column;
 }
 
 .new-asset-menu-shadow {
@@ -19,4 +21,32 @@
     height: 100%;
     background-color: #5D6C80;
     opacity: 0.4;
+}
+
+.close-new-asset-menu-button-wrapper {
+    display: flex;
+    flex-flow: row-reverse;
+    height: 5%;
+}
+
+.close-new-asset-menu-button {
+    font-size: 15px;
+    text-align: center;
+    outline: none;
+    width: 5%;
+    color: #D00000;
+    background-color: transparent;
+    border-color: #8DA7BE;
+    border-radius: 10%;
+    padding: 0;
+}
+
+.close-new-asset-menu-button:hover,
+.close-new-asset-menu-button:active {
+    background-color: #D00000;
+    color: #2D3142;
+}
+
+.close-new-asset-menu-button:active {
+    padding: 0 2px 2px 0;
 }
