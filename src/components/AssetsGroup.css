@@ -1,3 +1,9 @@
 .assets-group {
-    min-height: 20%;
+    min-height: 30%;
+    max-height: 50%;
 }
+
+.assets-group:hover {
+    height: 100%;
+}
+

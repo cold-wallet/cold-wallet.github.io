@@ -12,6 +12,10 @@
     border-radius: 4px;
 }
 
+.asset-item-value-input:disabled {
+    background-color: #F0F8FF;
+}
+
 .asset-item-value-input:focus {
     border-style: dashed;
 }
