@@ -1,7 +1,7 @@
 import React from "react";
-import {AssetsGroup} from "./AssetsGroup";
 import './AssetsPanel.css';
 import {useCookies} from "react-cookie";
+import {AssetsGroupsWrapper} from "./AssetsGroupsWrapper";
 
 
 function buildDefaultState() {
@@ -43,11 +43,7 @@ export function AssetsPanel() {
     return (
         <div className={"assets-wrapper"}>
             <div className={"assets-wrapper-title"}>{"So you have:"}</div>
-            <div className={"assets-groups-wrapper"}>
-                <AssetsGroup group={savedState.cash}/>
-                <AssetsGroup group={savedState.nonCash}/>
-                <AssetsGroup group={savedState.crypto}/>
-            </div>
+            <AssetsGroupsWrapper savedState={savedState}/>
         </div>
     );
 }

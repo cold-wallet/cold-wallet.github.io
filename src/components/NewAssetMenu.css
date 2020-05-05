@@ -1,0 +1,22 @@
+.new-asset-menu {
+    border-style: dashed;
+    border-color: #BFD0DF;
+    border-radius: 1%;
+    border-width: 6px;
+    top: 14%;
+    left: 1%;
+    position: absolute;
+    height: 62%;
+    width: 50%;
+    background-color: #F0F8FF;
+}
+
+.new-asset-menu-shadow {
+    left: 0;
+    top: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #5D6C80;
+    opacity: 0.4;
+}
