@@ -1,6 +1,7 @@
 .asset-item {
     display: flex;
     padding: 1%;
+    justify-content: space-evenly;
 }
 
 .asset-item:hover {

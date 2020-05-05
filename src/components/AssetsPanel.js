@@ -42,7 +42,7 @@ export function AssetsPanel() {
 
     return (
         <div className={"assets-wrapper"}>
-            <div className={"assets-wrapper-title"}>{"So you have:"}</div>
+            <div className={"assets-wrapper-title"}>{"So if you have:"}</div>
             <AssetsGroupsWrapper savedState={savedState}/>
         </div>
     );

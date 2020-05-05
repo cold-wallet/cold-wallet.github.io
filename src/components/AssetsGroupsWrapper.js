@@ -12,9 +12,9 @@ export class AssetsGroupsWrapper extends React.Component {
         };
     }
 
-    spawnMenu() {
+    spawnMenu(type) {
         this.setState({
-            showMenu: true
+            showMenu: type
         })
     }
 
@@ -29,7 +29,10 @@ export class AssetsGroupsWrapper extends React.Component {
             <div className={"assets-groups-wrapper"}>
                 {
                     this.state.showMenu
-                        ? <NewAssetMenu hideMenu={() => this.hideMenu()}/>
+                        ? <NewAssetMenu
+                            hideMenu={() => this.hideMenu()}
+                            assetType={this.state.showMenu}
+                        />
                         : null
                 }
                 {
@@ -39,7 +42,7 @@ export class AssetsGroupsWrapper extends React.Component {
                         this.savedState.crypto,
                     ].map((group, i) =>
                         <AssetsGroup key={i}
-                                     spawnMenu={() => this.spawnMenu()}
+                                     spawnMenu={() => this.spawnMenu(group.type)}
                                      group={group}
                         />
                     )

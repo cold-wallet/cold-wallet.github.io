@@ -1,0 +1,183 @@
+@mixin mainBtnStyle {
+    cursor: pointer;
+    outline: none;
+    text-transform: uppercase;
+    font-size: 0.8vw;
+    line-height: 1vw;
+    letter-spacing: 0.05vw;
+    padding: 0 1.2vw;
+    transition: all 0.25s;
+    border-radius: 0.1vw;
+
+    @media only screen and (min-width: 500px) and (max-width: 1024px) {
+        font-size: $tablet12px;
+        line-height: $tablet12px;
+        padding: $tablet18px $tablet24px;
+        letter-spacing: 1px;
+        border-radius: 2px;
+    }
+}
+
+@mixin btnWithoutBorder {
+    background-color: transparent;
+    border: none;
+    color: $textDarkLight;
+}
+
+@mixin fillBtnWithBorderAndBackground {
+    border: 1px solid transparent;
+    color: $white;
+
+    @media only screen and (max-width: 1024px) {
+        border: 1px solid transparent;
+    }
+
+    @media only screen and (max-width: 499px) {
+        border: 1px solid white;
+    }
+
+    &:hover {
+        background-color: transparent;
+        transition: all 0.25s;
+    }
+}
+
+@mixin greenBtnWithBorderAndBackground {
+    @include fillBtnWithBorderAndBackground;
+    background-color: $greenLight;
+
+    &:hover {
+        border: 1px solid $greenLight;
+        color: $greenLight;
+
+        @media only screen and (max-width: 1024px) {
+            border: 1px solid $greenLight;
+        }
+    }
+}
+
+@mixin greenBtnWithOutBackground {
+    @include fillBtnWithBorderAndBackground;
+    background-color: transparent;
+    color: $greenLight;
+    border: 1px solid $greenLight;
+
+    @media only screen and (max-width: 1024px) {
+        border: 1px solid $greenLight;
+    }
+
+    @media only screen and (max-width: 499px) {
+        background-color: $greenLight;
+        color: $white;
+    }
+
+    &:hover {
+        background-color: $greenLight;
+        color: $white;
+    }
+}
+
+@mixin redBtnWithOutBackground {
+    @include fillBtnWithBorderAndBackground;
+    background-color: transparent;
+    color: $red;
+    border: 1px solid $red;
+
+    @media only screen and (max-width: 1024px) {
+        border: 1px solid $red;
+    }
+
+    @media only screen and (max-width: 499px) {
+        background-color: $red;
+        color: $white;
+    }
+
+    &:hover {
+        background-color: $red;
+        color: $white;
+    }
+}
+
+@mixin redBtnWithBorderAndBackground {
+    @include fillBtnWithBorderAndBackground;
+    background-color: $red;
+
+    &:hover {
+        border: 1px solid $red;
+        color: $red;
+
+        @media only screen and (max-width: 1024px) {
+            border: 1px solid $red;
+        }
+    }
+}
+
+@mixin blueBtnWithOutBackground {
+    @include fillBtnWithBorderAndBackground;
+    background-color: transparent;
+    color: $blueDark;
+    border: 1px solid $blueDark;
+
+    @media only screen and (max-width: 1024px) {
+        border: 1px solid $blueDark;
+    }
+
+    @media only screen and (max-width: 499px) {
+        background-color: $blueDark;
+        color: $white;
+    }
+
+    &:hover {
+        background-color: $blueDark;
+        color: $white;
+    }
+}
+
+@mixin blueBtnWithBorderAndBackground {
+    @include fillBtnWithBorderAndBackground;
+    background-color: $blueDark;
+
+    &:hover {
+        border: 1px solid $blueDark;
+        color: $blueDark;
+
+        @media only screen and (max-width: 1024px) {
+            border: 1px solid $blueDark;
+        }
+    }
+}
+
+@mixin greyBtnWithBorderAndBackground {
+    @include fillBtnWithBorderAndBackground;
+    background-color: $greyButton;
+
+    &:hover {
+        border: 1px solid $greyButton;
+        color: $greyButton;
+
+        @media only screen and (max-width: 1024px) {
+            border: 1px solid $greyButton;
+        }
+    }
+}
+
+@mixin blackBtnWithOutBackground {
+    @include fillBtnWithBorderAndBackground;
+    background-color: transparent;
+    color: $greyLight;
+    border: 1px solid $greyLight;
+
+    @media only screen and (max-width: 1024px) {
+        border: 1px solid $greyLight;
+    }
+
+    @media only screen and (max-width: 499px) {
+        background-color: $greyLight;
+        color: $white;
+    }
+
+    &:hover {
+        background-color: $greyLight;
+        color: $white;
+    }
+}
