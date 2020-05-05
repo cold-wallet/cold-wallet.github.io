@@ -1,5 +1,6 @@
 .dashboard {
   display: flex;
+  height: 100%;
 }
 
 .App {
