@@ -36,3 +36,9 @@ jobs:
           BRANCH: master # The branch the action should deploy to.
           FOLDER: build # The folder the action should deploy.
 
+      - name: npm logs
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: logs
+          path: /home/runner/.npm/_logs
