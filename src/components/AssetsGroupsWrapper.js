@@ -9,7 +9,7 @@ export class AssetsGroupsWrapper extends React.Component {
         this.savedState = props.savedState;
         this.state = {
             showMenu: false,
-            onCurrencySelected: new Function()
+            onCurrencySelected: () => false
         };
     }
 
@@ -23,7 +23,7 @@ export class AssetsGroupsWrapper extends React.Component {
     hideMenu() {
         this.setState({
             showMenu: false,
-            onCurrencySelected: new Function()
+            onCurrencySelected: () => false
         })
     }
 
