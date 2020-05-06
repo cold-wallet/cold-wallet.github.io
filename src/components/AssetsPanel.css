@@ -11,6 +11,7 @@
 }
 
 .assets-wrapper-title {
+    cursor: default;
     background-color: #5d6c80;
     text-align: center;
     height: 4%;
@@ -37,9 +38,4 @@
     padding: 0 2px 2px 0;
 }
 
-.assets-title {
-    text-align: center;
-    background-color: #8da7be;
-    padding: 2%;
-}
 

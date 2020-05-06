@@ -15,6 +15,7 @@
 }
 
 .assets-title {
+    cursor: default;
     text-align: center;
     background-color: #8da7be;
     padding: 2%;

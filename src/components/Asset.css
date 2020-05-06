@@ -43,5 +43,6 @@
     justify-content: center;
 }
 
-
-
+.asset-item-currency-name {
+    cursor: default;
+}
