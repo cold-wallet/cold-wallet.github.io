@@ -27,7 +27,7 @@ jobs:
         run: |
           npm ci
           npm install
-          npm run predeploy
+          npm run build
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
