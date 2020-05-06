@@ -61,7 +61,7 @@ function getListOfTopCurrenciesByType(type) {
                     htmlCode: <span className={"asset-currency-icon"}>&euro;</span>
                 },
                 {
-                    name: "Pounds sterling",
+                    name: "Pound sterling",
                     code: "GBP",
                     htmlCode: <span className={"asset-currency-icon"}>&#xA3;</span>
                 },
