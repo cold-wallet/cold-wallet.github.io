@@ -25,30 +25,9 @@
 
 .new-asset-menu--header {
     display: flex;
-    height: 5%;
+    height: 7%;
+    margin-bottom: 2%;
     justify-content: flex-end;
-}
-
-.new-asset-menu--close-button {
-    font-size: 15px;
-    text-align: center;
-    outline: none;
-    width: 5%;
-    color: #D00000;
-    background-color: transparent;
-    border-color: #8DA7BE;
-    border-radius: 10%;
-    padding: 0;
-}
-
-.new-asset-menu--close-button:hover,
-.new-asset-menu--close-button:active {
-    background-color: #D00000;
-    color: #2D3142;
-}
-
-.new-asset-menu--close-button:active {
-    padding: 0 2px 2px 0;
 }
 
 .new-asset-menu--body {
@@ -76,7 +55,7 @@
     background-color: #ECEBDA;
     width: 30%;
     text-align: center;
-    margin: 2% 0 0 0;
+    margin: 0 0 2% 0;
     display: flex;
     flex-flow: column;
 }

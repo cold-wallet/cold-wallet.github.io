@@ -2,33 +2,22 @@ import React from "react";
 import './AssetsPanel.css';
 import {useCookies} from "react-cookie";
 import {AssetsGroupsWrapper} from "./AssetsGroupsWrapper";
+import AssetDTO from "./AssetDTO";
 
 
 function buildDefaultState() {
     return {
         cash: {
             type: 'cash',
-            assets: [{
-                type: 'cash',
-                amount: 0,
-                currency: "USD"
-            }]
+            assets: [new AssetDTO('cash', 0, "USD")],
         },
         nonCash: {
             type: 'non-cash',
-            assets: [{
-                type: 'non-cash',
-                amount: 0,
-                currency: "USD"
-            }]
+            assets: [new AssetDTO('non-cash', 0, "USD")],
         },
         crypto: {
             type: 'crypto',
-            assets: [{
-                type: 'crypto',
-                amount: 0,
-                currency: "BTC"
-            }]
+            assets: [new AssetDTO('crypto', 0, "BTC")],
         },
     }
 }

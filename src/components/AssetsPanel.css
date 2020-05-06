@@ -16,26 +16,3 @@
     text-align: center;
     height: 4%;
 }
-
-.delete-asset-button {
-    font-size: 20px;
-    text-align: center;
-    outline: none;
-    width: 13%;
-    color: #D00000;
-    background-color: transparent;
-    border-color: #8DA7BE;
-    border-radius: 10%;
-}
-
-.delete-asset-button:hover,
-.delete-asset-button:active {
-    background-color: #D00000;
-    color: #2D3142;
-}
-
-.delete-asset-button:active {
-    padding: 0 2px 2px 0;
-}
-
-

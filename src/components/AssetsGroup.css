@@ -22,29 +22,10 @@
 }
 
 .add-asset-button {
-    font-size: 24px;
-    text-align: center;
-    outline: none;
-    background-color: transparent;
-    border-color: #8DA7BE;
-    border-radius: 10%;
-    padding: 0;
-    width: 15%;
-    height: 30px;
-    color: #9BC995;
+    margin-left: 40%;
 }
 
-.add-asset-button:hover,
-.add-asset-button:active {
-    background-color: #9BC995;
-    color: #F0F8FF;
-}
-
-.add-asset-button:active {
-    padding: 0 2px 2px 0;
-}
-
-.add-asset-button-wrapper {
-    padding-left: 2%;
+.add-asset-button-wrapper:hover {
+    background-color: #BFD0DF;
 }
 

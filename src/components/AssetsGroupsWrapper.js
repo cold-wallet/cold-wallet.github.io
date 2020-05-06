@@ -9,45 +9,50 @@ export class AssetsGroupsWrapper extends React.Component {
         this.savedState = props.savedState;
         this.state = {
             showMenu: false,
+            onCurrencySelected: new Function()
         };
     }
 
-    spawnMenu(type) {
+    spawnMenu({type, onCurrencySelected}) {
         this.setState({
-            showMenu: type
+            showMenu: type,
+            onCurrencySelected: onCurrencySelected
         })
     }
 
     hideMenu() {
         this.setState({
-            showMenu: false
+            showMenu: false,
+            onCurrencySelected: new Function()
         })
     }
 
     render() {
-        return (
-            <div className={"assets-groups-wrapper"}>
-                {
-                    this.state.showMenu
-                        ? <NewAssetMenu
-                            hideMenu={() => this.hideMenu()}
-                            assetType={this.state.showMenu}
-                        />
-                        : null
-                }
-                {
-                    [
-                        this.savedState.cash,
-                        this.savedState.nonCash,
-                        this.savedState.crypto,
-                    ].map((group, i) =>
-                        <AssetsGroup key={i}
-                                     spawnMenu={() => this.spawnMenu(group.type)}
-                                     group={group}
-                        />
-                    )
-                }
-            </div>
-        );
+        return (<div className={"assets-groups-wrapper"}>
+            {
+                this.state.showMenu
+                    ? <NewAssetMenu
+                        hideMenu={() => this.hideMenu()}
+                        onCurrencySelected={(currency) => this.state.onCurrencySelected(currency)}
+                        assetType={this.state.showMenu}
+                    />
+                    : null
+            }
+            {
+                [
+                    this.savedState.cash,
+                    this.savedState.nonCash,
+                    this.savedState.crypto,
+                ].map((group) =>
+                    <AssetsGroup key={group.type}
+                                 spawnMenu={({onCurrencySelected}) => this.spawnMenu({
+                                     type: group.type,
+                                     onCurrencySelected: onCurrencySelected
+                                 })}
+                                 group={group}
+                    />
+                )
+            }
+        </div>);
     }
 }

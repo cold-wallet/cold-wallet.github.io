@@ -1,7 +1,12 @@
+.asset-item--active,
 .asset-item {
     display: flex;
     padding: 1%;
-    justify-content: space-evenly;
+    justify-content: space-between;
+}
+
+.asset-item--active {
+    background-color: #BFD0DF;
 }
 
 .asset-item:hover {
@@ -45,4 +50,9 @@
 
 .asset-item-currency-name {
     cursor: default;
+}
+
+.asset-item-value-input--invalid {
+    border-color: #D00000;
+    background-color: rgba(208, 0, 0, 0.2);
 }
