@@ -35,6 +35,7 @@ function buildDefaultState() {
 
 export function AssetsPanel() {
     const cookieName = 'assets';
+    // noinspection JSUnusedLocalSymbols
     const [cookies, setCookie] = useCookies([cookieName]);
     const savedState = (Object.keys(cookies).length === 0 && cookies.constructor === Object)
         ? buildDefaultState()
