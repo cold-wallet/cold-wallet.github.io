@@ -44,7 +44,7 @@ export class AssetsGroup extends React.Component {
     }
 
     onAccepted(amount) {
-        this.props.group.assets.push(new AssetDTO(
+        this.props.group.assets.unshift(new AssetDTO(
             this.props.group.type,
             amount,
             this.state.newAsset.currency
