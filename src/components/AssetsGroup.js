@@ -49,6 +49,7 @@ export class AssetsGroup extends React.Component {
             amount,
             this.state.newAsset.currency
         ));
+        this.props.onAccepted();
         this.setState({
             newAsset: null
         });

@@ -23,15 +23,24 @@ function buildEmptyState() {
 
 export function AssetsPanel() {
     const cookieName = 'assets';
-    const [cookies] = useCookies([cookieName]);
-    const savedState = (Object.keys(cookies).length === 0 && cookies.constructor === Object)
-        ? buildEmptyState()
-        : cookies;
+    const [cookies, setCookie] = useCookies([cookieName]);
+    let savedState;
 
-    return (
-        <div className={"assets-wrapper"}>
-            <div className={"assets-wrapper-title"}>{"So if you have:"}</div>
-            <AssetsGroupsWrapper savedState={savedState}/>
-        </div>
-    );
+    if (Object.keys(cookies).length === 0 || !cookies[cookieName]) {
+        savedState = buildEmptyState()
+    } else {
+        console.log("read cookies:", cookies);
+        savedState = cookies[cookieName]
+    }
+
+    return <div className={"assets-wrapper"}>
+        <div className={"assets-wrapper-title"}>{"So if you have:"}</div>
+        <AssetsGroupsWrapper
+            savedState={savedState}
+            saveState={(state) => {
+                console.log("saving cookies:", state);
+                setCookie(cookieName, state)
+            }}
+        />
+    </div>
 }

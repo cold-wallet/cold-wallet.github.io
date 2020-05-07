@@ -30,8 +30,11 @@ export class AssetsGroupsWrapper extends React.Component {
         return <div className={"assets-groups-wrapper"}>{[
             this.state.showMenu
                 ? <NewAssetMenu
+                    key={0}
                     hideMenu={() => this.hideMenu()}
-                    onCurrencySelected={(currency) => this.state.onCurrencySelected(currency)}
+                    onCurrencySelected={(currency) => {
+                        this.state.onCurrencySelected(currency);
+                    }}
                     assetType={this.state.showMenu}
                 />
                 : null,
@@ -45,6 +48,9 @@ export class AssetsGroupsWrapper extends React.Component {
                                  type: group.type,
                                  onCurrencySelected: onCurrencySelected
                              })}
+                             onAccepted={() => {
+                                 this.props.saveState(this.props.savedState);
+                             }}
                              group={group}
                 />
             ),
