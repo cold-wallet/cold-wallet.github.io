@@ -6,7 +6,6 @@ export class AssetsGroupsWrapper extends React.Component {
 
     constructor(props) {
         super(props);
-        this.savedState = props.savedState;
         this.state = {
             showMenu: false,
             onCurrencySelected: () => false
@@ -40,9 +39,9 @@ export class AssetsGroupsWrapper extends React.Component {
             }
             {
                 [
-                    this.savedState.cash,
-                    this.savedState.nonCash,
-                    this.savedState.crypto,
+                    this.props.savedState.cash,
+                    this.props.savedState["non-cash"],
+                    this.props.savedState.crypto,
                 ].map((group) =>
                     <AssetsGroup key={group.type}
                                  spawnMenu={({onCurrencySelected}) => this.spawnMenu({

@@ -1,4 +1,5 @@
 .assets-group {
+    overflow-y: auto;
     display: flex;
     flex-flow: column;
     background-color: #F0F8FF;
