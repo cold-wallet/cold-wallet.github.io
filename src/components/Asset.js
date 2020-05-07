@@ -26,6 +26,10 @@ export class Asset extends React.Component {
             || valueAsNumber <= 0
     }
 
+    onDeleteAsset() {
+        this.props.onDelete();
+    }
+
     render() {
         return (
             <div className={this.props.isNewAsset ? "asset-item--active" : "asset-item"}>
@@ -67,7 +71,9 @@ export class Asset extends React.Component {
                         ? <button
                             onClick={() => this.onNewAssetConfirmed()}
                             className={"accept-new-asset-button positive-button"}>✔</button>
-                        : <button className={"delete-asset-button negative-button"}>✖</button>
+                        : <button
+                            onClick={event => this.onDeleteAsset()}
+                            className={"delete-asset-button negative-button"}>✖</button>
                 }
             </div>
         );

@@ -49,7 +49,7 @@ export class AssetsGroup extends React.Component {
             amount,
             this.state.newAsset.currency
         ));
-        this.props.onAccepted();
+        this.props.saveStateFunction();
         this.setState({
             newAsset: null
         });
@@ -70,13 +70,22 @@ export class AssetsGroup extends React.Component {
             <Asset key={i}
                    value={asset.amount}
                    currencyCode={asset.currency}
+                   onDelete={() => {
+                       this.props.group.assets = this.props.group.assets.filter(_asset => _asset !== asset);
+                       this.props.saveStateFunction();
+                   }}
             />
         );
     }
 
     buildTemplateAsset() {
         const asset = buildTemplateAssetDTO(this.props.group.type);
-        return <Asset key={"template"} value={asset.amount} currencyCode={asset.currency}/>
+        return <Asset
+            key={"template"}
+            value={asset.amount}
+            currencyCode={asset.currency}
+            onDelete={() => console.log("vote for this feature")}
+        />
     }
 
     buildCurrentOrDefaultAssets() {

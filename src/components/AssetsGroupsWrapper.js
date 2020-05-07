@@ -48,7 +48,7 @@ export class AssetsGroupsWrapper extends React.Component {
                                  type: group.type,
                                  onCurrencySelected: onCurrencySelected
                              })}
-                             onAccepted={() => {
+                             saveStateFunction={() => {
                                  this.props.saveState(this.props.savedState);
                              }}
                              group={group}
