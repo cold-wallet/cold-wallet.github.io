@@ -1,8 +1,8 @@
 .assets-group {
+    background: linear-gradient(#F0F8FF, #BFD0DF);
     overflow-y: auto;
     display: flex;
     flex-flow: column;
-    background-color: #F0F8FF;
     min-height: 30%;
     max-height: 50%;
 }
