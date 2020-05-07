@@ -66,8 +66,8 @@ export class Asset extends React.Component {
                     this.props.isNewAsset
                         ? <button
                             onClick={() => this.onNewAssetConfirmed()}
-                            className={"accept-new-asset-button positive-button"}>v</button>
-                        : <button className={"delete-asset-button negative-button"}>x</button>
+                            className={"accept-new-asset-button positive-button"}>✔</button>
+                        : <button className={"delete-asset-button negative-button"}>✖</button>
                 }
             </div>
         );

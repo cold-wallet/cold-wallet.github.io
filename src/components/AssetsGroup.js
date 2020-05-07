@@ -59,7 +59,7 @@ export class AssetsGroup extends React.Component {
             <div className={"add-asset-button-wrapper"}>
                 <button className={"add-asset-button positive-button"}
                         onClick={() => this._onAddAssetButtonClick()}
-                >+
+                ><strong>+</strong>
                 </button>
             </div>
         </div>);

@@ -90,7 +90,7 @@ export function NewAssetMenu({hideMenu, assetType, onCurrencySelected}) {
             <div className={"new-asset-menu"}>
                 <div className={"new-asset-menu--header"}>
                     <div className={"new-asset-menu--header-title"}>Choose currency of new asset</div>
-                    <button className={"new-asset-menu--close-button negative-button"} onClick={hideMenu}>x</button>
+                    <button className={"new-asset-menu--close-button negative-button"} onClick={hideMenu}>✖</button>
                 </div>
                 <div className={"new-asset-menu--body"}>
                     <div className={"asset-pics--container"}>
