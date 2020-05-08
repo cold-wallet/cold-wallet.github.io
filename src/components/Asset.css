@@ -14,9 +14,9 @@
 }
 
 .asset-item-value {
-    width: 50%;
-    padding: 1%;
-    max-width: 50%;
+  width: 40%;
+  padding: 1%;
+  max-width: 50%;
 }
 
 .asset-item-value-input {
@@ -49,10 +49,21 @@
 }
 
 .asset-item-currency-name {
-    cursor: default;
+  cursor: default;
 }
 
 .asset-item-value-input--invalid {
-    border-color: #D00000;
-    background-color: rgba(208, 0, 0, 0.2);
+  border-color: #D00000;
+  background-color: rgba(208, 0, 0, 0.2);
+}
+
+.asset-item-buttons-container {
+  width: 30%;
+  display: flex;
+  flex-flow: row;
+  justify-content: flex-end;
+}
+
+.asset-item-buttons-container .button {
+  width: 50%;
 }

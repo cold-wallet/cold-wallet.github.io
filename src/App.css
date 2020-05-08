@@ -83,3 +83,24 @@
 .negative-button:active {
   padding: 0 2px 2px 0;
 }
+
+.neutral-button {
+  font-size: 20px;
+  text-align: center;
+  outline: none;
+  width: 13%;
+  color: #2D3142;
+  background-color: #F0F8FF;
+  border-color: #8DA7BE;
+  border-radius: 10%;
+}
+
+.neutral-button:hover,
+.neutral-button:active {
+  background-color: #BFD0DF;
+  color: #2D3142;
+}
+
+.neutral-button:active {
+  padding: 0 2px 2px 0;
+}

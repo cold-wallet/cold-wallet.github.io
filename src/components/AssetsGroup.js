@@ -49,10 +49,38 @@ export class AssetsGroup extends React.Component {
             amount,
             this.state.newAsset.currency
         ));
-        this.props.saveStateFunction();
         this.setState({
             newAsset: null
         });
+        this.props.saveStateFunction();
+    }
+
+    onAssetFromTemplateAccepted(amount, currency) {
+        this.props.group.assets.unshift(new AssetDTO(
+            this.props.group.type,
+            amount,
+            currency
+        ));
+        this.props.saveStateFunction();
+    }
+
+    buildAssets() {
+        return this.props.group.assets.map((asset, i) => {
+                console.log("building asset:", asset);
+                return <Asset key={i}
+                              value={asset.amount}
+                              currencyCode={asset.currency}
+                              onAccepted={(amount) => {
+                                  asset.amount = amount;
+                                  this.props.saveStateFunction();
+                              }}
+                              onDelete={() => {
+                                  this.props.group.assets = this.props.group.assets.filter(_asset => _asset !== asset);
+                                  this.props.saveStateFunction();
+                              }}
+                />
+            }
+        );
     }
 
     buildNewAssetItem() {
@@ -61,35 +89,36 @@ export class AssetsGroup extends React.Component {
                       onAccepted={(amount) => {
                           this.onAccepted(amount);
                       }}
+                      onDelete={() => {
+                          this.setState({
+                              newAsset: null
+                          });
+                      }}
                       currencyCode={this.state.newAsset.currency}
         />
-    }
-
-    buildAssets() {
-        return this.props.group.assets.map((asset, i) =>
-            <Asset key={i}
-                   value={asset.amount}
-                   currencyCode={asset.currency}
-                   onDelete={() => {
-                       this.props.group.assets = this.props.group.assets.filter(_asset => _asset !== asset);
-                       this.props.saveStateFunction();
-                   }}
-            />
-        );
     }
 
     buildTemplateAsset() {
         const asset = buildTemplateAssetDTO(this.props.group.type);
         return <Asset
             key={"template"}
+            isTemplateAsset={true}
             value={asset.amount}
             currencyCode={asset.currency}
-            onDelete={() => console.log("vote for this feature")}
+            onAccepted={(amount) => {
+                this.onAssetFromTemplateAccepted(amount, asset.currency);
+            }}
         />
     }
 
     buildCurrentOrDefaultAssets() {
-        return this.props.group.assets.length ? this.buildAssets() : this.buildTemplateAsset();
+        if (this.props.group.assets.length) {
+            return this.buildAssets();
+        }
+        if (!this.state.newAsset) {
+            return this.buildTemplateAsset();
+        }
+        return null;
     }
 
     buildNewAssetIfNeeds() {

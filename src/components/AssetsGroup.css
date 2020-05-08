@@ -1,14 +1,10 @@
 .assets-group {
-    background: linear-gradient(#F0F8FF, #BFD0DF);
-    overflow-y: auto;
-    display: flex;
-    flex-flow: column;
-    min-height: 30%;
-    max-height: 50%;
-}
-
-.assets-group:hover {
-    height: 100%;
+  background: linear-gradient(#F0F8FF, #BFD0DF);
+  overflow-y: auto;
+  display: flex;
+  flex-flow: column;
+  min-height: 33%;
+  max-height: 50%;
 }
 
 .assets {

@@ -5,14 +5,17 @@ export class Asset extends React.Component {
 
     constructor(props, context) {
         super(props, context);
-        this.state = {};
+        this.state = {
+            amount: props.value
+        };
     }
 
-    onNewAssetConfirmed() {
+    onAssetStateSaveRequested() {
         if (this.state.isInvalid || !this.state.amount) {
             this.nameInput.focus();
             return
         }
+        this.setState({editModeEnabled: false});
         this.props.onAccepted(this.state.amount)
     }
 
@@ -23,11 +26,20 @@ export class Asset extends React.Component {
     checkIsInvalid({valueAsNumber}) {
         return !valueAsNumber
             || isNaN(valueAsNumber)
-            || valueAsNumber <= 0
+            || (valueAsNumber <= 0)
     }
 
     onDeleteAsset() {
-        this.props.onDelete();
+        this.setState({editModeEnabled: false});
+        this.props.onDelete && this.props.onDelete();
+
+        if (this.props.isTemplateAsset) {
+            this.nameInput.value = "0";
+        }
+    }
+
+    onEditAssetRequested() {
+        this.setState({editModeEnabled: true});
     }
 
     render() {
@@ -45,8 +57,8 @@ export class Asset extends React.Component {
                         }
                         type="number"
                         value={this.props.value}
-                        disabled={!this.props.isNewAsset}
-                        onInput={(event) => {
+                        disabled={!this.props.isNewAsset && !this.props.isTemplateAsset && !this.state.editModeEnabled}
+                        onChange={(event) => {
                             let target = event.target;
 
                             if (this.checkIsInvalid(target)) {
@@ -54,6 +66,10 @@ export class Asset extends React.Component {
                                     isInvalid: true,
                                 });
                                 return
+                            }
+
+                            if (target.valueAsNumber && (target.value[0] === '0')) {
+                                target.value = target.value.slice(1);
                             }
 
                             this.setState({
@@ -66,15 +82,24 @@ export class Asset extends React.Component {
                 <div className={"asset-item-currency"}>
                     <span className={"asset-item-currency-name"}>{this.props.currencyCode}</span>
                 </div>
-                {
-                    this.props.isNewAsset
+                <div className={"asset-item-buttons-container"}>{[
+                    (this.props.isNewAsset || this.props.isTemplateAsset || this.state.editModeEnabled)
                         ? <button
-                            onClick={() => this.onNewAssetConfirmed()}
-                            className={"accept-new-asset-button positive-button"}>✔</button>
+                            key={"accept-new-asset-button"}
+                            onClick={() => this.onAssetStateSaveRequested()}
+                            className={"accept-new-asset-button positive-button button"}>✔</button>
+                        : null,
+                    (this.props.isNewAsset || this.props.isTemplateAsset || this.state.editModeEnabled)
+                        ? null
                         : <button
-                            onClick={event => this.onDeleteAsset()}
-                            className={"delete-asset-button negative-button"}>✖</button>
-                }
+                            key={"edit-asset-button"}
+                            onClick={() => this.onEditAssetRequested()}
+                            className={"edit-asset-button neutral-button pencil-icon button"}>🖉</button>,
+                    <button
+                        key={"delete-asset-button"}
+                        onClick={() => this.onDeleteAsset()}
+                        className={"delete-asset-button negative-button button"}>✖</button>
+                ]}</div>
             </div>
         );
     }
