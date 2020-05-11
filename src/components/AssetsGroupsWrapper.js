@@ -2,8 +2,14 @@ import React from "react";
 import {NewAssetMenu} from "./NewAssetMenu";
 import {AssetsGroup} from "./AssetsGroup";
 import AssetDTO from "./AssetDTO";
+import './AssetsGroupsWrapper.css';
 
 export class AssetsGroupsWrapper extends React.Component {
+
+    static defaultProps = {
+        savedState: {},
+        saveState: state => false
+    };
 
     state = {
         showMenu: false,
@@ -40,20 +46,19 @@ export class AssetsGroupsWrapper extends React.Component {
                 this.props.savedState.cash,
                 this.props.savedState["non-cash"],
                 this.props.savedState.crypto,
-            ].map((group) =>
-                <AssetsGroup key={group.type}
-                             spawnMenu={({onCurrencySelected}) => this.spawnMenu({
-                                 type: group.type,
-                                 onCurrencySelected: onCurrencySelected
-                             })}
-                             saveStateFunction={(assets) => {
-                                 const buffer = this.props.savedState;
-                                 buffer[group.type].assets = assets.map(asset => new AssetDTO(
-                                     asset.type, asset.amount, asset.currency,
-                                 ));
-                                 this.props.saveState(buffer);
-                             }}
-                             group={group}
+            ].map((group) => <AssetsGroup key={group.type}
+                                          spawnMenu={({onCurrencySelected}) => this.spawnMenu({
+                                              type: group.type,
+                                              onCurrencySelected: onCurrencySelected
+                                          })}
+                                          saveStateFunction={(assets) => {
+                                              const buffer = this.props.savedState;
+                                              buffer[group.type].assets = assets.map(asset => new AssetDTO(
+                                                  asset.type, asset.amount, asset.currency,
+                                              ));
+                                              this.props.saveState(buffer);
+                                          }}
+                                          group={group}
                 />
             ),
         ]}</div>

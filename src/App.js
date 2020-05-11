@@ -1,19 +1,55 @@
 import React from 'react';
 import './App.css';
-import {ResultsWrapper} from "./components/ResultsWrapper";
-import {AssetsPanel} from "./components/AssetsPanel";
-
+import ResultsWrapper from "./components/ResultsWrapper";
+import {useCookies} from "react-cookie";
+import {AssetsGroupsWrapper} from "./components/AssetsGroupsWrapper";
 import "./fonts.scss";
 import "./mixin.scss";
 import "./reset.scss";
 
-function App() {
-    return (
-        <div className="dashboard">
-            <AssetsPanel/>
-            <ResultsWrapper/>
+const cookieName = 'assets';
+
+export default function App() {
+    const [cookies, setCookie] = useCookies([cookieName]);
+    const savedState = readCookies(cookies).assets;
+
+    return <div className="dashboard">
+        <div className={"assets-wrapper"}>
+            <div className={"assets-wrapper-title"}>{"So if you have:"}</div>
+            <AssetsGroupsWrapper
+                savedState={savedState}
+                saveState={(state) => {
+                    console.log("saving cookies:", state);
+                    setCookie(cookieName, state);
+                }}
+            />
         </div>
-    );
+        <ResultsWrapper savedState={savedState}/>
+    </div>
 }
 
-export default App;
+function readCookies(savedCookies) {
+    if (savedCookies) {
+        console.log("read cookies:", savedCookies);
+        return savedCookies
+    } else {
+        return buildEmptyState()
+    }
+}
+
+function buildEmptyState() {
+    return {
+        cash: {
+            type: 'cash',
+            assets: [],
+        },
+        "non-cash": {
+            type: 'non-cash',
+            assets: [],
+        },
+        crypto: {
+            type: 'crypto',
+            assets: [],
+        },
+    }
+}

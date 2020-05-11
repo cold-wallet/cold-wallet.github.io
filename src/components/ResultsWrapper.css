@@ -1,5 +1,14 @@
 .results-wrapper {
-    width: 75%;
-    background-color: #A9DDD6;
-    padding: 5%;
+  width: 75%;
+  /*background-color: #A9DDD6;*/
+  background-color: #A9DDD6;
+  padding: 0.5% 1% 5% 0.5%;
+}
+
+.results-title {
+  padding-left: 25%;
+}
+
+.results-container {
+  width: 100%;
 }
