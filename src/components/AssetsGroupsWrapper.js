@@ -1,16 +1,14 @@
 import React from "react";
 import {NewAssetMenu} from "./NewAssetMenu";
 import {AssetsGroup} from "./AssetsGroup";
+import AssetDTO from "./AssetDTO";
 
 export class AssetsGroupsWrapper extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            showMenu: false,
-            onCurrencySelected: () => false
-        };
-    }
+    state = {
+        showMenu: false,
+        onCurrencySelected: () => false
+    };
 
     spawnMenu({type, onCurrencySelected}) {
         this.setState({
@@ -48,8 +46,12 @@ export class AssetsGroupsWrapper extends React.Component {
                                  type: group.type,
                                  onCurrencySelected: onCurrencySelected
                              })}
-                             saveStateFunction={() => {
-                                 this.props.saveState(this.props.savedState);
+                             saveStateFunction={(assets) => {
+                                 const buffer = this.props.savedState;
+                                 buffer[group.type].assets = assets.map(asset => new AssetDTO(
+                                     asset.type, asset.amount, asset.currency,
+                                 ));
+                                 this.props.saveState(buffer);
                              }}
                              group={group}
                 />

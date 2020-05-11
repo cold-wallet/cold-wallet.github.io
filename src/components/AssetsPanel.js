@@ -1,8 +1,34 @@
 import React from "react";
 import './AssetsPanel.css';
-import {useCookies} from "react-cookie";
+import Cookies from 'universal-cookie';
 import {AssetsGroupsWrapper} from "./AssetsGroupsWrapper";
 
+const cookieName = 'assets';
+
+export function AssetsPanel() {
+    let cookies = new Cookies();
+    let savedState = readCookies(cookies.get(cookieName));
+
+    return <div className={"assets-wrapper"}>
+        <div className={"assets-wrapper-title"}>{"So if you have:"}</div>
+        <AssetsGroupsWrapper
+            savedState={savedState}
+            saveState={(state) => {
+                console.log("saving cookies:", state);
+                cookies.set(cookieName, state);
+            }}
+        />
+    </div>
+}
+
+function readCookies(savedCookies) {
+    if (savedCookies) {
+        console.log("read cookies:", savedCookies);
+        return savedCookies
+    } else {
+        return buildEmptyState()
+    }
+}
 
 function buildEmptyState() {
     return {
@@ -19,28 +45,4 @@ function buildEmptyState() {
             assets: [],
         },
     }
-}
-
-export function AssetsPanel() {
-    const cookieName = 'assets';
-    const [cookies, setCookie] = useCookies([cookieName]);
-    let savedState;
-
-    if (Object.keys(cookies).length === 0 || !cookies[cookieName]) {
-        savedState = buildEmptyState()
-    } else {
-        console.log("read cookies:", cookies);
-        savedState = cookies[cookieName]
-    }
-
-    return <div className={"assets-wrapper"}>
-        <div className={"assets-wrapper-title"}>{"So if you have:"}</div>
-        <AssetsGroupsWrapper
-            savedState={savedState}
-            saveState={(state) => {
-                console.log("saving cookies:", state);
-                setCookie(cookieName, state)
-            }}
-        />
-    </div>
 }
