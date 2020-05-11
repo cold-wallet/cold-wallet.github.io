@@ -10,15 +10,24 @@ export default class ResultsWrapper extends React.Component {
         savedState: {},
     };
 
-    state = {};
+    state = {
+        rates: [],
+    };
 
     componentDidMount() {
         fetch("https://api.monobank.ua/bank/currency",
             {headers: {'User-agent': 'test' + Date.now()}})
             .then(res => res.json())
-            .then(rates => this.setState({
-                rates: rates,
-            }))
+            .catch(e => {
+                console.error(e);
+            })
+            .then(rates => {
+                if (!rates.errorDescription && rates.length) {
+                    this.setState({
+                        rates: rates,
+                    })
+                }
+            })
     }
 
     render() {
@@ -44,6 +53,10 @@ export default class ResultsWrapper extends React.Component {
 
         const rateUahUsd = this.state.rates.filter(r => (r.currencyCodeA === usdNumCode)
             && (r.currencyCodeB === uahNumCode))[0];
+
+        if (!rateUahUsd) {
+            return 0;
+        }
 
         const rateCross = rateUahUsd.rateCross || ((rateUahUsd.rateBuy + rateUahUsd.rateSell) / 2);
 
