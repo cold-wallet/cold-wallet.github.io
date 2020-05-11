@@ -54,7 +54,6 @@ export class AssetsGroup extends React.Component {
                 <input
                     ref={(input) => {
                         props.valueInput = input;
-                        input && input.focus();
                     }}
                     autoFocus
                     className={
