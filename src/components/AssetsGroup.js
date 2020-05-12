@@ -55,7 +55,7 @@ export class AssetsGroup extends React.Component {
                     ref={(input) => {
                         props.valueInput = input;
                     }}
-                    autoFocus
+                    autoFocus={!!this.state.newAsset}
                     className={
                         "asset-item-value-input" +
                         (this.state.newAsset?.isInvalid ? " asset-item-value-input--invalid" : "")
