@@ -2,8 +2,8 @@ import React from "react";
 import './ResultsWrapper.css'
 import currencies from './../resources/currencies-iso-4217';
 
-const usdNumCode = 840;
-const eurNumCode = 978;
+// const usdNumCode = 840;
+// const eurNumCode = 978;
 const uahNumCode = 980;
 
 export default class ResultsWrapper extends React.Component {
