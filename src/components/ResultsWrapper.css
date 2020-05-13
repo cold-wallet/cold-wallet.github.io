@@ -21,6 +21,7 @@
   overflow-y: auto;
   background-color: #6F9F98;
   padding-right: 1%;
+  height: 100%;
 }
 
 .total-amount-in-currencies--title {
