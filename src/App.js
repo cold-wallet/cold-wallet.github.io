@@ -10,8 +10,8 @@ import "./reset.scss";
 const cookieName = 'assets';
 
 export default function App() {
-    const [cookies, setCookie] = useCookies([cookieName]);
-    const savedState = readCookies(cookies).assets;
+    const [cookies, setCookie] = useCookies();
+    const savedState = readCookies(cookies)[cookieName];
 
     return <div className="dashboard">
         <div className={"assets-wrapper"}>
