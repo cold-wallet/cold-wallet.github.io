@@ -14,7 +14,7 @@
   width: 100%;
   display: flex;
   flex-flow: row;
-  height: 97.7%;
+  height: 99%;
 }
 
 .total-amount-in-one-currency--container {
@@ -22,6 +22,7 @@
   background-color: #6F9F98;
   padding-right: 1%;
   height: 100%;
+  width: 30%;
 }
 
 .total-amount-in-currencies--title {

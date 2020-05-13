@@ -2,33 +2,23 @@ import React from "react";
 import './ResultsWrapper.css'
 import currencies from './../resources/currencies-iso-4217';
 
-// const usdNumCode = 840;
-// const eurNumCode = 978;
 const uahNumCode = 980;
 
 export default class ResultsWrapper extends React.Component {
     static defaultProps = {
         savedState: {},
+        initialRates: [],
+        latestRatesConsumer: (latestRatesConsumer) => false,
     };
 
-    state = {
-        rates: [],
-    };
-
-    componentDidMount() {
-        fetch("https://api.monobank.ua/bank/currency",
-            {headers: {'User-agent': 'test' + Date.now()}})
-            .then(res => res.json())
-            .catch(e => {
-                console.error(e);
-            })
-            .then(rates => {
-                if (!rates.errorDescription && rates.length) {
-                    this.setState({
-                        rates: rates,
-                    })
-                }
-            })
+    constructor(props, context) {
+        super(props, context);
+        this.state = {
+            rates: props.initialRates || [],
+        };
+        this.props.latestRatesConsumer(rates => this.setState({
+            rates: rates,
+        }));
     }
 
     render() {
