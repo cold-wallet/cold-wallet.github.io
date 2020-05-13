@@ -1,14 +1,53 @@
 .results-wrapper {
+  cursor: default;
   width: 75%;
-  /*background-color: #A9DDD6;*/
-  background-color: #A9DDD6;
-  padding: 0.5% 1% 5% 0.5%;
+  background-color: #6F9F98;
+  padding: 0.5% 1% 1% 0.5%;
 }
 
 .results-title {
+  background-color: #6F9F98;
   padding-left: 25%;
 }
 
 .results-container {
   width: 100%;
+  display: flex;
+  flex-flow: row;
+  height: 97.7%;
+}
+
+.total-amount-in-one-currency--container {
+  overflow-y: auto;
+  background-color: #6F9F98;
+  padding-right: 1%;
+}
+
+.total-amount-in-currencies--title {
+  background-color: #8CBEB7;
+}
+
+.results-one-more-wrap-layer {
+  background-color: #A9DDD6;
+  height: 100%;
+}
+
+.total-amount-in-one-currency {
+  padding-bottom: 2%;
+  background-color: #6F9F98;
+}
+
+.total-amount-in-currencies--asset-row {
+  background-color: #A9DDD6;
+}
+
+.total-amount-in-currencies--group-of-assets {
+}
+
+.total-amount-in-currencies--group-name {
+  background-color: #9BCEC7;
+}
+
+.total-amount-in-currencies--total-amounts {
+  background-color: #7EAFA8;
 }

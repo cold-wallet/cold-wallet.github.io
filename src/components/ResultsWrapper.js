@@ -36,12 +36,16 @@ export default class ResultsWrapper extends React.Component {
             return null;
         }
         return <div className={"results-wrapper"}>
-            <div className={"results-title"}>Then short statistics would be:</div>
-            <div className={"results-container"}>{
-                this.getAnalyzers().map((analyzer, i) =>
-                    analyzer.buildInnerResult(i, this.props.savedState)
-                )
-            }</div>
+            <div className="results-one-more-wrap-layer">
+                <div className={"results-title"}>Then short statistics would be:</div>
+                <div className={"results-container"}>
+                    <div className={"total-amount-in-one-currency--container"}>{
+                        this.getAnalyzers().map((analyzer, i) =>
+                            analyzer.buildInnerResult(i, this.props.savedState)
+                        )
+                    }</div>
+                </div>
+            </div>
         </div>
     }
 
@@ -70,7 +74,7 @@ export default class ResultsWrapper extends React.Component {
     buildCurrencyTotalResult(assetGroups, resultCurrencyCode) {
         let totalAmount = 0;
         return <div key={resultCurrencyCode} className={"total-amount-in-one-currency"}>
-            All in {resultCurrencyCode} :
+            <div className={"total-amount-in-currencies--title"}>All in {resultCurrencyCode} :</div>
             {
                 assetGroups.map((group, i) => (
                     <div key={i} className={"total-amount-in-currencies--group-of-assets"}>
@@ -92,10 +96,8 @@ export default class ResultsWrapper extends React.Component {
                 ))
             }
             <div className={"total-amount-in-currencies--total-amounts"}>
-                <div className={"total-amount-in-currencies--total-in-currency"}>
-                    Total:
-                    <p>{totalAmount} {resultCurrencyCode}</p>
-                </div>
+                Total:
+                <p>{totalAmount} {resultCurrencyCode}</p>
             </div>
         </div>
     }
