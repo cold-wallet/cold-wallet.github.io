@@ -10,7 +10,7 @@ const dataStoreName = 'data';
 
 export default function App() {
     const storedData = JSON.parse(localStorage.getItem(dataStoreName)) || {};
-    const savedState = thisOrDefaultState(storedData.assets);
+    const savedState = storedData.assets || buildEmptyState();
     let savedRates = storedData.rates || [];
     const _buffer = {};
 
@@ -58,15 +58,6 @@ export default function App() {
             latestRatesConsumer={(latestRatesConsumer) => _buffer.latestRatesConsumer = latestRatesConsumer}
             savedState={savedState}/>
     </div>
-}
-
-function thisOrDefaultState(savedCookies) {
-    if (savedCookies) {
-        console.log("read cookies:", savedCookies);
-        return savedCookies
-    } else {
-        return buildEmptyState()
-    }
 }
 
 function buildEmptyState() {
