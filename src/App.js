@@ -14,6 +14,11 @@ export default function App() {
     const savedState = storedData.assets || buildEmptyState();
     let savedRates = storedData.rates || [];
     const _buffer = {};
+    const milli = 1000;
+    const startTimeout = 20 * milli;
+    const timeoutStep = 5 * milli;
+    const endTimeout = 5 * milli;
+    let currentTimeout = startTimeout;
 
     (function fetchLatestRates() {
         try {
@@ -41,9 +46,16 @@ export default function App() {
                 })
                 .catch(e => {
                     console.warn(e);
-                    const timeout = 10_000;
-                    console.log(`Will re-fetch after timeout: ${timeout / 1000}s`);
-                    setTimeout(fetchLatestRates, timeout);
+                    console.log(`Will re-fetch after timeout: ${currentTimeout / milli}s`);
+                    setTimeout(fetchLatestRates, currentTimeout);
+
+                    let newTimeoutValue = currentTimeout - timeoutStep;
+
+                    if (newTimeoutValue < endTimeout) {
+                        newTimeoutValue = endTimeout
+                    }
+
+                    currentTimeout = newTimeoutValue;
                 })
         } catch (e) {
             console.error(e);
