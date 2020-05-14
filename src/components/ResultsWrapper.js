@@ -1,6 +1,7 @@
 import React from "react";
 import './ResultsWrapper.css'
 import currencies from './../resources/currencies-iso-4217';
+import NumberFormat from 'react-number-format'
 
 const uahNumCode = 980;
 
@@ -105,12 +106,17 @@ export default class ResultsWrapper extends React.Component {
                                     className={"total-amount-in-currencies--asset-row"}
                                 >
                                     <div className={"total-amount-in-currencies--asset-row-part"}>
-                                        &nbsp;
-                                        {asset.amount} {asset.currency}
+                                        <NumberFormat value={asset.amount}
+                                                      displayType={'text'}
+                                                      decimalScale={(asset.type === "crypto") ? 8 : 2}
+                                                      thousandSeparator={true}/> {asset.currency}
                                     </div>
                                     <div>{asset.currency === resultCurrencyCode ? '=' : '≈'}</div>
                                     <div className={"total-amount-in-currencies--asset-row-part"}>
-                                        {fixNumberString(amount, resultCurrencyType)} {resultCurrencyCode}
+                                        <NumberFormat value={amount}
+                                                      displayType={'text'}
+                                                      decimalScale={(resultCurrencyType === "crypto") ? 8 : 2}
+                                                      thousandSeparator={true}/> {resultCurrencyCode}
                                     </div>
                                 </div>
                             })
@@ -119,7 +125,10 @@ export default class ResultsWrapper extends React.Component {
             }
             <div className={"total-amount-in-currencies--total-amounts"}>
                 <div>Total:</div>
-                <div>{fixNumberString(totalAmount, resultCurrencyType)} {resultCurrencyCode}</div>
+                <div><NumberFormat value={totalAmount}
+                                   displayType={'text'}
+                                   decimalScale={(resultCurrencyType === "crypto") ? 8 : 2}
+                                   thousandSeparator={true}/> {resultCurrencyCode}</div>
             </div>
         </div>
     }
@@ -237,7 +246,7 @@ export default class ResultsWrapper extends React.Component {
             return btcAmount * price;
         }
 
-        console.log("not found adequate transformation");
+        console.log("not found adequate transformation", asset, outputCurrency);
         return 0;
     }
 
@@ -290,14 +299,3 @@ export default class ResultsWrapper extends React.Component {
     }
 }
 
-function fixNumberString(fixMe, currencyType) {
-    const limit = (currencyType === "crypto") ? 8 : 2;
-    fixMe = "" + fixMe;
-    if (fixMe.indexOf(".") >= 0 || fixMe.indexOf(",") >= 0) {
-        const [left, right] = fixMe.split(/[,.]/gi);
-        if (right.length > limit) {
-            return left + "." + right.slice(0, limit)
-        }
-    }
-    return fixMe
-}
