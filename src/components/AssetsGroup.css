@@ -3,8 +3,7 @@
   overflow-y: auto;
   display: flex;
   flex-flow: column;
-  min-height: 33%;
-  max-height: 50%;
+  min-height: 180px;
 }
 
 .assets {
