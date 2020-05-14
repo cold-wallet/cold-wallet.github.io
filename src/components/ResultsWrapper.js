@@ -103,15 +103,23 @@ export default class ResultsWrapper extends React.Component {
                                 return <div
                                     key={i}
                                     className={"total-amount-in-currencies--asset-row"}
-                                >{asset.amount} {asset.currency} ≈&nbsp;
-                                    {fixNumberString(amount, resultCurrencyType)} {resultCurrencyCode}</div>
+                                >
+                                    <div className={"total-amount-in-currencies--asset-row-part"}>
+                                        &nbsp;
+                                        {asset.amount} {asset.currency}
+                                    </div>
+                                    <div>{asset.currency === resultCurrencyCode ? '=' : '≈'}</div>
+                                    <div className={"total-amount-in-currencies--asset-row-part"}>
+                                        {fixNumberString(amount, resultCurrencyType)} {resultCurrencyCode}
+                                    </div>
+                                </div>
                             })
                         }</div>
                 ))
             }
             <div className={"total-amount-in-currencies--total-amounts"}>
-                Total:
-                <p>{fixNumberString(totalAmount, resultCurrencyType)} {resultCurrencyCode}</p>
+                <div>Total:</div>
+                <div>{fixNumberString(totalAmount, resultCurrencyType)} {resultCurrencyCode}</div>
             </div>
         </div>
     }

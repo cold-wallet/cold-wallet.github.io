@@ -8,13 +8,14 @@
 .results-title {
   background-color: #6F9F98;
   padding-left: 25%;
+  height: 4%;
 }
 
 .results-container {
   width: 100%;
   display: flex;
   flex-flow: row;
-  height: 99%;
+  height: 97%;
 }
 
 .total-amount-in-one-currency--container {
@@ -23,11 +24,12 @@
   padding-right: 1%;
   height: 100%;
   min-width: 300px;
-  width: 30%;
+  width: 35%;
 }
 
 .total-amount-in-currencies--title {
   background-color: #8CBEB7;
+  padding: 1%;
 }
 
 .results-one-more-wrap-layer {
@@ -40,17 +42,31 @@
   background-color: #6F9F98;
 }
 
-.total-amount-in-currencies--asset-row {
-  background-color: #A9DDD6;
-}
-
 .total-amount-in-currencies--group-of-assets {
 }
 
 .total-amount-in-currencies--group-name {
   background-color: #9BCEC7;
+  padding: 0.5% 0.5% 0.5% 2%;
 }
 
 .total-amount-in-currencies--total-amounts {
   background-color: #7EAFA8;
+  display: flex;
+  flex-flow: row;
+  justify-content: space-around;
+  padding: 2%;
+}
+
+.total-amount-in-currencies--asset-row {
+  background-color: #A9DDD6;
+  padding: 0.5%;
+  display: flex;
+  flex-flow: row;
+  justify-content: space-around;
+}
+
+.total-amount-in-currencies--asset-row-part {
+  min-width: 20%;
+  max-width: 45%;
 }
