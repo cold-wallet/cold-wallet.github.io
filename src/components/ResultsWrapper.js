@@ -10,6 +10,7 @@ export default class ResultsWrapper extends React.Component {
         initialRates: [],
         latestAssetsConsumer: (latestAssetsConsumer) => false,
         latestRatesConsumer: (latestRatesConsumer) => false,
+        latestCryptoRatesConsumer: (latestCryptoRatesConsumer) => false,
     };
 
     constructor(props, context) {
@@ -17,13 +18,21 @@ export default class ResultsWrapper extends React.Component {
         this.state = {
             assets: props.savedState || [],
             rates: props.initialRates || [],
+            cryptoRates: props.initialCryptoRates || [],
         };
         this.props.latestAssetsConsumer(assets => this.setState({assets}));
         this.props.latestRatesConsumer(rates => this.setState({rates}));
+        this.props.latestCryptoRatesConsumer(cryptoRates => this.setState({cryptoRates}));
     }
 
     render() {
-        if (!this.state.rates || !this.state.rates.length) {
+        if (!this.state.assets
+            || !this.state.rates
+            || !this.state.rates.length
+            || !this.state.cryptoRates
+            || !this.state.cryptoRates.length
+        ) {
+            console.log("state is not ready", this.state);
             return null;
         }
         return <div className={"results-wrapper"}>
@@ -72,8 +81,8 @@ export default class ResultsWrapper extends React.Component {
                         {
                             group.assets.map((asset, i) => {
                                 const amount = (group.type === "crypto")
-                                    ? this.transformAssetToCryptoCurrency(asset, resultCurrencyCode)
-                                    : this.transformAssetToCurrency(asset, resultCurrencyCode);
+                                    ? this.cryptoCurrencyAssetToCurrency(asset, resultCurrencyCode)
+                                    : this.currencyAssetToCurrency(asset, resultCurrencyCode);
 
                                 totalAmount += +amount;
 
@@ -92,7 +101,7 @@ export default class ResultsWrapper extends React.Component {
         </div>
     }
 
-    transformAssetToCurrency({amount, currency}, outputCurrency) {
+    currencyAssetToCurrency({amount, currency}, outputCurrency) {
         let outputCurrencyNumCode = +(currencies[outputCurrency].numCode);
         let currencyNumCode = +(currencies[currency].numCode);
 
@@ -131,7 +140,46 @@ export default class ResultsWrapper extends React.Component {
         return amount * rateCross;
     }
 
-    transformAssetToCryptoCurrency(asset, outputCurrency) {
-        return asset.amount;
+    cryptoCurrencyAssetToCurrency(asset, outputCurrency) {
+        let btcAmount;
+
+        if (asset.currency !== "BTC") {
+            const currencyToBtcTicker = this.state.cryptoRates.filter(r => r.symbol === `${asset.currency}BTC`)[0] || {};
+            const currencyToBtcPrice = +(currencyToBtcTicker.price);
+
+            if (currencyToBtcPrice && !isNaN(currencyToBtcPrice)) {
+                btcAmount = asset.amount * currencyToBtcPrice;
+
+            } else {
+                const btcToCurrencyTicker = this.state.cryptoRates.filter(r => r.symbol === `BTC${asset.currency}`)[0] || {};
+                const btcToCurrencyPrice = +(btcToCurrencyTicker.price);
+
+                if (!btcToCurrencyPrice || isNaN(btcToCurrencyPrice)) {
+                    console.error(`no btc price for ${asset.currency}! returning zero`, this.state.cryptoRates);
+                    return 0
+                }
+
+                btcAmount = asset.amount / btcToCurrencyPrice;
+            }
+        } else {
+            btcAmount = asset.amount
+        }
+
+        const btcEurSymbol = "BTCEUR";
+        const btcEurTicker = this.state.cryptoRates.filter(r => r.symbol === btcEurSymbol)[0];
+        const btcEurPrice = +(btcEurTicker.price);
+
+        if (!btcEurPrice || isNaN(btcEurPrice)) {
+            console.error("no price for btc-eur!", this.state.cryptoRates);
+            return 0
+        }
+
+        const amountInEur = btcAmount * btcEurPrice;
+
+        if (`${asset.currency}${outputCurrency}` === btcEurSymbol) {
+            return amountInEur;
+        }
+
+        return this.currencyAssetToCurrency({amount: amountInEur, currency: "EUR"}, outputCurrency);
     }
 }

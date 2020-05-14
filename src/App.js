@@ -13,12 +13,14 @@ export default function App() {
     const storedData = JSON.parse(localStorage.getItem(dataStoreName)) || {};
     const savedState = storedData.assets || buildEmptyState();
     let savedRates = storedData.rates || [];
+    let savedCryptoRates = storedData.cryptoRates || [];
     const _buffer = {};
     const milli = 1000;
     const startTimeout = 20 * milli;
     const timeoutStep = 5 * milli;
     const endTimeout = 5 * milli;
     let currentTimeout = startTimeout;
+    let currentCryptoTimeout = 30 * milli;
 
     (function fetchLatestRates() {
         try {
@@ -62,6 +64,39 @@ export default function App() {
         }
     })();
 
+    (function fetchLatestCryptoCurrenciesRates() {
+        try {
+            axios.get("https://api.binance.com/api/v1/ticker/price")
+                .then(response => {
+                    let cryptoRates;
+                    if (response
+                        && (response.status === 200)
+                        && (cryptoRates = response.data)
+                        && (cryptoRates !== savedCryptoRates)
+                    ) {
+                        console.log("successfully loaded fresh cryptoRates", cryptoRates);
+                        storeData({
+                            assets: savedState,
+                            rates: savedRates,
+                            cryptoRates: cryptoRates,
+                        });
+                        _buffer.latestCryptoRatesConsumer && _buffer.latestCryptoRatesConsumer(cryptoRates);
+                        savedCryptoRates = cryptoRates;
+                    } else {
+                        console.warn("Fetching latest cryptoRates failed", response);
+                        throw response
+                    }
+                })
+                .catch(e => {
+                    console.warn(e);
+                    console.log(`Will re-fetch cryptoRates after timeout: ${currentCryptoTimeout / milli}s`);
+                    setTimeout(fetchLatestCryptoCurrenciesRates, currentCryptoTimeout);
+                })
+        } catch (e) {
+            console.error(e);
+        }
+    })();
+
     function storeData(data) {
         localStorage.setItem(dataStoreName, JSON.stringify(data));
     }
@@ -76,6 +111,7 @@ export default function App() {
                     storeData({
                         assets: state,
                         rates: savedRates,
+                        cryptoRates: savedCryptoRates,
                     });
                     _buffer.latestAssetsConsumer && _buffer.latestAssetsConsumer(state)
                 }}
@@ -83,8 +119,10 @@ export default function App() {
         </div>
         <ResultsWrapper
             initialRates={savedRates}
+            initialCryptoRates={savedCryptoRates}
             latestAssetsConsumer={latestAssetsConsumer => _buffer.latestAssetsConsumer = latestAssetsConsumer}
             latestRatesConsumer={latestRatesConsumer => _buffer.latestRatesConsumer = latestRatesConsumer}
+            latestCryptoRatesConsumer={cryptoRatesConsumer => _buffer.latestCryptoRatesConsumer = cryptoRatesConsumer}
             savedState={savedState}/>
     </div>
 }
