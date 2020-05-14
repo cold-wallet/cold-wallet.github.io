@@ -50,7 +50,6 @@ export default class ResultsWrapper extends React.Component {
                     data.cash,
                     data["non-cash"],
                     data.crypto,
-
                 ];
                 return [
                     this.buildCurrencyTotalResult(assetGroups, usdCurrencyCode),
