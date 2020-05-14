@@ -109,14 +109,16 @@ export default class ResultsWrapper extends React.Component {
                                         <NumberFormat value={asset.amount}
                                                       displayType={'text'}
                                                       decimalScale={(asset.type === "crypto") ? 8 : 2}
-                                                      thousandSeparator={true}/> {asset.currency}
+                                                      suffix={" " + asset.currency}
+                                                      thousandSeparator={true}/>
                                     </div>
                                     <div>{asset.currency === resultCurrencyCode ? '=' : '≈'}</div>
                                     <div className={"total-amount-in-currencies--asset-row-part"}>
                                         <NumberFormat value={amount}
                                                       displayType={'text'}
                                                       decimalScale={(resultCurrencyType === "crypto") ? 8 : 2}
-                                                      thousandSeparator={true}/> {resultCurrencyCode}
+                                                      suffix={" " + resultCurrencyCode}
+                                                      thousandSeparator={true}/>
                                     </div>
                                 </div>
                             })
@@ -128,7 +130,8 @@ export default class ResultsWrapper extends React.Component {
                 <div><NumberFormat value={totalAmount}
                                    displayType={'text'}
                                    decimalScale={(resultCurrencyType === "crypto") ? 8 : 2}
-                                   thousandSeparator={true}/> {resultCurrencyCode}</div>
+                                   suffix={" " + resultCurrencyCode}
+                                   thousandSeparator={true}/></div>
             </div>
         </div>
     }
