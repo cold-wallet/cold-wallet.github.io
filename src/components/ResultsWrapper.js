@@ -53,25 +53,29 @@ export default class ResultsWrapper extends React.Component {
         return [{
             name: 'total amount in currencies',
             buildInnerResult: (key, data) => {
-                const usdCurrencyCode = "USD";
-                const eurCurrencyCode = "EUR";
-                const uahCurrencyCode = "UAH";
                 const assetGroups = [
                     data.cash,
                     data["non-cash"],
                     data.crypto,
                 ];
-                return [
-                    this.buildCurrencyTotalResult(assetGroups, usdCurrencyCode),
-                    this.buildCurrencyTotalResult(assetGroups, eurCurrencyCode),
-                    this.buildCurrencyTotalResult(assetGroups, uahCurrencyCode),
-                ];
+                const currenciesBuffer = {};
+
+                data.cash.assets.concat(data["non-cash"].assets)
+                    .concat(data.crypto.assets)
+                    .forEach(asset => currenciesBuffer[asset.currency] = asset.type);
+
+                return Object.entries(currenciesBuffer)
+                    .map(currencyCodeToType => this.buildCurrencyTotalResult(assetGroups, currencyCodeToType))
             }
         }]
     }
 
-    buildCurrencyTotalResult(assetGroups, resultCurrencyCode) {
+    buildCurrencyTotalResult(assetGroups, currencyCodeToType) {
+        const resultCurrencyCode = currencyCodeToType[0];
+        const resultCurrencyType = currencyCodeToType[1];
         let totalAmount = 0;
+
+
         return <div key={resultCurrencyCode} className={"total-amount-in-one-currency"}>
             <div className={"total-amount-in-currencies--title"}>All in {resultCurrencyCode} :</div>
             {
@@ -80,23 +84,34 @@ export default class ResultsWrapper extends React.Component {
                         <div className={"total-amount-in-currencies--group-name"}>{group.type}</div>
                         {
                             group.assets.map((asset, i) => {
-                                const amount = (group.type === "crypto")
-                                    ? this.cryptoCurrencyAssetToCurrency(asset, resultCurrencyCode)
-                                    : this.currencyAssetToCurrency(asset, resultCurrencyCode);
+                                let amount;
 
+                                if (asset.currency === resultCurrencyCode) {
+                                    amount = asset.amount
+
+                                } else if (resultCurrencyType === "crypto") {
+                                    amount = (group.type === "crypto")
+                                        ? this.cryptoCurrencyAssetToCryptoCurrency(asset, resultCurrencyCode)
+                                        : this.currencyAssetToCryptoCurrency(asset, resultCurrencyCode);
+                                } else {
+                                    amount = (group.type === "crypto")
+                                        ? this.cryptoCurrencyAssetToCurrency(asset, resultCurrencyCode)
+                                        : this.currencyAssetToCurrency(asset, resultCurrencyCode);
+                                }
                                 totalAmount += +amount;
 
                                 return <div
                                     key={i}
                                     className={"total-amount-in-currencies--asset-row"}
-                                >{asset.amount} {asset.currency} ≈ {amount} {resultCurrencyCode}</div>
+                                >{asset.amount} {asset.currency} ≈&nbsp;
+                                    {fixNumberString(amount, resultCurrencyType)} {resultCurrencyCode}</div>
                             })
                         }</div>
                 ))
             }
             <div className={"total-amount-in-currencies--total-amounts"}>
                 Total:
-                <p>{totalAmount} {resultCurrencyCode}</p>
+                <p>{fixNumberString(totalAmount, resultCurrencyType)} {resultCurrencyCode}</p>
             </div>
         </div>
     }
@@ -182,4 +197,99 @@ export default class ResultsWrapper extends React.Component {
 
         return this.currencyAssetToCurrency({amount: amountInEur, currency: "EUR"}, outputCurrency);
     }
+
+    currencyAssetToCryptoCurrency(asset, outputCurrency) {
+        if (asset.currency === outputCurrency) {
+            return asset.amount
+        }
+
+        const eurAmount = (asset.currency === "EUR")
+            ? asset.amount
+            : this.currencyAssetToCurrency(asset, "EUR");
+
+        const btcEurTicker = this.state.cryptoRates.filter(r => r.symbol === `BTCEUR`)[0] || {};
+        const btcEurPrice = +(btcEurTicker.price);
+
+        const btcAmount = eurAmount / btcEurPrice;
+
+        if (outputCurrency === "BTC") {
+            return btcAmount
+        }
+
+        let ticker = this.state.cryptoRates.filter(r => r.symbol === `${outputCurrency}BTC`)[0] || {};
+        let price = +(ticker.price);
+
+        if (price && !isNaN(price)) {
+            return btcAmount / price;
+        }
+        ticker = this.state.cryptoRates.filter(r => r.symbol === `BTC${outputCurrency}`)[0] || {};
+        price = +(ticker.price);
+
+        if (price && !isNaN(price)) {
+            return btcAmount * price;
+        }
+
+        console.log("not found adequate transformation");
+        return 0;
+    }
+
+    cryptoCurrencyAssetToCryptoCurrency(asset, resultCurrencyCode) {
+        if (asset.currency === resultCurrencyCode) {
+            return asset.amount
+        }
+
+        {
+            const ticker = this.state.cryptoRates
+                .filter(r => r.symbol === `${asset.currency}${resultCurrencyCode}`)[0] || {};
+            const price = +(ticker.price);
+
+            if (price && !isNaN(price)) {
+                return asset.amount * price;
+            }
+        }
+        {
+            const ticker = this.state.cryptoRates
+                .filter(r => r.symbol === `${resultCurrencyCode}${asset.currency}`)[0] || {};
+            const price = +(ticker.price);
+
+            if (price && !isNaN(price)) {
+                return asset.amount / price;
+            }
+        }
+        let btcAmount;
+
+        const ticker = this.state.cryptoRates
+            .filter(r => r.symbol === `${resultCurrencyCode}BTC`)[0] || {};
+        const price = +(ticker.price);
+
+        if (price && !isNaN(price)) {
+            btcAmount = asset.amount * price;
+
+        } else {
+            const ticker = this.state.cryptoRates
+                .filter(r => r.symbol === `BTC${resultCurrencyCode}`)[0] || {};
+            const price = +(ticker.price);
+
+            if (price && !isNaN(price)) {
+                btcAmount = asset.amount / price;
+            }
+        }
+
+        if (!btcAmount) {
+            console.log("can not convert to " + resultCurrencyCode, asset);
+            return 0;
+        }
+    }
+}
+
+function fixNumberString(fixMe, currencyType) {
+    const limit = (currencyType === "crypto") ? 8 : 2;
+    fixMe = "" + fixMe;
+    if (fixMe.indexOf(".") >= 0 || fixMe.indexOf(",") >= 0) {
+        const [left, right] = fixMe.split(/[,.]/gi);
+        if (right.length > limit) {
+            return left + "." + right.slice(0, limit)
+        }
+    }
+    return fixMe
 }
