@@ -32,7 +32,7 @@ export default function App() {
                         && rates.length
                         && (rates !== savedRates)
                     ) {
-                        console.log("successfully loaded fresh rates");
+                        console.log("successfully loaded fresh rates", rates);
                         storeData({
                             assets: savedState,
                             rates,
@@ -77,12 +77,14 @@ export default function App() {
                         assets: state,
                         rates: savedRates,
                     });
+                    _buffer.latestAssetsConsumer && _buffer.latestAssetsConsumer(state)
                 }}
             />
         </div>
         <ResultsWrapper
             initialRates={savedRates}
-            latestRatesConsumer={(latestRatesConsumer) => _buffer.latestRatesConsumer = latestRatesConsumer}
+            latestAssetsConsumer={latestAssetsConsumer => _buffer.latestAssetsConsumer = latestAssetsConsumer}
+            latestRatesConsumer={latestRatesConsumer => _buffer.latestRatesConsumer = latestRatesConsumer}
             savedState={savedState}/>
     </div>
 }

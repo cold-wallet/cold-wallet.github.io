@@ -8,17 +8,18 @@ export default class ResultsWrapper extends React.Component {
     static defaultProps = {
         savedState: {},
         initialRates: [],
+        latestAssetsConsumer: (latestAssetsConsumer) => false,
         latestRatesConsumer: (latestRatesConsumer) => false,
     };
 
     constructor(props, context) {
         super(props, context);
         this.state = {
+            assets: props.savedState || [],
             rates: props.initialRates || [],
         };
-        this.props.latestRatesConsumer(rates => this.setState({
-            rates: rates,
-        }));
+        this.props.latestAssetsConsumer(assets => this.setState({assets}));
+        this.props.latestRatesConsumer(rates => this.setState({rates}));
     }
 
     render() {
@@ -31,7 +32,7 @@ export default class ResultsWrapper extends React.Component {
                 <div className={"results-container"}>
                     <div className={"total-amount-in-one-currency--container"}>{
                         this.getAnalyzers().map((analyzer, i) =>
-                            analyzer.buildInnerResult(i, this.props.savedState)
+                            analyzer.buildInnerResult(i, this.state.assets)
                         )
                     }</div>
                 </div>
