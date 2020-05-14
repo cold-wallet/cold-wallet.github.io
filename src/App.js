@@ -5,6 +5,7 @@ import {AssetsGroupsWrapper} from "./components/AssetsGroupsWrapper";
 import "./fonts.scss";
 import "./mixin.scss";
 import "./reset.scss";
+import axios from "axios";
 
 const dataStoreName = 'data';
 
@@ -14,26 +15,40 @@ export default function App() {
     let savedRates = storedData.rates || [];
     const _buffer = {};
 
-    try {
-        fetch("https://api.monobank.ua/bank/currency",
-            {headers: {'User-agent': 'test' + Date.now()}})
-            .then(res => res.json())
-            .catch(e => {
-                console.error(e);
-            })
-            .then(rates => {
-                if (!rates.errorDescription && rates.length && (rates !== savedRates)) {
-                    storeData({
-                        assets: savedState,
-                        rates,
-                    });
-                    _buffer.latestRatesConsumer && _buffer.latestRatesConsumer(rates);
-                    savedRates = rates;
-                }
-            });
-    } catch (e) {
-        console.error(e);
-    }
+    (function fetchLatestRates() {
+        try {
+            axios.get("https://api.monobank.ua/bank/currency")
+                .then(response => {
+                    let rates;
+                    if (response
+                        && (response.status === 200)
+                        && (rates = response.data)
+                        && !rates.errorDescription
+                        && rates.length
+                        && (rates !== savedRates)
+                    ) {
+                        console.log("successfully loaded fresh rates");
+                        storeData({
+                            assets: savedState,
+                            rates,
+                        });
+                        _buffer.latestRatesConsumer && _buffer.latestRatesConsumer(rates);
+                        savedRates = rates;
+                    } else {
+                        console.warn("Fetching latest rates failed", response);
+                        throw response
+                    }
+                })
+                .catch(e => {
+                    console.warn(e);
+                    const timeout = 10_000;
+                    console.log(`Will re-fetch after timeout: ${timeout / 1000}s`);
+                    setTimeout(fetchLatestRates, timeout);
+                })
+        } catch (e) {
+            console.error(e);
+        }
+    })();
 
     function storeData(data) {
         localStorage.setItem(dataStoreName, JSON.stringify(data));
