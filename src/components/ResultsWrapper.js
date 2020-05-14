@@ -147,16 +147,15 @@ export default class ResultsWrapper extends React.Component {
             return amountInUah
         }
 
-        const rateUahToCurrency = this.state.rates.filter(r => (r.currencyCodeA === outputCurrencyNumCode)
-            && (r.currencyCodeB === uahNumCode))[0];
-
-        if (!rateUahToCurrency) {
-            return 0;
-        }
-
-        const rateCross = rateUahToCurrency.rateCross || ((rateUahToCurrency.rateBuy + rateUahToCurrency.rateSell) / 2);
-
+        const rateCross = this.findRate(outputCurrencyNumCode, uahNumCode);
         return amountInUah / rateCross;
+    }
+
+    findRate(left, right) {
+        const rate = this.state.rates.filter(r => (r.currencyCodeA === left)
+            && (r.currencyCodeB === right))[0];
+
+        return rate.rateCross || ((rate.rateBuy + rate.rateSell) / 2);
     }
 
     transformCurrencyToUAH(amount, currencyNumCode) {
@@ -164,29 +163,32 @@ export default class ResultsWrapper extends React.Component {
             return amount;
         }
 
-        let rateToUah = this.state.rates.filter(r => (r.currencyCodeA === currencyNumCode)
-            && (r.currencyCodeB === uahNumCode))[0];
-
-        const rateCross = rateToUah.rateCross || ((rateToUah.rateBuy + rateToUah.rateSell) / 2);
-
+        const rateCross = this.findRate(currencyNumCode, uahNumCode);
         return amount * rateCross;
+    }
+
+    getCryptoPrice(left, right) {
+        const ticker = this.state.cryptoRates.filter(r => r.symbol === `${left}${right}`)[0] || {};
+        const price = +(ticker.price);
+
+        if (price && !isNaN(price)) {
+            return price;
+        }
     }
 
     cryptoCurrencyAssetToCurrency(asset, outputCurrency) {
         let btcAmount;
 
         if (asset.currency !== "BTC") {
-            const currencyToBtcTicker = this.state.cryptoRates.filter(r => r.symbol === `${asset.currency}BTC`)[0] || {};
-            const currencyToBtcPrice = +(currencyToBtcTicker.price);
+            const currencyToBtcPrice = this.getCryptoPrice(asset.currency, "BTC");
 
-            if (currencyToBtcPrice && !isNaN(currencyToBtcPrice)) {
+            if (currencyToBtcPrice) {
                 btcAmount = asset.amount * currencyToBtcPrice;
 
             } else {
-                const btcToCurrencyTicker = this.state.cryptoRates.filter(r => r.symbol === `BTC${asset.currency}`)[0] || {};
-                const btcToCurrencyPrice = +(btcToCurrencyTicker.price);
+                const btcToCurrencyPrice = this.getCryptoPrice("BTC", asset.currency);
 
-                if (!btcToCurrencyPrice || isNaN(btcToCurrencyPrice)) {
+                if (!btcToCurrencyPrice) {
                     console.error(`no btc price for ${asset.currency}! returning zero`, this.state.cryptoRates);
                     return 0
                 }
@@ -198,10 +200,9 @@ export default class ResultsWrapper extends React.Component {
         }
 
         const btcEurSymbol = "BTCEUR";
-        const btcEurTicker = this.state.cryptoRates.filter(r => r.symbol === btcEurSymbol)[0];
-        const btcEurPrice = +(btcEurTicker.price);
+        const btcEurPrice = this.getCryptoPrice("BTC", "EUR");
 
-        if (!btcEurPrice || isNaN(btcEurPrice)) {
+        if (!btcEurPrice) {
             console.error("no price for btc-eur!", this.state.cryptoRates);
             return 0
         }
@@ -224,25 +225,21 @@ export default class ResultsWrapper extends React.Component {
             ? asset.amount
             : this.currencyAssetToCurrency(asset, "EUR");
 
-        const btcEurTicker = this.state.cryptoRates.filter(r => r.symbol === `BTCEUR`)[0] || {};
-        const btcEurPrice = +(btcEurTicker.price);
-
+        const btcEurPrice = this.getCryptoPrice("BTC", "EUR");
         const btcAmount = eurAmount / btcEurPrice;
 
         if (outputCurrency === "BTC") {
             return btcAmount
         }
 
-        let ticker = this.state.cryptoRates.filter(r => r.symbol === `${outputCurrency}BTC`)[0] || {};
-        let price = +(ticker.price);
+        let price = this.getCryptoPrice(outputCurrency, "BTC");
 
-        if (price && !isNaN(price)) {
+        if (price) {
             return btcAmount / price;
         }
-        ticker = this.state.cryptoRates.filter(r => r.symbol === `BTC${outputCurrency}`)[0] || {};
-        price = +(ticker.price);
+        price = this.getCryptoPrice("BTC", outputCurrency);
 
-        if (price && !isNaN(price)) {
+        if (price) {
             return btcAmount * price;
         }
 
@@ -256,38 +253,26 @@ export default class ResultsWrapper extends React.Component {
         }
 
         {
-            const ticker = this.state.cryptoRates
-                .filter(r => r.symbol === `${asset.currency}${resultCurrencyCode}`)[0] || {};
-            const price = +(ticker.price);
-
-            if (price && !isNaN(price)) {
+            const price = this.getCryptoPrice(asset.currency, resultCurrencyCode);
+            if (price) {
                 return asset.amount * price;
             }
         }
         {
-            const ticker = this.state.cryptoRates
-                .filter(r => r.symbol === `${resultCurrencyCode}${asset.currency}`)[0] || {};
-            const price = +(ticker.price);
-
-            if (price && !isNaN(price)) {
+            const price = this.getCryptoPrice(resultCurrencyCode, asset.currency);
+            if (price) {
                 return asset.amount / price;
             }
         }
         let btcAmount;
-
-        const ticker = this.state.cryptoRates
-            .filter(r => r.symbol === `${resultCurrencyCode}BTC`)[0] || {};
-        const price = +(ticker.price);
-
-        if (price && !isNaN(price)) {
+        const price = this.getCryptoPrice(resultCurrencyCode, "BTC");
+        if (price) {
             btcAmount = asset.amount * price;
 
         } else {
-            const ticker = this.state.cryptoRates
-                .filter(r => r.symbol === `BTC${resultCurrencyCode}`)[0] || {};
-            const price = +(ticker.price);
+            const price = this.getCryptoPrice("BTC", resultCurrencyCode);
 
-            if (price && !isNaN(price)) {
+            if (price) {
                 btcAmount = asset.amount / price;
             }
         }
