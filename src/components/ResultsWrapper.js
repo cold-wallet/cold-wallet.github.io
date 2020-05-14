@@ -4,6 +4,7 @@ import currencies from './../resources/currencies-iso-4217';
 import NumberFormat from 'react-number-format'
 
 const uahNumCode = 980;
+const BTC = "BTC";
 
 export default class ResultsWrapper extends React.Component {
     static defaultProps = {
@@ -180,36 +181,12 @@ export default class ResultsWrapper extends React.Component {
     }
 
     cryptoCurrencyAssetToCurrency(asset, outputCurrency) {
-        let btcAmount;
-
-        if (asset.currency !== "BTC") {
-            const currencyToBtcPrice = this.getCryptoPrice(asset.currency, "BTC");
-
-            if (currencyToBtcPrice) {
-                btcAmount = asset.amount * currencyToBtcPrice;
-
-            } else {
-                const btcToCurrencyPrice = this.getCryptoPrice("BTC", asset.currency);
-
-                if (!btcToCurrencyPrice) {
-                    console.error(`no btc price for ${asset.currency}! returning zero`, this.state.cryptoRates);
-                    return 0
-                }
-
-                btcAmount = asset.amount / btcToCurrencyPrice;
-            }
-        } else {
-            btcAmount = asset.amount
-        }
+        const btcAmount = (asset.currency === BTC)
+            ? asset.amount
+            : this.transformCrypto(asset.amount, asset.currency, BTC);
 
         const btcEurSymbol = "BTCEUR";
-        const btcEurPrice = this.getCryptoPrice("BTC", "EUR");
-
-        if (!btcEurPrice) {
-            console.error("no price for btc-eur!", this.state.cryptoRates);
-            return 0
-        }
-
+        const btcEurPrice = this.getCryptoPrice(BTC, "EUR");
         const amountInEur = btcAmount * btcEurPrice;
 
         if (`${asset.currency}${outputCurrency}` === btcEurSymbol) {
@@ -228,22 +205,16 @@ export default class ResultsWrapper extends React.Component {
             ? asset.amount
             : this.currencyAssetToCurrency(asset, "EUR");
 
-        const btcEurPrice = this.getCryptoPrice("BTC", "EUR");
+        const btcEurPrice = this.getCryptoPrice(BTC, "EUR");
         const btcAmount = eurAmount / btcEurPrice;
 
-        if (outputCurrency === "BTC") {
+        if (outputCurrency === BTC) {
             return btcAmount
         }
 
-        let price = this.getCryptoPrice(outputCurrency, "BTC");
-
-        if (price) {
-            return btcAmount / price;
-        }
-        price = this.getCryptoPrice("BTC", outputCurrency);
-
-        if (price) {
-            return btcAmount * price;
+        let amount = this.transformCrypto(btcAmount, BTC, outputCurrency);
+        if (amount) {
+            return amount;
         }
 
         console.log("not found adequate transformation", asset, outputCurrency);
@@ -254,35 +225,23 @@ export default class ResultsWrapper extends React.Component {
         if (asset.currency === resultCurrencyCode) {
             return asset.amount
         }
+        let amount = this.transformCrypto(asset.amount, asset.currency, resultCurrencyCode);
+        if (amount) {
+            return amount
+        }
 
-        {
-            const price = this.getCryptoPrice(asset.currency, resultCurrencyCode);
-            if (price) {
-                return asset.amount * price;
-            }
-        }
-        {
-            const price = this.getCryptoPrice(resultCurrencyCode, asset.currency);
-            if (price) {
-                return asset.amount / price;
-            }
-        }
-        let btcAmount;
-        const price = this.getCryptoPrice(resultCurrencyCode, "BTC");
+        let btcAmount = this.transformCrypto(asset.amount, asset.currency, BTC);
+        return this.transformCrypto(btcAmount, BTC, resultCurrencyCode);
+    }
+
+    transformCrypto(amountFrom, currencyFrom, currencyTo) {
+        let price = this.getCryptoPrice(currencyFrom, currencyTo);
         if (price) {
-            btcAmount = asset.amount * price;
-
-        } else {
-            const price = this.getCryptoPrice("BTC", resultCurrencyCode);
-
-            if (price) {
-                btcAmount = asset.amount / price;
-            }
+            return amountFrom * price;
         }
-
-        if (!btcAmount) {
-            console.log("can not convert to " + resultCurrencyCode, asset);
-            return 0;
+        price = this.getCryptoPrice(currencyTo, currencyFrom);
+        if (price) {
+            return amountFrom / price;
         }
     }
 }
