@@ -238,9 +238,6 @@ export class AssetsGroup extends React.Component {
         if (this.state.assets.length) {
             return this.buildAssets();
         }
-        if (!this.state.newAsset) {
-            return this.buildNewAssetItem()
-        }
         return null;
     }
 
