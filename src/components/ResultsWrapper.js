@@ -5,6 +5,8 @@ import NumberFormat from 'react-number-format'
 
 const uahNumCode = 980;
 const BTC = "BTC";
+const USD = "USD";
+const EUR = "EUR";
 
 export default class ResultsWrapper extends React.Component {
     static defaultProps = {
@@ -185,15 +187,14 @@ export default class ResultsWrapper extends React.Component {
             ? asset.amount
             : this.transformCrypto(asset.amount, asset.currency, BTC);
 
-        const btcEurSymbol = "BTCEUR";
-        const btcEurPrice = this.getCryptoPrice(BTC, "EUR");
+        const btcEurPrice = this.getCryptoPrice(BTC, EUR);
         const amountInEur = btcAmount * btcEurPrice;
 
-        if (`${asset.currency}${outputCurrency}` === btcEurSymbol) {
+        if (asset.currency === BTC && outputCurrency === EUR) {
             return amountInEur;
         }
 
-        return this.currencyAssetToCurrency({amount: amountInEur, currency: "EUR"}, outputCurrency);
+        return this.currencyAssetToCurrency({amount: amountInEur, currency: EUR}, outputCurrency);
     }
 
     currencyAssetToCryptoCurrency(asset, outputCurrency) {
@@ -201,11 +202,11 @@ export default class ResultsWrapper extends React.Component {
             return asset.amount
         }
 
-        const eurAmount = (asset.currency === "EUR")
+        const eurAmount = (asset.currency === EUR)
             ? asset.amount
-            : this.currencyAssetToCurrency(asset, "EUR");
+            : this.currencyAssetToCurrency(asset, EUR);
 
-        const btcEurPrice = this.getCryptoPrice(BTC, "EUR");
+        const btcEurPrice = this.getCryptoPrice(BTC, EUR);
         const btcAmount = eurAmount / btcEurPrice;
 
         if (outputCurrency === BTC) {
