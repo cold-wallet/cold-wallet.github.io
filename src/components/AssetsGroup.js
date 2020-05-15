@@ -83,7 +83,7 @@ export class AssetsGroup extends React.Component {
                 <button
                     key={"accept-new-asset-button"}
                     onClick={() => {
-                        if (this.checkIsInvalid({valueAsNumber: props.valueAsNumber})) {
+                        if (this.checkIsInvalid(props.valueAsNumber)) {
                             const newAsset = this.state.newAsset
                                 || (() => buildTemplateAssetDTO(this.props.group.type))();
                             newAsset.isInvalid = true;
@@ -113,7 +113,7 @@ export class AssetsGroup extends React.Component {
         </div>
     }
 
-    checkIsInvalid({valueAsNumber}) {
+    checkIsInvalid(valueAsNumber) {
         return !valueAsNumber
             || isNaN(valueAsNumber)
             || (valueAsNumber <= 0)
@@ -209,7 +209,7 @@ export class AssetsGroup extends React.Component {
                             ? <button
                                 key={"accept-new-asset-button"}
                                 onClick={() => {
-                                    if (this.checkIsInvalid(_state.valueInput)) {
+                                    if (this.checkIsInvalid(_state.valueInput.valueAsNumber)) {
                                         props.enableInvalidMode();
                                         return;
 
