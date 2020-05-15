@@ -1,16 +1,16 @@
 .asset-item--active,
 .asset-item {
-    display: flex;
-    padding: 1%;
-    justify-content: space-between;
+  display: flex;
+  padding: 1%;
+  justify-content: space-between;
 }
 
 .asset-item--active {
-    background-color: #BFD0DF;
+  background-color: #BFD0DF;
 }
 
 .asset-item:hover {
-    background-color: #BFD0DF;
+  background-color: #BFD0DF;
 }
 
 .asset-item-value {
@@ -20,32 +20,32 @@
 }
 
 .asset-item-value-input {
-    text-align: center;
-    border-style: solid;
-    border-color: #8da7be;
-    outline: none;
-    width: 100%;
-    border-radius: 4px;
+  text-align: center;
+  border-style: solid;
+  border-color: #8da7be;
+  outline: none;
+  width: 100%;
+  border-radius: 4px;
 }
 
 .asset-item-value-input:disabled {
-    background-color: #F0F8FF;
+  background-color: #F0F8FF;
 }
 
 .asset-item-value-input:focus {
-    border-style: dashed;
+  border-style: dashed;
 }
 
 .asset-item-value-input:active {
-    border-style: solid;
-    border-color: #4f5a6b;
+  border-style: solid;
+  border-color: #4f5a6b;
 }
 
 .asset-item-currency {
-    padding: 1%;
-    width: 30%;
-    display: flex;
-    justify-content: center;
+  padding: 1%;
+  width: 30%;
+  display: flex;
+  justify-content: center;
 }
 
 .asset-item-currency-name {
