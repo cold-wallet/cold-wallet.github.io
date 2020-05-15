@@ -62,7 +62,8 @@ export default class ResultsWrapper extends React.Component {
                 const currenciesBuffer = data.cash.assets.concat(data["non-cash"].assets)
                     .concat(data.crypto.assets)
                     .reduce((result, asset) => {
-                        result[asset.currency] = asset.type
+                        result[asset.currency] = asset.type;
+                        return result;
                     }, {});
 
                 return Object.entries(currenciesBuffer)
