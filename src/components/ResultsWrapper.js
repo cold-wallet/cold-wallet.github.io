@@ -2,6 +2,7 @@ import React from "react";
 import './ResultsWrapper.css'
 import currencies from './../resources/currencies-iso-4217';
 import NumberFormat from 'react-number-format'
+import {PieChart} from "react-minimal-pie-chart";
 
 const uahNumCode = 980;
 const BTC = "BTC";
@@ -41,13 +42,11 @@ export default class ResultsWrapper extends React.Component {
         return <div className={"results-wrapper"}>
             <div className="results-one-more-wrap-layer">
                 <div className={"results-title"}>Then short statistics would be:</div>
-                <div className={"results-container"}>
-                    <div className={"total-amount-in-one-currency--container"}>{
-                        this.getAnalyzers().map((analyzer, i) =>
-                            analyzer.buildInnerResult(i, this.state.assets)
-                        )
-                    }</div>
-                </div>
+                <div className={"results-container"}>{
+                    this.getAnalyzers().map((analyzer, i) =>
+                        analyzer.buildInnerResult(i, this.state.assets)
+                    )
+                }</div>
             </div>
         </div>
     }
@@ -68,8 +67,80 @@ export default class ResultsWrapper extends React.Component {
                         return result;
                     }, {});
 
-                return Object.entries(currenciesBuffer)
-                    .map(currencyCodeToType => this.buildCurrencyTotalResult(assetGroups, currencyCodeToType))
+                return <div key={key} className={"total-amount-in-one-currency--container"}>{
+                    Object.entries(currenciesBuffer).map(
+                        currencyCodeToType => this.buildCurrencyTotalResult(assetGroups, currencyCodeToType)
+                    )
+                }</div>
+            }
+        }, {
+            name: 'balance',
+            buildInnerResult: (key, data) => {
+                console.log("building balance");
+
+                let assets = data.cash.assets
+                    .concat(data["non-cash"].assets)
+                    .concat(data.crypto.assets)
+                    .map(asset => {
+                        asset.usdAmount = (asset.type === "crypto")
+                            ? this.cryptoCurrencyAssetToCurrency(asset, USD)
+                            : this.currencyAssetToCurrency(asset, USD);
+
+                        return asset
+                    })
+                    .sort((a, b) => b.usdAmount - a.usdAmount)
+                    .map(asset => {
+                        asset.usdAmount = +numberFormat(asset.usdAmount, (asset.type === "crypto") ? 8 : 2);
+                        return asset
+                    });
+
+                const totalUsdAmount = assets.map(asset => asset.usdAmount)
+                    .reduce((a, b) => a + b, 0);
+
+                const colors = [
+                    "#081c15",
+                    "#1b4332",
+                    "#2d6a4f",
+                    "#40916c",
+                    "#52b788",
+                    "#74c69d",
+                    "#95d5b2",
+                    "#a6ddbd",
+                    "#b7e4c7",
+                    "#d8f3dc",
+                ];
+
+                let count = 0;
+
+                const chartsData = assets.map(asset => {
+                    ++count;
+
+                    if (count >= colors.length) {
+                        count = 0
+                    }
+
+                    return {
+                        value: asset.usdAmount,
+                        color: `${colors[count]}`,
+                        title: `${asset.amount} ${asset.currency}`,
+                    }
+                });
+
+                return <div key={key} className={"balance-results-container"}>
+                    <div className={"balance-circle-container"}>
+                        <PieChart
+                            labelStyle={{
+                                lineHeight: "20px",
+                                fontSize: "7px",
+                            }}
+                            totalValue={totalUsdAmount}
+                            label={({dataEntry}) => {
+                                return `${Math.round(dataEntry.percentage)}%`
+                            }}
+                            data={chartsData}
+                        />
+                    </div>
+                </div>
             }
         }]
     }
@@ -247,3 +318,13 @@ export default class ResultsWrapper extends React.Component {
     }
 }
 
+function numberFormat(fixMe, afterDecimalPoint) {
+    fixMe = "" + fixMe;
+    if (fixMe.indexOf(".") >= 0) {
+        const [left, right] = fixMe.split(/[.]/gi);
+        if (right.length > afterDecimalPoint) {
+            fixMe = left + "." + right.slice(0, afterDecimalPoint)
+        }
+    }
+    return +fixMe
+}

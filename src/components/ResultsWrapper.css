@@ -70,3 +70,33 @@
   min-width: 20%;
   max-width: 45%;
 }
+
+
+.balance-results-container {
+  overflow-y: auto;
+  background-color: #6F9F98;
+  height: 100%;
+  min-width: 300px;
+  width: 60%;
+}
+
+.balance-circle-container {
+  width: 80%;
+  height: 100%;
+  padding-left: 5%;
+  display: flex;
+  flex-flow: row;
+  justify-content: space-evenly;
+}
+
+.balance-circle {
+  height: 50%;
+  width: 50%;
+  min-width: 300px;
+  max-width: 600px;
+  min-height: 300px;
+  max-height: 600px;
+
+  border-radius: 50%;
+  background-color: green;
+}
