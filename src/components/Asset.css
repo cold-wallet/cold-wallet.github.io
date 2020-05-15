@@ -19,24 +19,30 @@
   max-width: 50%;
 }
 
-.asset-item-value-input {
+.asset-item-value-input,
+.asset-item-value input {
   text-align: center;
   border-style: solid;
   border-color: #8da7be;
+  border-width: 2px;
   outline: none;
   width: 100%;
+  padding: 2% 0;
   border-radius: 4px;
 }
 
-.asset-item-value-input:disabled {
+.asset-item-value-input:disabled,
+.asset-item-value input:disabled {
   background-color: #F0F8FF;
 }
 
-.asset-item-value-input:focus {
+.asset-item-value-input:focus,
+.asset-item-value input:focus {
   border-style: dashed;
 }
 
-.asset-item-value-input:active {
+.asset-item-value-input:active,
+.asset-item-value input:active {
   border-style: solid;
   border-color: #4f5a6b;
 }

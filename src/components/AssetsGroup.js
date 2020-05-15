@@ -2,6 +2,7 @@ import React from "react";
 import './AssetsGroup.css';
 import './Asset.css'
 import AssetDTO from "./AssetDTO";
+import NumberFormat from "react-number-format";
 
 export class AssetsGroup extends React.Component {
 
@@ -14,13 +15,9 @@ export class AssetsGroup extends React.Component {
         },
     };
 
-    constructor(props, context) {
-        super(props, context);
-
-        this.state = {
-            assets: this.props.group.assets,
-        };
-    }
+    state = {
+        assets: this.props.group.assets,
+    };
 
     render() {
         return <div className={"assets-group"}>
@@ -51,17 +48,32 @@ export class AssetsGroup extends React.Component {
         };
         return <div key={props.key} className={"asset-item--active"}>
             <div className={"asset-item-value"}>
-                <input
-                    ref={(input) => {
+                <NumberFormat
+                    allowNegative={false}
+                    getInputRef={(input) => {
                         props.valueInput = input;
+                        input && this.state.newAsset && input.focus();
                     }}
-                    autoFocus={!!this.state.newAsset}
-                    className={
+                    isNumericString={true}
+                    displayType={"input"}
+                    decimalScale={(this.props.group.type === "crypto") ? 8 : 2}
+                    thousandSeparator={true}
+                    defaultValue={props.amount || props.value || ""}
+                    onValueChange={(values) => {
+                        const {floatValue} = values;
+                        // {
+                        //     formattedValue: '$23,234,235.56', //value after applying formatting
+                        //     value: '23234235.56', //non formatted value as numeric string 23234235.56,
+                        //     // if you are setting this value to state make sure to pass isNumericString prop to true
+                        //     floatValue: 23234235.56 //floating point representation. For big numbers it
+                        //     // can have exponential syntax
+                        // }
+                        props.valueAsNumber = floatValue
+                    }}
+                    renderText={value => <div className={
                         "asset-item-value-input" +
                         (this.state.newAsset?.isInvalid ? " asset-item-value-input--invalid" : "")
-                    }
-                    type="number"
-                    defaultValue={props.amount || props.value || "0"}
+                    }>{value}</div>}
                 />
             </div>
             <div className={"asset-item-currency"}>
@@ -71,11 +83,7 @@ export class AssetsGroup extends React.Component {
                 <button
                     key={"accept-new-asset-button"}
                     onClick={() => {
-                        let valueAsNumber = props.valueInput.valueAsNumber;
-                        if (valueAsNumber && (props.valueInput.value[0] === '0')) {
-                            props.valueInput.value = props.valueInput.value.slice(1);
-                        }
-                        if (this.checkIsInvalid(props.valueInput)) {
+                        if (this.checkIsInvalid({valueAsNumber: props.valueAsNumber})) {
                             const newAsset = this.state.newAsset
                                 || (() => buildTemplateAssetDTO(this.props.group.type))();
                             newAsset.isInvalid = true;
@@ -85,7 +93,7 @@ export class AssetsGroup extends React.Component {
                         }
                         this.addAsset(new AssetDTO(
                             this.props.group.type,
-                            props.valueInput.valueAsNumber,
+                            props.valueAsNumber,
                             props.currencyCode,
                         ));
                     }}
@@ -93,7 +101,8 @@ export class AssetsGroup extends React.Component {
                 <button
                     key={"delete-asset-button"}
                     onClick={() => {
-                        props.valueInput.value = "0";
+                        props.valueInput.value = "";
+                        props.valueAsNumber = 0;
                         props.valueInput.focus();
                         this.setState({
                             newAsset: null
@@ -115,7 +124,7 @@ export class AssetsGroup extends React.Component {
         assets.unshift(asset);
         this.setState({
             newAsset: null,
-            assets: assets
+            assets,
         });
         this.props.saveStateFunction(assets);
     }
@@ -123,6 +132,7 @@ export class AssetsGroup extends React.Component {
     buildAssets() {
         return this.state.assets.map((asset, i) => ({
             key: i,
+            asset,
             value: asset.amount,
             currencyCode: asset.currency,
             onAccepted: (amount) => {
@@ -155,31 +165,40 @@ export class AssetsGroup extends React.Component {
                 })
             },
         })).map(props => {
-            const _state = {};
+            const _state = {
+                valueInput: {
+                    valueAsNumber: props.asset.amount,
+                }
+            };
             return (
                 <div key={props.key} className={"asset-item"}>
                     <div className={"asset-item-value"}>
-                        <input
-                            ref={(input) => {
-                                if (!input) {
-                                    return
-                                }
-
-                                _state.valueInput = input;
-                                _state.valueInput.focus();
-
-                                if (!isNaN(props.value) && !props.isInvalid) {
-                                    _state.valueInput.value = props.value;
-                                }
+                        <NumberFormat
+                            allowNegative={false}
+                            getInputRef={(input) => {
+                                input && input.focus();
                             }}
-                            autoFocus
-                            className={
+                            isNumericString={true}
+                            displayType={props.editModeEnabled ? "input" : "text"}
+                            decimalScale={(props.asset.type === "crypto") ? 8 : 2}
+                            thousandSeparator={true}
+                            disabled={!props.editModeEnabled}
+                            value={props.asset.amount}
+                            onValueChange={(values) => {
+                                const {floatValue} = values;
+                                // {
+                                //     formattedValue: '$23,234,235.56', //value after applying formatting
+                                //     value: '23234235.56', //non formatted value as numeric string 23234235.56,
+                                //     // if you are setting this value to state make sure to pass isNumericString prop to true
+                                //     floatValue: 23234235.56 //floating point representation. For big numbers it
+                                //     // can have exponential syntax
+                                // }
+                                _state.valueInput.valueAsNumber = floatValue
+                            }}
+                            renderText={value => <div className={
                                 "asset-item-value-input" +
                                 (props.isInvalid ? " asset-item-value-input--invalid" : "")
-                            }
-                            type="number"
-                            disabled={!props.editModeEnabled}
-                            defaultValue={props.value}
+                            }>{value}</div>}
                         />
                     </div>
                     <div className={"asset-item-currency"}>
@@ -190,11 +209,6 @@ export class AssetsGroup extends React.Component {
                             ? <button
                                 key={"accept-new-asset-button"}
                                 onClick={() => {
-                                    if (_state.valueInput.valueAsNumber) {
-                                        while (_state.valueInput.value[0] === '0') {
-                                            _state.valueInput.value = _state.valueInput.value.slice(1);
-                                        }
-                                    }
                                     if (this.checkIsInvalid(_state.valueInput)) {
                                         props.enableInvalidMode();
                                         return;
