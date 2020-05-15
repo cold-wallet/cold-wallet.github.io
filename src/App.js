@@ -34,7 +34,6 @@ export default function App() {
                         && rates.length
                         && (rates !== savedRates)
                     ) {
-                        console.log("successfully loaded fresh rates", rates);
                         storeData({
                             assets: savedState,
                             rates,
@@ -74,7 +73,6 @@ export default function App() {
                         && (cryptoRates = response.data)
                         && (cryptoRates !== savedCryptoRates)
                     ) {
-                        console.log("successfully loaded fresh cryptoRates", cryptoRates);
                         storeData({
                             assets: savedState,
                             rates: savedRates,
@@ -107,7 +105,6 @@ export default function App() {
             <AssetsGroupsWrapper
                 savedState={savedState}
                 saveState={(state) => {
-                    console.log("saving cookies:", state);
                     storeData({
                         assets: state,
                         rates: savedRates,

@@ -34,7 +34,6 @@ export default class ResultsWrapper extends React.Component {
             || !this.state.cryptoRates
             || !this.state.cryptoRates.length
         ) {
-            console.log("state is not ready", this.state);
             return null;
         }
         return <div className={"results-wrapper"}>
