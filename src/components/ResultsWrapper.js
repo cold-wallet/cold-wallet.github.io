@@ -2,7 +2,7 @@ import React from "react";
 import './ResultsWrapper.css'
 import currencies from './../resources/currencies-iso-4217';
 import NumberFormat from 'react-number-format'
-import {PieChart} from "react-minimal-pie-chart";
+import {VictoryLabel, VictoryPie} from "victory"
 
 const uahNumCode = 980;
 const BTC = "BTC";
@@ -85,7 +85,6 @@ export default class ResultsWrapper extends React.Component {
                         asset.usdAmount = (asset.type === "crypto")
                             ? this.cryptoCurrencyAssetToCurrency(asset, USD)
                             : this.currencyAssetToCurrency(asset, USD);
-
                         return asset
                     })
                     .sort((a, b) => b.usdAmount - a.usdAmount)
@@ -97,47 +96,134 @@ export default class ResultsWrapper extends React.Component {
                 const totalUsdAmount = assets.map(asset => asset.usdAmount)
                     .reduce((a, b) => a + b, 0);
 
-                const colors = [
-                    "#081c15",
-                    "#1b4332",
-                    "#2d6a4f",
-                    "#40916c",
-                    "#52b788",
-                    "#74c69d",
-                    "#95d5b2",
-                    "#a6ddbd",
-                    "#b7e4c7",
-                    "#d8f3dc",
-                ];
+                assets = assets
+                    .map(asset => {
+                        asset.percents = (100 * asset.usdAmount) / totalUsdAmount;
+                        return asset
+                    });
 
-                let count = 0;
+                const tinyAmounts = assets.filter(asset => asset.percents < 1);
+
+                function buildTitle(asset) {
+                    let afterDecimalPoint;
+                    if (asset.percents < 0.01) {
+                        afterDecimalPoint = 8;
+                    } else if (asset.percents < 2) {
+                        afterDecimalPoint = 2
+                    } else {
+                        afterDecimalPoint = 0
+                    }
+                    return `${asset.amount} ${asset.currency} (${numberFormat(
+                        asset.percents, afterDecimalPoint
+                    )}%)`
+                }
+
+                if (tinyAmounts.length) {
+                    const otherAmounts = assets.filter(asset => asset.percents >= 1);
+                    const tinyAssetsComposite = tinyAmounts.reduce((accumulator, asset) => {
+                        accumulator.text += `\n${buildTitle(asset)}`;
+                        accumulator.usdAmount += asset.usdAmount;
+                        return accumulator
+                    }, {
+                        text: "",
+                        usdAmount: 0,
+                        percents: 0,
+                    });
+
+                    tinyAssetsComposite.percents = (100 * tinyAssetsComposite.usdAmount) / totalUsdAmount;
+                    tinyAssetsComposite.text = `Other ${numberFormat(tinyAssetsComposite.percents, 2)}% :`
+                        + tinyAssetsComposite.text;
+
+                    otherAmounts.push(tinyAssetsComposite);
+                    assets = otherAmounts;
+                }
 
                 const chartsData = assets.map(asset => {
-                    ++count;
-
-                    if (count >= colors.length) {
-                        count = 0
-                    }
-
                     return {
-                        value: asset.usdAmount,
-                        color: `${colors[count]}`,
-                        title: `${asset.amount} ${asset.currency}`,
+                        x: asset.text ? asset.text : buildTitle(asset),
+                        y: asset.usdAmount,
                     }
                 });
 
                 return <div key={key} className={"balance-results-container"}>
                     <div className={"balance-circle-container"}>
-                        <PieChart
-                            labelStyle={{
-                                lineHeight: "20px",
-                                fontSize: "7px",
+                        <VictoryPie
+                            labelComponent={<VictoryLabel className={"pie-chart-label"}/>}
+                            labelRadius={(e) => {
+                                const maxRadius = 120;
+                                const elementsCount = e.data.length;
+
+                                if (e.index === elementsCount - 1) {
+                                    return maxRadius
+                                }
+
+                                const step = maxRadius / elementsCount;
+                                const skipCount = 2; // empiric value
+                                let skipIndex = e.index - skipCount;
+
+                                if (skipIndex <= 0) {
+                                    skipIndex = 0;
+                                }
+
+                                return ~~(skipIndex * step + 25)
                             }}
-                            totalValue={totalUsdAmount}
-                            label={({dataEntry}) => {
-                                return `${Math.round(dataEntry.percentage)}%`
-                            }}
+                            events={[
+                                {
+                                    target: "data",
+                                    eventHandlers: {
+                                        onMouseOver: () => {
+                                            return [{
+                                                target: "labels",
+                                                mutation: (props) => {
+                                                    return {
+                                                        style: Object.assign({}, props.style, {
+                                                            fill: "#F0F8FF",
+                                                        })
+                                                    };
+                                                }
+                                            }, {
+                                                target: "data",
+                                                mutation: (props) => {
+                                                    return {
+                                                        style: Object.assign({}, props.style, {
+                                                            stroke: "#081C15",
+                                                            strokeWidth: 1,
+                                                        })
+                                                    };
+                                                }
+                                            }];
+                                        },
+                                        onMouseOut: () => {
+                                            return [{
+                                                target: "labels",
+                                                mutation: () => {
+                                                    return null
+                                                }
+                                            }, {
+                                                mutation: () => {
+                                                    return null
+                                                }
+                                            }];
+                                        }
+                                    }
+                                }
+                            ]}
+                            labelPosition="centroid"
                             data={chartsData}
+                            animate={{
+                                duration: 2000
+                            }}
+                            colorScale={[
+                                "#1b4332",
+                                "#2d6a4f",
+                                "#40916c",
+                                "#52b788",
+                                "#74c69d",
+                                "#95d5b2",
+                                "#a6ddbd",
+                                "#b7e4c7",
+                                "#d8f3dc",
+                            ]}
                         />
                     </div>
                 </div>
@@ -319,6 +405,9 @@ export default class ResultsWrapper extends React.Component {
 }
 
 function numberFormat(fixMe, afterDecimalPoint) {
+    if (afterDecimalPoint === 0) {
+        return Math.round(fixMe)
+    }
     fixMe = "" + fixMe;
     if (fixMe.indexOf(".") >= 0) {
         const [left, right] = fixMe.split(/[.]/gi);

@@ -15,7 +15,7 @@
     "universal-cookie": "latest",
     "axios": "^0.19.2",
     "react-number-format": "^4.4.1",
-    "react-minimal-pie-chart": "^8.0.0"
+    "victory": "^34.3.5"
   },
   "scripts": {
     "start": "react-scripts start",

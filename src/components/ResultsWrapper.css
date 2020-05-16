@@ -81,22 +81,10 @@
 }
 
 .balance-circle-container {
-  width: 80%;
-  height: 100%;
-  padding-left: 5%;
+  width: 90%;
+  padding: 5%;
   display: flex;
   flex-flow: row;
   justify-content: space-evenly;
 }
 
-.balance-circle {
-  height: 50%;
-  width: 50%;
-  min-width: 300px;
-  max-width: 600px;
-  min-height: 300px;
-  max-height: 600px;
-
-  border-radius: 50%;
-  background-color: green;
-}
