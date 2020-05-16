@@ -178,7 +178,7 @@ export default class ResultsWrapper extends React.Component {
                                                 mutation: (props) => {
                                                     return {
                                                         style: Object.assign({}, props.style, {
-                                                            fill: "#F0F8FF",
+                                                            fill: "#00FF03",
                                                         })
                                                     };
                                                 }
@@ -187,7 +187,7 @@ export default class ResultsWrapper extends React.Component {
                                                 mutation: (props) => {
                                                     return {
                                                         style: Object.assign({}, props.style, {
-                                                            stroke: "#081C15",
+                                                            stroke: "#00FF03",
                                                             strokeWidth: 1,
                                                         })
                                                     };
