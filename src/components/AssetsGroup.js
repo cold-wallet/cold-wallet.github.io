@@ -3,6 +3,7 @@ import './AssetsGroup.css';
 import './Asset.css'
 import AssetDTO from "./AssetDTO";
 import NumberFormat from "react-number-format";
+import noExponents from "../extensions/noExponents";
 
 export class AssetsGroup extends React.Component {
 
@@ -58,7 +59,7 @@ export class AssetsGroup extends React.Component {
                     displayType={"input"}
                     decimalScale={(this.props.group.type === "crypto") ? 8 : 2}
                     thousandSeparator={true}
-                    defaultValue={props.amount || props.value || ""}
+                    defaultValue={(props.amount || props.value || "")}
                     onValueChange={(values) => {
                         const {floatValue} = values;
                         // {
@@ -183,7 +184,7 @@ export class AssetsGroup extends React.Component {
                             decimalScale={(props.asset.type === "crypto") ? 8 : 2}
                             thousandSeparator={true}
                             disabled={!props.editModeEnabled}
-                            value={props.asset.amount}
+                            value={noExponents(props.asset.amount)}
                             onValueChange={(values) => {
                                 const {floatValue} = values;
                                 // {

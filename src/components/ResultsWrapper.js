@@ -3,6 +3,7 @@ import './ResultsWrapper.css'
 import currencies from './../resources/currencies-iso-4217';
 import NumberFormat from 'react-number-format'
 import {VictoryLabel, VictoryPie} from "victory"
+import noExponents from "../extensions/noExponents";
 
 const uahNumCode = 980;
 const BTC = "BTC";
@@ -113,7 +114,7 @@ export default class ResultsWrapper extends React.Component {
                     } else {
                         afterDecimalPoint = 0
                     }
-                    return `${asset.amount} ${asset.currency} (${numberFormat(
+                    return `${addCommas(noExponents(asset.amount))} ${asset.currency} (${numberFormat(
                         asset.percents, afterDecimalPoint
                     )}%)`
                 }
@@ -266,7 +267,7 @@ export default class ResultsWrapper extends React.Component {
                                     className={"total-amount-in-currencies--asset-row"}
                                 >
                                     <div className={"total-amount-in-currencies--asset-row-part"}>
-                                        <NumberFormat value={asset.amount}
+                                        <NumberFormat value={noExponents(asset.amount)}
                                                       displayType={'text'}
                                                       decimalScale={(asset.type === "crypto") ? 8 : 2}
                                                       suffix={" " + asset.currency}
@@ -274,7 +275,7 @@ export default class ResultsWrapper extends React.Component {
                                     </div>
                                     <div>{asset.currency === resultCurrencyCode ? '=' : '≈'}</div>
                                     <div className={"total-amount-in-currencies--asset-row-part"}>
-                                        <NumberFormat value={amount}
+                                        <NumberFormat value={noExponents(amount)}
                                                       displayType={'text'}
                                                       decimalScale={(resultCurrencyType === "crypto") ? 8 : 2}
                                                       suffix={" " + resultCurrencyCode}
@@ -287,7 +288,7 @@ export default class ResultsWrapper extends React.Component {
             }
             <div className={"total-amount-in-currencies--total-amounts"}>
                 <div>Total:</div>
-                <div><NumberFormat value={totalAmount}
+                <div><NumberFormat value={noExponents(totalAmount)}
                                    displayType={'text'}
                                    decimalScale={(resultCurrencyType === "crypto") ? 8 : 2}
                                    suffix={" " + resultCurrencyCode}
@@ -416,4 +417,8 @@ function numberFormat(fixMe, afterDecimalPoint) {
         }
     }
     return +fixMe
+}
+
+function addCommas(toMe) {
+    return toMe.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
 }
