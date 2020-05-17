@@ -1,0 +1,421 @@
+@import './variables';
+@import './reset';
+
+html, body, .root {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+button {
+    cursor: pointer;
+}
+
+html {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100vh;
+    height: 100%;
+    overflow-y: overlay;
+    overflow-x: hidden;
+}
+
+body {
+    background-color: $bodyColor;
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+    //font-family: $MontserratRegular;
+    min-height: 100vh;
+}
+
+//*,
+//*::before,
+//*::after {
+//    box-sizing: inherit;
+//}
+
+// remove arrows for input type number
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+// custom scrollbar
+
+::-webkit-scrollbar {
+    width: 0.7vw;
+}
+
+::-webkit-scrollbar-track {
+    background: #3E3E3E;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #555;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #222;
+}
+
+// custom scrollbar
+
+// hide transparent on focus
+input:focus::-webkit-input-placeholder {
+    color: transparent;
+}
+
+.ant-message {
+    font-family: $MontserratRegular;
+    color: $greyLight;
+    font-size: 1vw;
+    z-index: 9999999;
+}
+
+// DropDown
+
+.antDSelect {
+    background: #f2f3f9;
+    border-radius: 0.1vw;
+    font-family: $MontserratRegular;
+    font-size: 1.1vw;
+    color: $textDarkLight;
+
+    @media only screen and (min-width: 500px) and (max-width: 1024px) {
+        font-size: $tablet16px;
+        border-radius: 2px;
+    }
+
+    @media only screen and (max-width: 499px) {
+        font-size: $mobile16px;
+        border-radius: 2px;
+    }
+
+    & > * {
+        box-shadow: none !important;
+        font-family: $MontserratRegular;
+    }
+
+    &__wrapper {
+        margin: 2.6vw 0;
+        display: flex;
+        justify-content: space-between;
+
+        @media only screen and (max-width: 1024px) {
+            flex-wrap: wrap;
+        }
+
+        &_deleteIcon {
+            position: absolute;
+            top: 2.9vw;
+            right: 1vw;
+            height: 0.8vw;
+            width: 0.8vw;
+            z-index: 9999;
+            cursor: pointer;
+            z-index: 1;
+
+            @media only screen and (min-width: 500px) and (max-width: 1024px) {
+                right: 1.6vw;
+                height: 1.6vw;
+                width: 1.6vw;
+                top: 5.7vw;
+            }
+
+            @media only screen and (max-width: 499px) {
+                right: 3.2vw;
+                height: 2.6vw;
+                width: 2.6vw;
+                top: 12.4vw;
+            }
+        }
+
+        &_item {
+            display: flex;
+            flex-direction: column;
+            width: fit-content;
+            position: relative;
+
+            @media only screen and (max-width: 1024px) {
+                width: 28%;
+                margin-bottom: $tablet40px;
+            }
+
+            @media only screen and (max-width: 499px) {
+                width: 45%;
+                margin-bottom: $mobile42px;
+            }
+
+            .select-search-box__search,
+            .select-search-box__select {
+                max-width: 12.7vw;
+
+                @media only screen and (max-width: 1024px) {
+                    max-width: 100%;
+                }
+            }
+
+            .select-search-box__search {
+                padding-right: 2vw;
+
+                @media only screen and (min-width: 500px) and (max-width: 1024px) {
+                    padding-right: 4vw !important;
+                }
+
+                @media only screen and (max-width: 499px) {
+                    padding-right: 6vw !important;
+                }
+            }
+        }
+
+        &_dash {
+            color: $textDarkLight;
+            height: 3.91vw;
+            font-size: 1.3vw;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            margin: auto 1vw 0 1vw;
+
+            @media only screen and (min-width: 500px) and (max-width: 1024px) {
+                height: $tablet60px;
+                margin: auto $tablet18px 0 $tablet18px;
+            }
+
+            @media only screen and (max-width: 499px) {
+                font-size: 3vw;
+                height: $mobile60px;
+                margin: auto 3vw 0 3vw;
+            }
+        }
+
+        &_input {
+            width: 7vw;
+            height: 3.91vw;
+            line-height: 3.91vw;
+            background: #f2f3f9;
+            border-radius: 0.1vw;
+            font-family: $MontserratRegular;
+            font-size: 1.1vw;
+            color: $textDarkLight;
+            border-radius: 0.1vw;
+            border: 1px solid #f2f3f9;
+            outline: none;
+            padding: 0 1vw;
+            margin-top: 0.7vw;
+
+            @media only screen and (min-width: 500px) and (max-width: 1024px) {
+                font-size: $tablet16px;
+                line-height: $tablet60px;
+                padding-left: $tablet12px;
+                margin-top: $tablet10px;
+                width: 100%;
+                height: $tablet60px;
+                border: 1px solid #f2f3f9;
+            }
+
+            @media only screen and (max-width: 499px) {
+                font-size: $mobile16px;
+                line-height: $mobile60px;
+                padding-left: $mobile12px;
+                margin-top: $mobile10px;
+                width: 100%;
+                height: $mobile60px;
+                border: 1px solid #f2f3f9;
+            }
+
+            &:hover,
+            &:active,
+            &:focus {
+                border: 1px solid $blueDark;
+
+                @media only screen and (max-width: 1024px) {
+                    border: 1px solid $blueDark;
+                    border-radius: 1px;
+                }
+            }
+
+            &::placeholder {
+                background: #f2f3f9;
+                border-radius: 0.1vw;
+                font-family: $MontserratRegular;
+                font-size: 1.1vw;
+                color: $greyButton;
+
+                @media only screen and (min-width: 500px) and (max-width: 1024px) {
+                    font-size: $tablet16px;
+                    line-height: $tablet26px;
+                    border-radius: 2px;
+                }
+
+                @media only screen and (max-width: 499px) {
+                    font-size: $mobile16px;
+                    line-height: $mobile25px;
+                    border-radius: 2px;
+                }
+            }
+        }
+
+        &_label {
+            font-family: $MontserratRegular;
+            font-size: 0.7vw;
+            line-height: 0.7vw;
+            color: $textDarkLight;
+            display: flex;
+            flex-direction: column;
+
+            @media only screen and (min-width: 500px) and (max-width: 1024px) {
+                font-size: $tablet10px;
+                line-height: $tablet10px;
+            }
+
+            @media only screen and (max-width: 499px) {
+                font-size: $mobile10px;
+                line-height: $mobile10px;
+            }
+        }
+    }
+
+    &__wrapper-input {
+        display: flex;
+
+        @media only screen and (min-width: 500px) and (max-width: 1024px) {
+            order: 1;
+            justify-content: space-between;
+            width: 64%;
+            margin-bottom: $tablet40px;
+        }
+
+        @media only screen and (max-width: 499px) {
+            order: 1;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: $mobile42px;
+        }
+    }
+
+    &__title {
+        font-family: $MontserratRegular;
+        font-size: 0.7vw;
+        line-height: 0.7vw;
+        color: $textDarkLight;
+        margin-bottom: 0.7vw;
+
+        @media only screen and (min-width: 500px) and (max-width: 1024px) {
+            font-size: $tablet10px;
+            line-height: $tablet10px;
+            margin-bottom: $tablet10px;
+        }
+
+        @media only screen and (max-width: 499px) {
+            font-size: $mobile10px;
+            line-height: $mobile10px;
+            margin-bottom: $mobile10px;
+        }
+    }
+
+    .ant-select-selection {
+        min-width: 12.7vw;
+        height: 3.91vw;
+        border: 1px solid #f2f3f9;
+        background-color: transparent;
+        border-radius: 0.1vw;
+
+        @media only screen and (min-width: 500px) and (max-width: 1024px) {
+            height: $tablet60px;
+            border: 1px solid #f2f3f9;
+        }
+
+        @media only screen and (max-width: 499px) {
+            height: $mobile60px;
+            border: 1px solid #f2f3f9;
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+            border: 1px solid $blueDark;
+
+            @media only screen and (max-width: 1024px) {
+                border: 1px solid $blueDark;
+                border-radius: 2px;
+            }
+        }
+    }
+
+    .anticon {
+        color: $textDarkLight;
+    }
+
+    .ant-select-arrow {
+        right: 1vw;
+        font-size: 0.8vw;
+        margin-top: 0;
+        transform: translateY(-50%);
+
+        @media only screen and (min-width: 500px) and (max-width: 1024px) {
+            font-size: $tablet12px;
+            right: $tablet12px;
+        }
+
+        @media only screen and (max-width: 499px) {
+            right: 3.2vw;
+            font-size: $mobile10px;
+        }
+    }
+
+    .ant-select-selection__rendered {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        outline: none;
+        margin: 0 1vw;
+        line-height: inherit;
+
+        @media only screen and (min-width: 500px) and (max-width: 1024px) {
+            margin: 0 $tablet12px;
+        }
+
+        @media only screen and (max-width: 499px) {
+            margin: 0 6vw 0 $mobile12px;
+        }
+    }
+
+    .ant-select-selection__placeholder {
+        background: #f2f3f9;
+        border-radius: 0.1vw;
+        font-family: $MontserratRegular;
+        font-size: 1.1vw;
+        color: $greyButton;
+        transform: translateY(-50%);
+        margin: 0;
+        line-height: normal;
+        height: auto;
+
+        @media only screen and (min-width: 500px) and (max-width: 1024px) {
+            font-size: $tablet16px;
+            border-radius: 2px;
+        }
+
+        @media only screen and (max-width: 499px) {
+            font-size: $mobile16px;
+            border-radius: 2px;
+        }
+    }
+}
