@@ -3,6 +3,20 @@ Personal Assets
 
 ![](https://github.com/personal-assets/personal-assets.github.io/workflows/CI/CD%20Pipeline/badge.svg)
 
+[Personal finance assets dashboard](https://personal-assets.github.io/)
+
+Free to use, personal finance assets dashboard with all major currencies and crypto-currencies supported.
+Latest cross-(crypto)-currencies rates. No registration required.
+
+Features:
+ * Your data is saved in local storage of your browser
+ * Latest cross-(crypto)-currency rates
+ * Short statistics of your assets:
+   * whole cross-currency amount calculation
+   * assets balance chart
+
+![](./resources/screen.png)
+
 [Palette used](https://coolors.co/9bc995-d00000-2d3142-5d6c80-8da7be-bfd0df-f0f8ff-a9ddd6-35605a-2e3532),
 [Palette used](https://coolors.co/2d3142-5d6c80-8da7be-bfd0df-f0f8ff-ecebda-e8ddb5-f6ae2d),
 [Blue gamma](https://coolors.co/2d3142-5d6c80-8da7be-bfd0df-f0f8ff),
