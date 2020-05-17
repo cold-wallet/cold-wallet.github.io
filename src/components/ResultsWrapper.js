@@ -77,8 +77,6 @@ export default class ResultsWrapper extends React.Component {
         }, {
             name: 'balance',
             buildInnerResult: (key, data) => {
-                console.log("building balance");
-
                 let assets = data.cash.assets
                     .concat(data["non-cash"].assets)
                     .concat(data.crypto.assets)
@@ -114,12 +112,12 @@ export default class ResultsWrapper extends React.Component {
                     } else {
                         afterDecimalPoint = 0
                     }
-                    return `${addCommas(noExponents(asset.amount))} ${asset.currency} (${numberFormat(
-                        asset.percents, afterDecimalPoint
-                    )}%)`
+                    const amount = noExponents(addCommas(asset.amount));
+                    const percents = noExponents(numberFormat(asset.percents, afterDecimalPoint));
+                    return `${amount} ${asset.currency} (${percents}%)`
                 }
 
-                if (tinyAmounts.length) {
+                if (tinyAmounts.length > 1) {
                     const otherAmounts = assets.filter(asset => asset.percents >= 1);
                     const tinyAssetsComposite = tinyAmounts.reduce((accumulator, asset) => {
                         accumulator.text += `\n${buildTitle(asset)}`;
@@ -149,7 +147,29 @@ export default class ResultsWrapper extends React.Component {
                 return <div key={key} className={"balance-results-container"}>
                     <div className={"balance-circle-container"}>
                         <VictoryPie
-                            labelComponent={<VictoryLabel className={"pie-chart-label"}/>}
+                            labelComponent={<VictoryLabel
+                                text={datum => {
+                                    let text = datum.datum.xName;
+
+                                    if (~~text.indexOf("\n")) {
+                                        return text.split("\n")
+                                            .map((row, i) => {
+                                                if (!i) {
+                                                    return row;
+                                                }
+                                                const words = row.split(" ");
+                                                words[0] = noExponents(words[0]);
+                                                words[2] = `(${
+                                                    noExponents(words[2].replace(/[(%)]/gi, ""))
+                                                }%)`;
+                                                return words.join(" ")
+                                            })
+                                            .join("\n");
+                                    }
+
+                                    return text
+                                }}
+                                className={"pie-chart-label"}/>}
                             labelRadius={(e) => {
                                 const maxRadius = 120;
                                 const elementsCount = e.data.length;
@@ -406,6 +426,7 @@ export default class ResultsWrapper extends React.Component {
 }
 
 function numberFormat(fixMe, afterDecimalPoint) {
+    fixMe = noExponents(fixMe);
     if (afterDecimalPoint === 0) {
         return Math.round(fixMe)
     }
@@ -416,9 +437,11 @@ function numberFormat(fixMe, afterDecimalPoint) {
             fixMe = left + "." + right.slice(0, afterDecimalPoint)
         }
     }
-    return +fixMe
+    return +noExponents(fixMe)
 }
 
 function addCommas(toMe) {
-    return toMe.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+    return noExponents(toMe)
+        .toString()
+        .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
 }
