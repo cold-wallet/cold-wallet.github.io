@@ -1,5 +1,5 @@
 export default function noExponents(fixME) {
-    if (!fixME || !(+fixME)) {
+    if (!fixME || !(+fixME) || String(fixME).toLowerCase().indexOf("e") === -1) {
         return fixME
     }
 
