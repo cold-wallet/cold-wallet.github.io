@@ -113,7 +113,7 @@ export default class ResultsWrapper extends React.Component {
                         afterDecimalPoint = 0
                     }
                     const amount = noExponents(addCommas(asset.amount));
-                    const percents = noExponents(numberFormat(asset.percents, afterDecimalPoint));
+                    const percents = numberFormat(asset.percents, afterDecimalPoint);
                     return `${amount} ${asset.currency} (${percents}%)`
                 }
 
@@ -149,7 +149,10 @@ export default class ResultsWrapper extends React.Component {
                         <VictoryPie
                             labelComponent={<VictoryLabel
                                 text={datum => {
-                                    let text = datum.datum.xName;
+                                    let text = datum.datum.xName
+                                        .replace(/(,0 )/gi, ',000 ')
+                                        .replace(/(,0,)/gi, ',000,')
+                                    ;
 
                                     if (~~text.indexOf("\n")) {
                                         return text.split("\n")

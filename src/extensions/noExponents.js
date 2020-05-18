@@ -1,4 +1,8 @@
 export default function noExponents(fixME) {
+    if (!fixME || !(+fixME)) {
+        return fixME
+    }
+
     let data = String(fixME).split(/[eE]/);
     if (data.length === 1) {
         return data[0];
