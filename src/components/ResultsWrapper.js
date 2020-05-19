@@ -138,7 +138,6 @@ export default class ResultsWrapper extends React.Component {
                 } else if (this.state.chartType === "per-type") {
                     preparedAssets = assets;
                 }
-                console.log(preparedAssets);
 
                 const tinyAmounts = preparedAssets.filter(asset => asset.percents < 1);
                 if (tinyAmounts.length > 1) {
@@ -167,6 +166,10 @@ export default class ResultsWrapper extends React.Component {
                         y: asset.usdAmount,
                     }
                 });
+
+                if (!chartsData.length) {
+                    return null
+                }
 
                 return <div key={key} className={"balance-results-container"}>
                     <div className={"balance-circle-container"}>
