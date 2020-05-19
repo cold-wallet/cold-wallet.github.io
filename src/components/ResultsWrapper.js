@@ -25,6 +25,7 @@ export default class ResultsWrapper extends React.Component {
             assets: props.savedState || [],
             rates: props.initialRates || [],
             cryptoRates: props.initialCryptoRates || [],
+            chartType: props.chartType || "total",
         };
         this.props.latestAssetsConsumer(assets => this.setState({assets}));
         this.props.latestRatesConsumer(rates => this.setState({rates}));
@@ -101,8 +102,6 @@ export default class ResultsWrapper extends React.Component {
                         return asset
                     });
 
-                const tinyAmounts = assets.filter(asset => asset.percents < 1);
-
                 function buildTitle(asset) {
                     let afterDecimalPoint;
                     if (asset.percents < 0.01) {
@@ -117,8 +116,33 @@ export default class ResultsWrapper extends React.Component {
                     return `${amount} ${asset.currency} (${percents}%)`
                 }
 
+                let preparedAssets;
+
+                if (!this.state.chartType || (this.state.chartType === "total")) {
+                    preparedAssets = assets;
+
+                } else if (this.state.chartType === "per-currency") {
+                    preparedAssets = Object.entries(assets
+                        .reduce((a, asset) => {
+                            if (a[asset.currency]) {
+                                a[asset.currency].amount += asset.amount;
+                                a[asset.currency].usdAmount += asset.usdAmount;
+                                a[asset.currency].percents += asset.percents;
+                            } else {
+                                a[asset.currency] = {...asset};
+                            }
+                            return a
+                        }, {}))
+                        .map(entries => entries[1]);
+
+                } else if (this.state.chartType === "per-type") {
+                    preparedAssets = assets;
+                }
+                console.log(preparedAssets);
+
+                const tinyAmounts = preparedAssets.filter(asset => asset.percents < 1);
                 if (tinyAmounts.length > 1) {
-                    const otherAmounts = assets.filter(asset => asset.percents >= 1);
+                    const otherAmounts = preparedAssets.filter(asset => asset.percents >= 1);
                     const tinyAssetsComposite = tinyAmounts.reduce((accumulator, asset) => {
                         accumulator.text += `\n${buildTitle(asset)}`;
                         accumulator.usdAmount += asset.usdAmount;
@@ -134,10 +158,10 @@ export default class ResultsWrapper extends React.Component {
                         + tinyAssetsComposite.text;
 
                     otherAmounts.push(tinyAssetsComposite);
-                    assets = otherAmounts;
+                    preparedAssets = otherAmounts;
                 }
 
-                const chartsData = assets.map(asset => {
+                const chartsData = preparedAssets.map(asset => {
                     return {
                         x: asset.text ? asset.text : buildTitle(asset),
                         y: asset.usdAmount,
@@ -146,109 +170,217 @@ export default class ResultsWrapper extends React.Component {
 
                 return <div key={key} className={"balance-results-container"}>
                     <div className={"balance-circle-container"}>
-                        <VictoryPie
-                            labelComponent={<VictoryLabel
-                                text={datum => {
-                                    let text = datum.datum.xName
-                                        .replace(/(,0 )/gi, ',000 ')
-                                        .replace(/(,0,)/gi, ',000,')
-                                    ;
+                        <div className={"balance-circle-chart"}>
+                            <VictoryPie
+                                labelComponent={<VictoryLabel
+                                    text={datum => {
+                                        let text = datum.datum.xName
+                                            .replace(/(,0 )/gi, ',000 ')
+                                            .replace(/(,0,)/gi, ',000,');
 
-                                    if (~~text.indexOf("\n")) {
-                                        return text.split("\n")
-                                            .map((row, i) => {
-                                                if (!i) {
-                                                    return row;
-                                                }
-                                                const words = row.split(" ");
-                                                words[0] = noExponents(words[0]);
-                                                words[2] = `(${
-                                                    noExponents(words[2].replace(/[(%)]/gi, ""))
-                                                }%)`;
-                                                return words.join(" ")
-                                            })
-                                            .join("\n");
+                                        if (~~text.indexOf("\n")) {
+                                            return text.split("\n")
+                                                .map((row, i) => {
+                                                    if (!i) {
+                                                        return row;
+                                                    }
+                                                    const words = row.split(" ");
+                                                    words[0] = noExponents(words[0]);
+                                                    words[2] = `(${
+                                                        noExponents(words[2].replace(/[(%)]/gi, ""))
+                                                    }%)`;
+                                                    return words.join(" ")
+                                                })
+                                                .join("\n");
+                                        }
+
+                                        return text
+                                    }}
+                                    className={"pie-chart-label"}/>}
+                                labelRadius={(e) => {
+                                    const maxRadius = 120;
+                                    const elementsCount = e.data.length;
+
+                                    if (e.index === elementsCount - 1) {
+                                        return maxRadius
                                     }
 
-                                    return text
+                                    const step = maxRadius / elementsCount;
+                                    const skipCount = 2; // empiric value
+                                    let skipIndex = e.index - skipCount;
+
+                                    if (skipIndex <= 0) {
+                                        skipIndex = 0;
+                                    }
+
+                                    return ~~(skipIndex * step + 25)
                                 }}
-                                className={"pie-chart-label"}/>}
-                            labelRadius={(e) => {
-                                const maxRadius = 120;
-                                const elementsCount = e.data.length;
-
-                                if (e.index === elementsCount - 1) {
-                                    return maxRadius
-                                }
-
-                                const step = maxRadius / elementsCount;
-                                const skipCount = 2; // empiric value
-                                let skipIndex = e.index - skipCount;
-
-                                if (skipIndex <= 0) {
-                                    skipIndex = 0;
-                                }
-
-                                return ~~(skipIndex * step + 25)
-                            }}
-                            events={[
-                                {
-                                    target: "data",
-                                    eventHandlers: {
-                                        onMouseOver: () => {
-                                            return [{
-                                                target: "labels",
-                                                mutation: (props) => {
-                                                    return {
-                                                        style: Object.assign({}, props.style, {
-                                                            fill: "#00FF03",
-                                                        })
-                                                    };
-                                                }
-                                            }, {
-                                                target: "data",
-                                                mutation: (props) => {
-                                                    return {
-                                                        style: Object.assign({}, props.style, {
-                                                            stroke: "#00FF03",
-                                                            strokeWidth: 1,
-                                                        })
-                                                    };
-                                                }
-                                            }];
-                                        },
-                                        onMouseOut: () => {
-                                            return [{
-                                                target: "labels",
-                                                mutation: () => {
-                                                    return null
-                                                }
-                                            }, {
-                                                mutation: () => {
-                                                    return null
-                                                }
-                                            }];
+                                events={[
+                                    {
+                                        target: "data",
+                                        eventHandlers: {
+                                            onMouseOver: () => {
+                                                return [{
+                                                    target: "labels",
+                                                    mutation: (props) => {
+                                                        return {
+                                                            style: Object.assign({}, props.style, {
+                                                                fill: "#00FF03",
+                                                            })
+                                                        };
+                                                    }
+                                                }, {
+                                                    target: "data",
+                                                    mutation: (props) => {
+                                                        return {
+                                                            style: Object.assign({}, props.style, {
+                                                                stroke: "#00FF03",
+                                                                strokeWidth: 1,
+                                                            })
+                                                        };
+                                                    }
+                                                }];
+                                            },
+                                            onMouseOut: () => {
+                                                return [{
+                                                    target: "labels",
+                                                    mutation: () => {
+                                                        return null
+                                                    }
+                                                }, {
+                                                    mutation: () => {
+                                                        return null
+                                                    }
+                                                }];
+                                            }
                                         }
                                     }
-                                }
-                            ]}
-                            labelPosition="centroid"
-                            data={chartsData}
-                            animate={{
-                                duration: 2000
-                            }}
-                            colorScale={[
-                                "#1b4332",
-                                "#2d6a4f",
-                                "#40916c",
-                                "#52b788",
-                                "#74c69d",
-                                "#95d5b2",
-                                "#a6ddbd",
-                                "#b7e4c7",
-                                "#d8f3dc",
-                            ]}
-                        />
+                                ]}
+                                labelPosition="centroid"
+                                data={chartsData}
+                                animate={{
+                                    duration: 1000
+                                }}
+                                colorScale={[
+                                    "#1b4332",
+                                    "#2d6a4f",
+                                    "#40916c",
+                                    "#52b788",
+                                    "#74c69d",
+                                    "#95d5b2",
+                                    "#a6ddbd",
+                                    "#b7e4c7",
+                                    "#d8f3dc",
+                                ]}
+                            />
+                        </div>
+                        <div className="circle-chart-type--select-container">
+                            <div className={"circle-chart-type--item" +
+                            (this.state.chartType === "total" ? " circle-chart-type--item--active" : "")
+                            }
+                                 onClick={() => this.setState({chartType: "total"})}
+                            >
+                                <div className={"circle-chart-type--item-wrapper"}><VictoryPie
+                                    data={[{
+                                        x: USD,
+                                        y: 0.5,
+                                    }, {
+                                        x: BTC,
+                                        y: 1,
+                                    }, {
+                                        x: USD,
+                                        y: 1.2,
+                                    }, {
+                                        x: EUR,
+                                        y: 1.5,
+                                    }]}
+                                    style={{labels: {fontSize: 45, fontWeight: "bold"}}}
+                                    labelComponent={<VictoryLabel/>}
+                                    labelRadius={40}
+                                    animate={{
+                                        duration: 1000
+                                    }}
+                                    colorScale={[
+                                        "#40916c",
+                                        "#52b788",
+                                        "#74c69d",
+                                        "#95d5b2",
+                                        "#a6ddbd",
+                                        "#b7e4c7",
+                                        "#d8f3dc",
+                                    ]}
+                                /></div>
+                                <div className="circle-chart-type--text">Total picture</div>
+                            </div>
+                            <div className={"circle-chart-type--item" +
+                            (this.state.chartType === "per-currency" ? " circle-chart-type--item--active" : "")
+                            }
+                                 onClick={() => this.setState({chartType: "per-currency"})}
+                            >
+                                <div className={"circle-chart-type--item-wrapper"}><VictoryPie
+                                    data={[{
+                                        x: BTC,
+                                        y: 1,
+                                    }, {
+                                        x: USD,
+                                        y: 1.2,
+                                    }, {
+                                        x: EUR,
+                                        y: 1.5,
+                                    }]}
+                                    style={{labels: {fontSize: 45, fontWeight: "bold"}}}
+                                    labelComponent={<VictoryLabel/>}
+                                    labelRadius={40}
+                                    animate={{
+                                        duration: 1000
+                                    }}
+                                    colorScale={[
+                                        "#40916c",
+                                        "#52b788",
+                                        "#74c69d",
+                                        "#95d5b2",
+                                        "#a6ddbd",
+                                        "#b7e4c7",
+                                        "#d8f3dc",
+                                    ]}
+                                /></div>
+                                <span className="circle-chart-type--text">Balance per currency</span>
+                            </div>
+                            <div className={"circle-chart-type--item" +
+                            (this.state.chartType === "per-type" ? " circle-chart-type--item--active" : "")
+                            }
+                                 onClick={() => this.setState({chartType: "per-type"})}
+                            >
+                                <div className={"circle-chart-type--item-wrapper"}><VictoryPie
+                                    data={[{
+                                        x: "cash",
+                                        y: 0.5,
+                                    }, {
+                                        x: "non-cash",
+                                        y: 1,
+                                    }, {
+                                        x: "crypto",
+                                        y: 0.8,
+                                    }]}
+                                    style={{labels: {fontSize: 45, fontWeight: "bold"}}}
+                                    labelComponent={<VictoryLabel/>}
+                                    labelRadius={40}
+                                    animate={{
+                                        duration: 1000
+                                    }}
+                                    colorScale={[
+                                        "#40916c",
+                                        "#52b788",
+                                        "#74c69d",
+                                        "#95d5b2",
+                                        "#a6ddbd",
+                                        "#b7e4c7",
+                                        "#d8f3dc",
+                                    ]}
+                                /></div>
+                                <div className="circle-chart-type--text">Balance per type</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             }

@@ -82,9 +82,41 @@
 
 .balance-circle-container {
   width: 90%;
-  padding: 5%;
+  height: 100%;
+  padding: 0 5%;
   display: flex;
-  flex-flow: row;
+  flex-flow: column;
   justify-content: space-evenly;
 }
 
+.balance-circle-chart {
+  height: 80%;
+}
+
+.circle-chart-type--select-container {
+  height: 20%;
+  padding: 0 10% 0 15%;
+  display: flex;
+  flex-flow: row;
+}
+
+.circle-chart-type--item--active {
+  background-color: #52b799;
+}
+
+.circle-chart-type--item:hover {
+  background-color: #d8f3dc;
+}
+
+.circle-chart-type--item {
+  width: 32%;
+  cursor: pointer;
+}
+
+.circle-chart-type--item-wrapper {
+  padding: 0 15%;
+}
+
+.circle-chart-type--text {
+  text-align: center;
+}
