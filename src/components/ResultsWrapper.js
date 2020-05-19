@@ -118,10 +118,7 @@ export default class ResultsWrapper extends React.Component {
 
                 let preparedAssets;
 
-                if (!this.state.chartType || (this.state.chartType === "total")) {
-                    preparedAssets = assets;
-
-                } else if (this.state.chartType === "per-currency") {
+                if (this.state.chartType === "per-currency") {
                     preparedAssets = Object.entries(assets
                         .reduce((a, asset) => {
                             if (a[asset.currency]) {
@@ -135,7 +132,7 @@ export default class ResultsWrapper extends React.Component {
                         }, {}))
                         .map(entries => entries[1]);
 
-                } else if (this.state.chartType === "per-type") {
+                } else {
                     preparedAssets = assets;
                 }
 
@@ -181,19 +178,21 @@ export default class ResultsWrapper extends React.Component {
                                             .replace(/(,0 )/gi, ',000 ')
                                             .replace(/(,0,)/gi, ',000,');
 
-                                        if (~~text.indexOf("\n")) {
-                                            return text.split("\n")
-                                                .map((row, i) => {
-                                                    if (!i) {
-                                                        return row;
-                                                    }
-                                                    const words = row.split(" ");
-                                                    words[0] = noExponents(words[0]);
-                                                    words[2] = `(${
-                                                        noExponents(words[2].replace(/[(%)]/gi, ""))
-                                                    }%)`;
-                                                    return words.join(" ")
-                                                })
+                                        if (~text.indexOf("\n")
+                                            || ~text.split(" ")[0].toLowerCase().indexOf("e")
+                                        ) {
+                                            const rows = text.split("\n");
+                                            return rows.map((row, i) => {
+                                                if (!i && rows.length > 1) {
+                                                    return row;
+                                                }
+                                                const words = row.split(" ");
+                                                words[0] = noExponents(words[0]);
+                                                words[2] = `(${
+                                                    noExponents(words[2].replace(/[(%)]/gi, ""))
+                                                }%)`;
+                                                return words.join(" ")
+                                            })
                                                 .join("\n");
                                         }
 
@@ -216,7 +215,7 @@ export default class ResultsWrapper extends React.Component {
                                         skipIndex = 0;
                                     }
 
-                                    return ~~(skipIndex * step + 25)
+                                    return skipIndex * step + 25
                                 }}
                                 events={[
                                     {
