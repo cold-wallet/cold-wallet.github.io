@@ -26,6 +26,7 @@ export default class ResultsWrapper extends React.Component {
             rates: props.initialRates || [],
             cryptoRates: props.initialCryptoRates || [],
             chartType: props.chartType || "total",
+            externalMutations: undefined,
         };
         this.props.latestAssetsConsumer(assets => this.setState({assets}));
         this.props.latestRatesConsumer(rates => this.setState({rates}));
@@ -51,6 +52,12 @@ export default class ResultsWrapper extends React.Component {
                 }</div>
             </div>
         </div>
+    }
+
+    removeMutation() {
+        this.setState({
+            externalMutations: undefined
+        });
     }
 
     getAnalyzers() {
@@ -102,6 +109,19 @@ export default class ResultsWrapper extends React.Component {
                         return asset
                     });
 
+                function buildAnotherTitle({percents, amount, currency}) {
+                    let afterDecimalPoint;
+                    if (percents < 0.01) {
+                        afterDecimalPoint = 8;
+                    } else if (percents < 2) {
+                        afterDecimalPoint = 2
+                    } else {
+                        afterDecimalPoint = 0
+                    }
+                    return ` (${numberFormat(percents, afterDecimalPoint)}%):
+                           ${noExponents(addCommas(numberFormat(amount, afterDecimalPoint)))} ${currency}`
+                }
+
                 function buildTitle(asset) {
                     let afterDecimalPoint;
                     if (asset.percents < 0.01) {
@@ -136,32 +156,71 @@ export default class ResultsWrapper extends React.Component {
                     preparedAssets = assets;
                 }
 
-                const tinyAmounts = preparedAssets.filter(asset => asset.percents < 1);
-                if (tinyAmounts.length > 1) {
-                    const otherAmounts = preparedAssets.filter(asset => asset.percents >= 1);
-                    const tinyAssetsComposite = tinyAmounts.reduce((accumulator, asset) => {
-                        accumulator.text += `\n${buildTitle(asset)}`;
-                        accumulator.usdAmount += asset.usdAmount;
-                        return accumulator
-                    }, {
-                        text: "",
-                        usdAmount: 0,
-                        percents: 0,
-                    });
+                let amountPerTypeChartData = [];
+                let yToEventKey = {};
 
-                    tinyAssetsComposite.percents = (100 * tinyAssetsComposite.usdAmount) / totalUsdAmount;
-                    tinyAssetsComposite.text = `Other ${numberFormat(tinyAssetsComposite.percents, 2)}% :`
-                        + tinyAssetsComposite.text;
+                if (this.state.chartType === "per-type") {
+                    const cashAssets = assets.filter(asset => asset.type === "cash");
+                    const nonCashAssets = assets.filter(asset => asset.type === "non-cash");
+                    const cryptoAssets = assets.filter(asset => asset.type === "crypto");
 
-                    otherAmounts.push(tinyAssetsComposite);
-                    preparedAssets = otherAmounts;
+                    amountPerTypeChartData = [{type: "cash", groupAssets: cashAssets},
+                        {type: "non-cash", groupAssets: nonCashAssets},
+                        {type: "crypto", groupAssets: cryptoAssets},]
+                        .map(({type, groupAssets}) => groupAssets.reduce((a, asset) => {
+                            a.y += asset.usdAmount;
+                            a.percents += asset.percents;
+                            return a
+                        }, {
+                            eventKey: type,
+                            x: type,
+                            percents: 0,
+                            y: 0,
+                        }))
+                        .map((o) => {
+                            o.x += buildAnotherTitle({
+                                percents: o.percents,
+                                amount: o.y,
+                                currency: USD,
+                            });
+                            return o
+                        });
+                    preparedAssets = cashAssets.concat(nonCashAssets).concat(cryptoAssets).map(asset => {
+                        asset.eventKey = asset.type;
+                        return asset
+                    })
+                } else {
+                    const tinyAmounts = preparedAssets.filter(asset => asset.percents < 1);
+                    if (tinyAmounts.length > 1) {
+                        const otherAmounts = preparedAssets.filter(asset => asset.percents >= 1);
+                        const tinyAssetsComposite = tinyAmounts.reduce((accumulator, asset) => {
+                            accumulator.text += `\n${buildTitle(asset)}`;
+                            accumulator.usdAmount += asset.usdAmount;
+                            return accumulator
+                        }, {
+                            text: "",
+                            usdAmount: 0,
+                            percents: 0,
+                        });
+
+                        tinyAssetsComposite.percents = (100 * tinyAssetsComposite.usdAmount) / totalUsdAmount;
+                        tinyAssetsComposite.text = `Other ${numberFormat(tinyAssetsComposite.percents, 2)}% :`
+                            + tinyAssetsComposite.text;
+
+                        otherAmounts.push(tinyAssetsComposite);
+                        preparedAssets = otherAmounts;
+                    }
                 }
 
                 const chartsData = preparedAssets.map(asset => {
                     return {
                         x: asset.text ? asset.text : buildTitle(asset),
                         y: asset.usdAmount,
+                        type: asset.type,
                     }
+                }).map(datum => {
+                    yToEventKey[datum.x] = datum.type;
+                    return datum
                 });
 
                 if (!chartsData.length) {
@@ -170,11 +229,58 @@ export default class ResultsWrapper extends React.Component {
 
                 return <div key={key} className={"balance-results-container"}>
                     <div className={"balance-circle-container"}>
-                        <div className={"balance-circle-chart"}>
+                        <div className={"balance-circle-chart"}>{[
+                            this.state.chartType === "per-type" ? <VictoryPie
+                                key={"grouped"}
+                                name={"per-type-chart"}
+                                style={{
+                                    parent: {
+                                        top: "-2%",
+                                        right: "2.5%",
+                                        position: "absolute",
+                                        width: "45%",
+                                    },
+                                    labels: {
+                                        fontSize: 8,
+                                        fill: "black",
+                                    },
+                                }}
+                                externalEventMutations={this.state.externalMutations}
+                                width={300}
+                                height={300}
+                                labelRadius={70}
+                                data={amountPerTypeChartData}
+                                events={[]}
+                                colorScale={[
+                                    "#1b4932",
+                                    "#40966c",
+                                    "#95d9b2",
+                                ]}
+                            /> : null,
                             <VictoryPie
+                                key="total"
+                                width={300}
+                                height={300}
+                                style={this.state.chartType === "per-type" ? {
+                                    parent: {
+                                        top: "14%",
+                                        right: "10%",
+                                        width: "30%",
+                                        position: "absolute",
+                                    },
+                                    labels: {
+                                        fontSize: 12,
+                                        fill: "black",
+                                    },
+                                } : {
+                                    labels: {
+                                        fontSize: 10,
+                                        fill: "black",
+                                    }
+                                }}
                                 labelComponent={<VictoryLabel
-                                    text={datum => {
-                                        let text = datum.datum.xName
+                                    text={({datum}) => {
+                                        let text = datum.xName
                                             .replace(/(,0 )/gi, ',000 ')
                                             .replace(/(,0,)/gi, ',000,');
 
@@ -200,7 +306,7 @@ export default class ResultsWrapper extends React.Component {
                                     }}
                                     className={"pie-chart-label"}/>}
                                 labelRadius={(e) => {
-                                    const maxRadius = 120;
+                                    const maxRadius = this.state.chartType === "per-type" ? 80 : 60;
                                     const elementsCount = e.data.length;
 
                                     if (e.index === elementsCount - 1) {
@@ -215,49 +321,92 @@ export default class ResultsWrapper extends React.Component {
                                         skipIndex = 0;
                                     }
 
-                                    return skipIndex * step + 25
+                                    return skipIndex * step + 20;
                                 }}
-                                events={[
-                                    {
-                                        target: "data",
-                                        eventHandlers: {
-                                            onMouseOver: () => {
-                                                return [{
-                                                    target: "labels",
-                                                    mutation: (props) => {
-                                                        return {
+                                events={[{
+                                    target: "data",
+                                    eventHandlers: {
+                                        onMouseOver: () => [{
+                                            target: "labels",
+                                            mutation: (props) => {
+                                                console.log(yToEventKey[props?.slice?.data?.x]);
+                                                this.setState({
+                                                    externalMutations: [{
+                                                        childName: "per-type-chart",
+                                                        target: "labels",
+                                                        eventKey: yToEventKey[props?.slice?.data?.x],
+                                                        mutation: (props) => ({
                                                             style: Object.assign({}, props.style, {
                                                                 fill: "#00FF03",
-                                                            })
-                                                        };
-                                                    }
-                                                }, {
-                                                    target: "data",
-                                                    mutation: (props) => {
-                                                        return {
+                                                            }),
+                                                        }),
+                                                        callback: () => this.removeMutation()
+                                                    }, {
+                                                        childName: "per-type-chart",
+                                                        target: "data",
+                                                        eventKey: yToEventKey[props?.slice?.data?.x],
+                                                        mutation: (props) => ({
                                                             style: Object.assign({}, props.style, {
                                                                 stroke: "#00FF03",
                                                                 strokeWidth: 1,
                                                             })
-                                                        };
-                                                    }
-                                                }];
-                                            },
-                                            onMouseOut: () => {
-                                                return [{
-                                                    target: "labels",
-                                                    mutation: () => {
-                                                        return null
-                                                    }
-                                                }, {
-                                                    mutation: () => {
-                                                        return null
-                                                    }
-                                                }];
+                                                        }),
+                                                        callback: () => this.removeMutation()
+                                                    }]
+                                                });
+                                                return {
+                                                    style: Object.assign({}, props.style, {
+                                                        fill: "#00FF03",
+                                                    })
+                                                };
                                             }
-                                        }
+                                        }, {
+                                            target: "data",
+                                            mutation: (props) => {
+                                                return {
+                                                    style: Object.assign({}, props.style, {
+                                                        stroke: "#00FF03",
+                                                        strokeWidth: 1,
+                                                    })
+                                                };
+                                            }
+                                        }],
+                                        onMouseOut: (props) => [{
+                                            target: "labels",
+                                            mutation: (p) => {
+                                                console.log(p);
+                                                this.setState({
+                                                    externalMutations: [{
+                                                        childName: "per-type-chart",
+                                                        target: "labels",
+                                                        eventKey: "all",
+                                                        mutation: (props) => ({
+                                                            style: Object.assign({}, props.style, {
+                                                                fill: "black",
+                                                            })
+                                                        }),
+                                                        callback: () => this.removeMutation()
+                                                    }, {
+                                                        childName: "per-type-chart",
+                                                        target: "data",
+                                                        eventKey: "all",
+                                                        mutation: (props) => ({
+                                                            style: Object.assign({}, props.style, {
+                                                                strokeWidth: 0,
+                                                            })
+                                                        }),
+                                                        callback: () => this.removeMutation()
+                                                    }]
+                                                });
+                                                return null
+                                            }
+                                        }, {
+                                            mutation: () => {
+                                                return null
+                                            }
+                                        }]
                                     }
-                                ]}
+                                }]}
                                 labelPosition="centroid"
                                 data={chartsData}
                                 animate={{
@@ -275,7 +424,7 @@ export default class ResultsWrapper extends React.Component {
                                     "#d8f3dc",
                                 ]}
                             />
-                        </div>
+                        ]}</div>
                         <div className="circle-chart-type--select-container">
                             <div className={"circle-chart-type--item" +
                             (this.state.chartType === "total" ? " circle-chart-type--item--active" : "")
