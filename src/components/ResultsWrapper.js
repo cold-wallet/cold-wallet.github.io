@@ -296,6 +296,7 @@ export default class ResultsWrapper extends React.Component {
                                         top: "14%",
                                         right: "10%",
                                         width: "30%",
+                                        height: "10%",
                                         position: "absolute",
                                     },
                                     labels: {
@@ -315,7 +316,7 @@ export default class ResultsWrapper extends React.Component {
                                     const maxRadius = this.state.chartType === "per-type" ? 80 : 60;
                                     const elementsCount = e.data.length;
 
-                                    if (e.index === elementsCount - 1) {
+                                    if (e.index === elementsCount - 1 && this.state.chartType !== "per-type") {
                                         return maxRadius
                                     }
 
