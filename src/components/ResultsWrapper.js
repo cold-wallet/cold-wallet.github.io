@@ -159,6 +159,36 @@ export default class ResultsWrapper extends React.Component {
                 let amountPerTypeChartData = [];
                 let yToEventKey = {};
 
+                function fixLabelText(text) {
+                    text = (text || "")
+                        .replace(/(,0 )/gi, ',000 ')
+                        .replace(/(,0,)/gi, ',000,');
+
+                    if (~text.indexOf("\n")
+                        || ~text.split(" ")[0].toLowerCase().indexOf("e")
+                    ) {
+                        const rows = text.split("\n");
+                        return rows.map((row, i) => {
+                            if (!i && rows.length > 1) {
+                                return row;
+                            }
+                            const words = row.split(" ");
+                            words[0] = noExponents(words[0]);
+                            words[2] = `(${
+                                noExponents(words[2].replace(/[(%)]/gi, ""))
+                            }%)`;
+                            return words.join(" ")
+                        })
+                            .join("\n");
+                    }
+
+                    return text
+                }
+
+                function extractEventKey(props) {
+                    return yToEventKey[fixLabelText(props?.slice?.data?.x)];
+                }
+
                 if (this.state.chartType === "per-type") {
                     const cashAssets = assets.filter(asset => asset.type === "cash");
                     const nonCashAssets = assets.filter(asset => asset.type === "non-cash");
@@ -279,31 +309,7 @@ export default class ResultsWrapper extends React.Component {
                                     }
                                 }}
                                 labelComponent={<VictoryLabel
-                                    text={({datum}) => {
-                                        let text = datum.xName
-                                            .replace(/(,0 )/gi, ',000 ')
-                                            .replace(/(,0,)/gi, ',000,');
-
-                                        if (~text.indexOf("\n")
-                                            || ~text.split(" ")[0].toLowerCase().indexOf("e")
-                                        ) {
-                                            const rows = text.split("\n");
-                                            return rows.map((row, i) => {
-                                                if (!i && rows.length > 1) {
-                                                    return row;
-                                                }
-                                                const words = row.split(" ");
-                                                words[0] = noExponents(words[0]);
-                                                words[2] = `(${
-                                                    noExponents(words[2].replace(/[(%)]/gi, ""))
-                                                }%)`;
-                                                return words.join(" ")
-                                            })
-                                                .join("\n");
-                                        }
-
-                                        return text
-                                    }}
+                                    text={({datum}) => fixLabelText(datum.xName)}
                                     className={"pie-chart-label"}/>}
                                 labelRadius={(e) => {
                                     const maxRadius = this.state.chartType === "per-type" ? 80 : 60;
@@ -329,22 +335,22 @@ export default class ResultsWrapper extends React.Component {
                                         onMouseOver: () => [{
                                             target: "labels",
                                             mutation: (props) => {
-                                                console.log(yToEventKey[props?.slice?.data?.x]);
-                                                this.setState({
+                                                this.state.chartType === "per-type" && this.setState({
                                                     externalMutations: [{
                                                         childName: "per-type-chart",
                                                         target: "labels",
-                                                        eventKey: yToEventKey[props?.slice?.data?.x],
+                                                        eventKey: extractEventKey(props),
                                                         mutation: (props) => ({
                                                             style: Object.assign({}, props.style, {
                                                                 fill: "#00FF03",
+                                                                textShadow: "1px 1px 2px black, 0 0 1em black",
                                                             }),
                                                         }),
                                                         callback: () => this.removeMutation()
                                                     }, {
                                                         childName: "per-type-chart",
                                                         target: "data",
-                                                        eventKey: yToEventKey[props?.slice?.data?.x],
+                                                        eventKey: extractEventKey(props),
                                                         mutation: (props) => ({
                                                             style: Object.assign({}, props.style, {
                                                                 stroke: "#00FF03",
@@ -357,6 +363,7 @@ export default class ResultsWrapper extends React.Component {
                                                 return {
                                                     style: Object.assign({}, props.style, {
                                                         fill: "#00FF03",
+                                                        textShadow: "1px 1px 2px black, 0 0 1em black",
                                                     })
                                                 };
                                             }
@@ -374,8 +381,7 @@ export default class ResultsWrapper extends React.Component {
                                         onMouseOut: (props) => [{
                                             target: "labels",
                                             mutation: (p) => {
-                                                console.log(p);
-                                                this.setState({
+                                                this.state.chartType === "per-type" && this.setState({
                                                     externalMutations: [{
                                                         childName: "per-type-chart",
                                                         target: "labels",
@@ -383,6 +389,7 @@ export default class ResultsWrapper extends React.Component {
                                                         mutation: (props) => ({
                                                             style: Object.assign({}, props.style, {
                                                                 fill: "black",
+                                                                textShadow: "",
                                                             })
                                                         }),
                                                         callback: () => this.removeMutation()
