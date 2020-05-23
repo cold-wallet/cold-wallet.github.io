@@ -4,6 +4,9 @@ import currencies from './../resources/currencies-iso-4217';
 import NumberFormat from 'react-number-format'
 import {VictoryLabel, VictoryPie} from "victory"
 import noExponents from "../extensions/noExponents";
+import Highcharts from 'highcharts'
+import HighchartsReact from 'highcharts-react-official'
+import './../extensions/highChartTheme'
 
 const uahNumCode = 980;
 const BTC = "BTC";
@@ -26,7 +29,6 @@ export default class ResultsWrapper extends React.Component {
             rates: props.initialRates || [],
             cryptoRates: props.initialCryptoRates || [],
             chartType: props.chartType || "total",
-            externalMutations: undefined,
         };
         this.props.latestAssetsConsumer(assets => this.setState({assets}));
         this.props.latestRatesConsumer(rates => this.setState({rates}));
@@ -52,12 +54,6 @@ export default class ResultsWrapper extends React.Component {
                 }</div>
             </div>
         </div>
-    }
-
-    removeMutation() {
-        this.setState({
-            externalMutations: undefined
-        });
     }
 
     getAnalyzers() {
@@ -118,8 +114,7 @@ export default class ResultsWrapper extends React.Component {
                     } else {
                         afterDecimalPoint = 0
                     }
-                    return ` (${numberFormat(percents, afterDecimalPoint)}%):
-                           ${noExponents(addCommas(numberFormat(amount, afterDecimalPoint)))} ${currency}`
+                    return ` : ${noExponents(addCommas(numberFormat(amount, afterDecimalPoint)))} ${currency}`
                 }
 
                 function buildTitle(asset) {
@@ -134,6 +129,11 @@ export default class ResultsWrapper extends React.Component {
                     const amount = noExponents(addCommas(asset.amount));
                     const percents = numberFormat(asset.percents, afterDecimalPoint);
                     return `${amount} ${asset.currency} (${percents}%)`
+                }
+
+                function buildHighChartsTitle(asset) {
+                    const amount = noExponents(addCommas(asset.amount));
+                    return `${amount} ${asset.currency}`
                 }
 
                 let preparedAssets;
@@ -159,44 +159,22 @@ export default class ResultsWrapper extends React.Component {
                 let amountPerTypeChartData = [];
                 let yToEventKey = {};
 
-                function fixLabelText(text) {
-                    text = (text || "")
-                        .replace(/(,0 )/gi, ',000 ')
-                        .replace(/(,0,)/gi, ',000,');
-
-                    if (~text.indexOf("\n")
-                        || ~text.split(" ")[0].toLowerCase().indexOf("e")
-                    ) {
-                        const rows = text.split("\n");
-                        return rows.map((row, i) => {
-                            if (!i && rows.length > 1) {
-                                return row;
-                            }
-                            const words = row.split(" ");
-                            words[0] = noExponents(words[0]);
-                            words[2] = `(${
-                                noExponents(words[2].replace(/[(%)]/gi, ""))
-                            }%)`;
-                            return words.join(" ")
-                        })
-                            .join("\n");
+                if (this.state.chartType === "per-type") {
+                    const buffer = [];
+                    const cashAssets = assets.filter(asset => asset.type === "cash");
+                    if (cashAssets.length) {
+                        buffer.push({type: "cash", groupAssets: cashAssets})
+                    }
+                    const nonCashAssets = assets.filter(asset => asset.type === "non-cash");
+                    if (nonCashAssets.length) {
+                        buffer.push({type: "non-cash", groupAssets: nonCashAssets})
+                    }
+                    const cryptoAssets = assets.filter(asset => asset.type === "crypto");
+                    if (cryptoAssets.length) {
+                        buffer.push({type: "crypto", groupAssets: cryptoAssets})
                     }
 
-                    return text
-                }
-
-                function extractEventKey(props) {
-                    return yToEventKey[fixLabelText(props?.slice?.data?.x)];
-                }
-
-                if (this.state.chartType === "per-type") {
-                    const cashAssets = assets.filter(asset => asset.type === "cash");
-                    const nonCashAssets = assets.filter(asset => asset.type === "non-cash");
-                    const cryptoAssets = assets.filter(asset => asset.type === "crypto");
-
-                    amountPerTypeChartData = [{type: "cash", groupAssets: cashAssets},
-                        {type: "non-cash", groupAssets: nonCashAssets},
-                        {type: "crypto", groupAssets: cryptoAssets},]
+                    amountPerTypeChartData = buffer
                         .map(({type, groupAssets}) => groupAssets.reduce((a, asset) => {
                             a.y += asset.usdAmount;
                             a.percents += asset.percents;
@@ -234,8 +212,7 @@ export default class ResultsWrapper extends React.Component {
                         });
 
                         tinyAssetsComposite.percents = (100 * tinyAssetsComposite.usdAmount) / totalUsdAmount;
-                        tinyAssetsComposite.text = `Other ${numberFormat(tinyAssetsComposite.percents, 2)}% :`
-                            + tinyAssetsComposite.text;
+                        tinyAssetsComposite.text = `Other : ${tinyAssetsComposite.text}`;
 
                         otherAmounts.push(tinyAssetsComposite);
                         preparedAssets = otherAmounts;
@@ -257,182 +234,114 @@ export default class ResultsWrapper extends React.Component {
                     return null
                 }
 
+                const series = [{
+                    allowPointSelect: true,
+                    name: 'TOTAL',
+                    innerSize: (this.state.chartType === "per-type") ? '55%' : 0,
+                    size: '85%',
+                    accessibility: {
+                        announceNewData: {
+                            enabled: true
+                        },
+                    },
+                    dataLabels: {
+                        distance: 20,
+                    },
+                    data: preparedAssets.map(asset => {
+                        return {
+                            x: asset.text ? asset.text : buildHighChartsTitle(asset),
+                            y: asset.usdAmount,
+                            type: asset.type,
+                        }
+                    }).map(item => ({
+                        name: item.x,
+                        y: item.y,
+                    }))
+                }];
+                if (this.state.chartType === "per-type") {
+                    series.unshift({
+                        name: 'Total',
+                        size: '44%',
+                        dataLabels: {
+                            distance: -30,
+                            filter: {
+                                property: 'percentage',
+                                operator: '>',
+                                value: 0
+                            }
+                        },
+                        allowPointSelect: false,
+                        data: amountPerTypeChartData.map(item => ({
+                            name: item.x,
+                            y: item.y,
+                        })),
+                    })
+                }
+
+                // Make monochrome colors
+                const pieColors = (function () {
+                    let colors = [],
+                        base = Highcharts.getOptions().colors[0],
+                        i;
+
+                    for (i = 0; i < 10; i += 1) {
+                        // Start out with a darkened base color (negative brighten), and end
+                        // up with a much brighter color
+                        colors.push(Highcharts.color(base).brighten((i - 3) / 7).get());
+                    }
+                    return colors;
+                }());
+
+                const options = {
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: '',
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                    },
+                    accessibility: {
+                        announceNewData: {
+                            enabled: true
+                        },
+                        point: {
+                            valueSuffix: '%'
+                        }
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            colors: pieColors,
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b><br>{point.percentage:.2f} %',
+                                distance: 20,
+                                filter: {
+                                    property: 'percentage',
+                                    operator: '>',
+                                    value: 1
+                                }
+                            }
+                        }
+                    },
+                    series: series,
+                };
+
                 return <div key={key} className={"balance-results-container"}>
                     <div className={"balance-circle-container"}>
-                        <div className={"balance-circle-chart"}>{[
-                            this.state.chartType === "per-type" ? <VictoryPie
-                                key={"grouped"}
-                                name={"per-type-chart"}
-                                style={{
-                                    parent: {
-                                        top: "-2%",
-                                        right: "2.5%",
-                                        position: "absolute",
-                                        width: "45%",
-                                    },
-                                    labels: {
-                                        fontSize: 8,
-                                        fill: "black",
-                                    },
-                                }}
-                                externalEventMutations={this.state.externalMutations}
-                                width={300}
-                                height={300}
-                                labelRadius={70}
-                                data={amountPerTypeChartData}
-                                events={[]}
-                                colorScale={[
-                                    "#1b4932",
-                                    "#40966c",
-                                    "#95d9b2",
-                                ]}
-                            /> : null,
-                            <VictoryPie
-                                key="total"
-                                width={300}
-                                height={300}
-                                style={this.state.chartType === "per-type" ? {
-                                    parent: {
-                                        top: "14%",
-                                        right: "10%",
-                                        width: "30%",
-                                        height: "10%",
-                                        position: "absolute",
-                                    },
-                                    labels: {
-                                        fontSize: 12,
-                                        fill: "black",
-                                    },
-                                } : {
-                                    labels: {
-                                        fontSize: 10,
-                                        fill: "black",
-                                    }
-                                }}
-                                labelComponent={<VictoryLabel
-                                    text={({datum}) => fixLabelText(datum.xName)}
-                                    className={"pie-chart-label"}/>}
-                                labelRadius={(e) => {
-                                    const maxRadius = this.state.chartType === "per-type" ? 80 : 60;
-                                    const elementsCount = e.data.length;
-
-                                    if (e.index === elementsCount - 1 && this.state.chartType !== "per-type") {
-                                        return maxRadius
-                                    }
-
-                                    const step = maxRadius / elementsCount;
-                                    const skipCount = 2; // empiric value
-                                    let skipIndex = e.index - skipCount;
-
-                                    if (skipIndex <= 0) {
-                                        skipIndex = 0;
-                                    }
-
-                                    return skipIndex * step + 20;
-                                }}
-                                events={[{
-                                    target: "data",
-                                    eventHandlers: {
-                                        onMouseOver: () => [{
-                                            target: "labels",
-                                            mutation: (props) => {
-                                                this.state.chartType === "per-type" && this.setState({
-                                                    externalMutations: [{
-                                                        childName: "per-type-chart",
-                                                        target: "labels",
-                                                        eventKey: extractEventKey(props),
-                                                        mutation: (props) => ({
-                                                            style: Object.assign({}, props.style, {
-                                                                fill: "#00FF03",
-                                                                textShadow: "1px 1px 2px black, 0 0 1em black",
-                                                            }),
-                                                        }),
-                                                        callback: () => this.removeMutation()
-                                                    }, {
-                                                        childName: "per-type-chart",
-                                                        target: "data",
-                                                        eventKey: extractEventKey(props),
-                                                        mutation: (props) => ({
-                                                            style: Object.assign({}, props.style, {
-                                                                stroke: "#00FF03",
-                                                                strokeWidth: 1,
-                                                            })
-                                                        }),
-                                                        callback: () => this.removeMutation()
-                                                    }]
-                                                });
-                                                return {
-                                                    style: Object.assign({}, props.style, {
-                                                        fill: "#00FF03",
-                                                        textShadow: "1px 1px 2px black, 0 0 1em black",
-                                                    })
-                                                };
-                                            }
-                                        }, {
-                                            target: "data",
-                                            mutation: (props) => {
-                                                return {
-                                                    style: Object.assign({}, props.style, {
-                                                        stroke: "#00FF03",
-                                                        strokeWidth: 1,
-                                                    })
-                                                };
-                                            }
-                                        }],
-                                        onMouseOut: (props) => [{
-                                            target: "labels",
-                                            mutation: (p) => {
-                                                this.state.chartType === "per-type" && this.setState({
-                                                    externalMutations: [{
-                                                        childName: "per-type-chart",
-                                                        target: "labels",
-                                                        eventKey: "all",
-                                                        mutation: (props) => ({
-                                                            style: Object.assign({}, props.style, {
-                                                                fill: "black",
-                                                                textShadow: "",
-                                                            })
-                                                        }),
-                                                        callback: () => this.removeMutation()
-                                                    }, {
-                                                        childName: "per-type-chart",
-                                                        target: "data",
-                                                        eventKey: "all",
-                                                        mutation: (props) => ({
-                                                            style: Object.assign({}, props.style, {
-                                                                strokeWidth: 0,
-                                                            })
-                                                        }),
-                                                        callback: () => this.removeMutation()
-                                                    }]
-                                                });
-                                                return null
-                                            }
-                                        }, {
-                                            mutation: () => {
-                                                return null
-                                            }
-                                        }]
-                                    }
-                                }]}
-                                labelPosition="centroid"
-                                data={chartsData}
-                                animate={{
-                                    duration: 1000
-                                }}
-                                colorScale={[
-                                    "#1b4332",
-                                    "#2d6a4f",
-                                    "#40916c",
-                                    "#52b788",
-                                    "#74c69d",
-                                    "#95d5b2",
-                                    "#a6ddbd",
-                                    "#b7e4c7",
-                                    "#d8f3dc",
-                                ]}
+                        <div className={"balance-circle-chart"}>
+                            <HighchartsReact
+                                key={"highChart"}
+                                highcharts={Highcharts}
+                                options={options}
                             />
-                        ]}</div>
+                        </div>
                         <div className="circle-chart-type--select-container">
                             <div className={"circle-chart-type--item" +
                             (this.state.chartType === "total" ? " circle-chart-type--item--active" : "")

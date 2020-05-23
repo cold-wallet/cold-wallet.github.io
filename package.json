@@ -15,7 +15,9 @@
     "universal-cookie": "latest",
     "axios": "^0.19.2",
     "react-number-format": "^4.4.1",
-    "victory": "^34.3.5"
+    "victory": "^34.3.5",
+    "highcharts": "^8.1.0",
+    "highcharts-react-official": "^3.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
