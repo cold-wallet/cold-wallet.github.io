@@ -246,6 +246,11 @@ export default class ResultsWrapper extends React.Component {
                     },
                     dataLabels: {
                         distance: 20,
+                        filter: {
+                            property: 'percentage',
+                            operator: '>',
+                            value: 1
+                        }
                     },
                     data: preparedAssets.map(asset => {
                         return {
