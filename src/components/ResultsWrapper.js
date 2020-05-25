@@ -338,6 +338,15 @@ export default class ResultsWrapper extends React.Component {
                     series: series,
                 };
 
+                const colorScale = [
+                    "#40916c",
+                    "#52b788",
+                    "#74c69d",
+                    "#95d5b2",
+                    "#a6ddbd",
+                    "#b7e4c7",
+                    "#d8f3dc",
+                ];
                 return <div key={key} className={"balance-results-container"}>
                     <div className={"balance-circle-container"}>
                         <div className={"balance-circle-chart"}>
@@ -373,15 +382,7 @@ export default class ResultsWrapper extends React.Component {
                                     animate={{
                                         duration: 1000
                                     }}
-                                    colorScale={[
-                                        "#40916c",
-                                        "#52b788",
-                                        "#74c69d",
-                                        "#95d5b2",
-                                        "#a6ddbd",
-                                        "#b7e4c7",
-                                        "#d8f3dc",
-                                    ]}
+                                    colorScale={colorScale}
                                 /></div>
                                 <div className="circle-chart-type--text">Total picture</div>
                             </div>
@@ -407,15 +408,7 @@ export default class ResultsWrapper extends React.Component {
                                     animate={{
                                         duration: 1000
                                     }}
-                                    colorScale={[
-                                        "#40916c",
-                                        "#52b788",
-                                        "#74c69d",
-                                        "#95d5b2",
-                                        "#a6ddbd",
-                                        "#b7e4c7",
-                                        "#d8f3dc",
-                                    ]}
+                                    colorScale={colorScale}
                                 /></div>
                                 <span className="circle-chart-type--text">Balance per currency</span>
                             </div>
@@ -441,15 +434,7 @@ export default class ResultsWrapper extends React.Component {
                                     animate={{
                                         duration: 1000
                                     }}
-                                    colorScale={[
-                                        "#40916c",
-                                        "#52b788",
-                                        "#74c69d",
-                                        "#95d5b2",
-                                        "#a6ddbd",
-                                        "#b7e4c7",
-                                        "#d8f3dc",
-                                    ]}
+                                    colorScale={colorScale}
                                 /></div>
                                 <div className="circle-chart-type--text">Balance per type</div>
                             </div>
