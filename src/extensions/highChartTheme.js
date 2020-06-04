@@ -8,7 +8,16 @@ import Highcharts from "highcharts";
     }, null, document.getElementsByTagName('head')[0]);
     Highcharts.theme = {
         colors: [
-            "#40916c",
+            "#41926d",
+            "#2d6a4f",
+            "#357a5b",
+            "#5bac85",
+            "#b7e4c7",
+            "#d8f3dc",
+            "#6ab791",
+            "#245741",
+            "#78c19c",
+            "#98d3b2",
         ],
         chart: {
             backgroundColor: {},
