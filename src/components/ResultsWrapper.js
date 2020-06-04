@@ -8,7 +8,10 @@ import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import './../extensions/highChartTheme'
 
-const uahNumCode = 980;
+// -> Load Highcharts modules
+import highCharts3d from 'highcharts/highcharts-3d'
+highCharts3d(Highcharts);
+
 const BTC = "BTC";
 const USD = "USD";
 const EUR = "EUR";
@@ -302,13 +305,15 @@ export default class ResultsWrapper extends React.Component {
                         plotBackgroundColor: null,
                         plotBorderWidth: null,
                         plotShadow: false,
-                        type: 'pie'
+                        type: 'pie',
+                        options3d: {
+                            enabled: true,
+                            alpha: 35,
+                            beta: 0
+                        },
                     },
                     title: {
                         text: '',
-                    },
-                    tooltip: {
-                        pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
                     },
                     accessibility: {
                         announceNewData: {
@@ -322,6 +327,7 @@ export default class ResultsWrapper extends React.Component {
                         pie: {
                             allowPointSelect: true,
                             cursor: 'pointer',
+                            depth: 35,
                             colors: pieColors,
                             dataLabels: {
                                 enabled: true,
