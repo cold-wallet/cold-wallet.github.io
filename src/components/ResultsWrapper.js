@@ -1,15 +1,16 @@
 import React from "react";
 import './ResultsWrapper.css'
-import currencies from './../resources/currencies-iso-4217';
 import NumberFormat from 'react-number-format'
 import {VictoryLabel, VictoryPie} from "victory"
 import noExponents from "../extensions/noExponents";
+import numberFormat from "../extensions/numberFormat";
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import './../extensions/highChartTheme'
-
+import rates from "./rates";
 // -> Load Highcharts modules
 import highCharts3d from 'highcharts/highcharts-3d'
+//
 highCharts3d(Highcharts);
 
 const BTC = "BTC";
@@ -456,7 +457,6 @@ export default class ResultsWrapper extends React.Component {
         const resultCurrencyType = currencyCodeToType[1];
         let totalAmount = 0;
 
-
         return <div key={resultCurrencyCode} className={"total-amount-in-one-currency"}>
             <div className={"total-amount-in-currencies--title"}>All in {resultCurrencyCode} :</div>
             {
@@ -622,21 +622,6 @@ export default class ResultsWrapper extends React.Component {
             return amountFrom / price;
         }
     }
-}
-
-function numberFormat(fixMe, afterDecimalPoint) {
-    fixMe = noExponents(fixMe);
-    if (afterDecimalPoint === 0) {
-        return Math.round(fixMe)
-    }
-    fixMe = "" + fixMe;
-    if (fixMe.indexOf(".") >= 0) {
-        const [left, right] = fixMe.split(/[.]/gi);
-        if (right.length > afterDecimalPoint) {
-            fixMe = left + "." + right.slice(0, afterDecimalPoint)
-        }
-    }
-    return +noExponents(fixMe)
 }
 
 function addCommas(toMe) {
