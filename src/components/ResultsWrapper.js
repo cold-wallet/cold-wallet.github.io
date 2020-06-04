@@ -286,19 +286,19 @@ export default class ResultsWrapper extends React.Component {
                     })
                 }
 
-                // Make monochrome colors
-                const pieColors = (function () {
-                    let colors = [],
-                        base = Highcharts.getOptions().colors[0],
-                        i;
-
-                    for (i = 0; i < 10; i += 1) {
-                        // Start out with a darkened base color (negative brighten), and end
-                        // up with a much brighter color
-                        colors.push(Highcharts.color(base).brighten((i - 3) / 7).get());
-                    }
-                    return colors;
-                }());
+                const pieColors = [
+                    "#103b34",
+                    "#245741",
+                    "#2d6a4f",
+                    "#357a5b",
+                    "#41926d",
+                    "#5bac85",
+                    "#6ab791",
+                    "#78c19c",
+                    "#98d3b2",
+                    "#b7e4c7",
+                    "#d8f3dc",
+                ];
 
                 const options = {
                     chart: {
