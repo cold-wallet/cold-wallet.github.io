@@ -89,9 +89,7 @@ export default class ResultsWrapper extends React.Component {
                     .concat(data["non-cash"].assets)
                     .concat(data.crypto.assets)
                     .map(asset => {
-                        asset.usdAmount = (asset.type === "crypto")
-                            ? this.cryptoCurrencyAssetToCurrency(asset, USD)
-                            : this.currencyAssetToCurrency(asset, USD);
+                        asset.usdAmount = rates.transformAssetValueToFiat(asset, USD);
                         return asset
                     })
                     .sort((a, b) => b.usdAmount - a.usdAmount)
@@ -471,13 +469,9 @@ export default class ResultsWrapper extends React.Component {
                                     amount = asset.amount
 
                                 } else if (resultCurrencyType === "crypto") {
-                                    amount = (group.type === "crypto")
-                                        ? this.cryptoCurrencyAssetToCryptoCurrency(asset, resultCurrencyCode)
-                                        : this.currencyAssetToCryptoCurrency(asset, resultCurrencyCode);
+                                    amount = rates.transformAssetValueToCrypto(asset, resultCurrencyCode);
                                 } else {
-                                    amount = (group.type === "crypto")
-                                        ? this.cryptoCurrencyAssetToCurrency(asset, resultCurrencyCode)
-                                        : this.currencyAssetToCurrency(asset, resultCurrencyCode);
+                                    amount = rates.transformAssetValueToFiat(asset, resultCurrencyCode);
                                 }
                                 totalAmount += +amount;
 
@@ -514,113 +508,6 @@ export default class ResultsWrapper extends React.Component {
                                    thousandSeparator={true}/></div>
             </div>
         </div>
-    }
-
-    currencyAssetToCurrency({amount, currency}, outputCurrency) {
-        let outputCurrencyNumCode = +(currencies[outputCurrency].numCode);
-        let currencyNumCode = +(currencies[currency].numCode);
-
-        if (currencyNumCode === outputCurrencyNumCode) {
-            return amount
-        }
-
-        const amountInUah = this.transformCurrencyToUAH(amount, currencyNumCode);
-
-        if (outputCurrencyNumCode === uahNumCode) {
-            return amountInUah
-        }
-
-        const rateCross = this.findRate(outputCurrencyNumCode, uahNumCode);
-        return amountInUah / rateCross;
-    }
-
-    findRate(left, right) {
-        const rate = this.state.rates.filter(r => (r.currencyCodeA === left)
-            && (r.currencyCodeB === right))[0];
-
-        return rate.rateCross || ((rate.rateBuy + rate.rateSell) / 2);
-    }
-
-    transformCurrencyToUAH(amount, currencyNumCode) {
-        if (currencyNumCode === uahNumCode) {
-            return amount;
-        }
-
-        const rateCross = this.findRate(currencyNumCode, uahNumCode);
-        return amount * rateCross;
-    }
-
-    getCryptoPrice(left, right) {
-        const ticker = this.state.cryptoRates.filter(r => r.symbol === `${left}${right}`)[0] || {};
-        const price = +(ticker.price);
-
-        if (price && !isNaN(price)) {
-            return price;
-        }
-    }
-
-    cryptoCurrencyAssetToCurrency(asset, outputCurrency) {
-        const btcAmount = (asset.currency === BTC)
-            ? asset.amount
-            : this.transformCrypto(asset.amount, asset.currency, BTC);
-
-        const btcEurPrice = this.getCryptoPrice(BTC, EUR);
-        const amountInEur = btcAmount * btcEurPrice;
-
-        if (asset.currency === BTC && outputCurrency === EUR) {
-            return amountInEur;
-        }
-
-        return this.currencyAssetToCurrency({amount: amountInEur, currency: EUR}, outputCurrency);
-    }
-
-    currencyAssetToCryptoCurrency(asset, outputCurrency) {
-        if (asset.currency === outputCurrency) {
-            return asset.amount
-        }
-
-        const eurAmount = (asset.currency === EUR)
-            ? asset.amount
-            : this.currencyAssetToCurrency(asset, EUR);
-
-        const btcEurPrice = this.getCryptoPrice(BTC, EUR);
-        const btcAmount = eurAmount / btcEurPrice;
-
-        if (outputCurrency === BTC) {
-            return btcAmount
-        }
-
-        let amount = this.transformCrypto(btcAmount, BTC, outputCurrency);
-        if (amount) {
-            return amount;
-        }
-
-        console.log("not found adequate transformation", asset, outputCurrency);
-        return 0;
-    }
-
-    cryptoCurrencyAssetToCryptoCurrency(asset, resultCurrencyCode) {
-        if (asset.currency === resultCurrencyCode) {
-            return asset.amount
-        }
-        let amount = this.transformCrypto(asset.amount, asset.currency, resultCurrencyCode);
-        if (amount) {
-            return amount
-        }
-
-        let btcAmount = this.transformCrypto(asset.amount, asset.currency, BTC);
-        return this.transformCrypto(btcAmount, BTC, resultCurrencyCode);
-    }
-
-    transformCrypto(amountFrom, currencyFrom, currencyTo) {
-        let price = this.getCryptoPrice(currencyFrom, currencyTo);
-        if (price) {
-            return amountFrom * price;
-        }
-        price = this.getCryptoPrice(currencyTo, currencyFrom);
-        if (price) {
-            return amountFrom / price;
-        }
     }
 }
 
