@@ -144,6 +144,7 @@
   opacity: 1;
 }
 
+.results-timelapse-percents--block,
 .results-timelapse--block {
   padding: 5% 0 0 9%;
   width: 82%;
@@ -151,6 +152,7 @@
   flex-flow: column;
 }
 
+.results-timelapse-percents--container,
 .results-timelapse--container {
   width: 100%;
   height: 100%;

@@ -522,7 +522,7 @@ export default class ResultsWrapper extends React.Component {
                     ? <div key={"go-to-next"}
                            onClick={() => {
                                this.setState({
-                                   activeResultsTab: "timelapse",
+                                   activeResultsTab: "timelapse-percents",
                                })
                            }}>
                         <img className={"go-to-next-block--button"}
@@ -555,7 +555,7 @@ export default class ResultsWrapper extends React.Component {
                                 })({...Highcharts})}
                                 options={{
                                     chart: {
-                                        height: '33%',
+                                        height: '60%',
                                         type: 'area',
                                         zoomType: 'x',
                                     },
@@ -596,12 +596,64 @@ export default class ResultsWrapper extends React.Component {
                                     },
                                 }}
                             />
+                        </div>
+                    </div> : null;
+
+                return [
+                    buildGoToPrev(),
+                    buildChronologyCharts(),
+                    buildGoToNext(),
+                ]
+            }
+        }, {
+            name: 'timelapse-percents',
+            buildInnerResult: (key, data) => {
+                if (!data.cash.assets
+                    .concat(data["non-cash"].assets)
+                    .concat(data.crypto.assets).length) {
+                    return null
+                }
+                const buildGoToPrev = () => this.state.activeResultsTab === "timelapse-percents"
+                    ? <div key={"go-to-prev"}
+                           onClick={() => this.setState({
+                               activeResultsTab: "timelapse",
+                           })}>
+                        <img className={"go-to-prev-block--button"}
+                             alt="go to prev analysis block view"
+                             title={"go to prev block"}
+                             src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"/>
+                        <span style={{display: "none",}}>
+                             <a href="https://icons8.com/icon/81122/double-right">Double Right icon by Icons8</a>
+                         </span>
+                    </div> : null;
+                const historyChartsData = historyService.readHistory();
+                const historySeries = historyChartsData.series;
+
+                const buildGoToNext = () => this.state.activeResultsTab === "timelapse-percents"
+                    ? <div key={"go-to-next"}
+                           onClick={() => {
+                               this.setState({
+                                   activeResultsTab: "timelapse-percents",
+                               })
+                           }}>
+                        <img className={"go-to-next-block--button"}
+                             alt="go to next analysis block view"
+                             title={"go to next block"}
+                             src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"/>
+                        <span style={{display: "none",}}>
+                             <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
+                         </span>
+                    </div> : null;
+
+                const buildChronologyCharts = () => this.state.activeResultsTab === "timelapse-percents"
+                    ? <div key={key} className={"results-timelapse-percents--block"}>
+                        <div className="results-timelapse-percents--container">
                             <HighchartsReact
                                 key={"timelapse-chart"}
                                 highcharts={Highcharts}
                                 options={{
                                     chart: {
-                                        height: '30%',
+                                        height: '60%',
                                         type: 'area',
                                         zoomType: 'x',
                                     },
