@@ -3,41 +3,42 @@ import {NewAssetMenu} from "./NewAssetMenu";
 import {AssetsGroup} from "./AssetsGroup";
 import AssetDTO from "./AssetDTO";
 import './AssetsGroupsWrapper.css';
+import assetsRepository from "./assetsRepository";
 
 export class AssetsGroupsWrapper extends React.Component {
 
     static defaultProps = {
         savedState: {},
-        saveState: state => false
     };
 
     state = {
         showMenu: false,
-        onCurrencySelected: () => false
+        onSettingsSet: () => false,
     };
-
-    spawnMenu({type, onCurrencySelected}) {
-        this.setState({
-            showMenu: type,
-            onCurrencySelected: onCurrencySelected
-        })
-    }
 
     hideMenu() {
         this.setState({
             showMenu: false,
-            onCurrencySelected: () => false
+            onSettingsSet: () => false,
         })
     }
 
+    componentDidMount() {
+        const storedData = assetsRepository.getLatest();
+        this.setState({savedState: storedData.assets})
+    }
+
     render() {
+        if (!this.state.savedState) {
+            return null
+        }
         return <div className={"assets-groups-wrapper"}>{[
             this.state.showMenu
                 ? <NewAssetMenu
                     key={0}
                     hideMenu={() => this.hideMenu()}
-                    onCurrencySelected={(currency) => {
-                        this.state.onCurrencySelected(currency);
+                    onSettingsSet={(settings) => {
+                        this.state.onSettingsSet(settings);
                     }}
                     assetType={this.state.showMenu}
                 />
@@ -46,19 +47,20 @@ export class AssetsGroupsWrapper extends React.Component {
                 this.props.savedState.cash,
                 this.props.savedState["non-cash"],
                 this.props.savedState.crypto,
-            ].map((group) => <AssetsGroup key={group.type}
-                                          spawnMenu={({onCurrencySelected}) => this.spawnMenu({
-                                              type: group.type,
-                                              onCurrencySelected: onCurrencySelected
-                                          })}
-                                          saveStateFunction={(assets) => {
-                                              const buffer = this.props.savedState;
-                                              buffer[group.type].assets = assets.map(asset => new AssetDTO(
-                                                  asset.type, asset.amount, asset.currency,
-                                              ));
-                                              this.props.saveState(buffer);
-                                          }}
-                                          group={group}
+            ].map((group) =>
+                <AssetsGroup key={group.type}
+                             spawnMenu={({onSettingsSet}) => this.setState({
+                                 showMenu: group.type,
+                                 onSettingsSet: onSettingsSet,
+                             })}
+                             saveStateFunction={(assets) => {
+                                 const buffer = this.props.savedState;
+                                 buffer[group.type].assets = assets.map(AssetDTO.copy);
+                                 assetsRepository.save({
+                                     assets: buffer,
+                                 });
+                             }}
+                             group={group}
                 />
             ),
         ]}</div>

@@ -10,6 +10,11 @@ import './../extensions/highChartTheme'
 import rates from "./rates";
 // -> Load Highcharts modules
 import highCharts3d from 'highcharts/highcharts-3d'
+import assetsRepository from "./assetsRepository";
+import historyService from "./historyService";
+import fiatRatesRepository from "./FiatRatesRepository";
+import cryptoRatesRepository from "./CryptoRatesRepository";
+import historyRepository from "./HistoryRepository";
 //
 highCharts3d(Highcharts);
 
@@ -17,34 +22,41 @@ const BTC = "BTC";
 const USD = "USD";
 const EUR = "EUR";
 
+let unmount;
+
 export default class ResultsWrapper extends React.Component {
     static defaultProps = {
         savedState: {},
-        initialRates: [],
-        latestAssetsConsumer: (latestAssetsConsumer) => false,
-        latestRatesConsumer: (latestRatesConsumer) => false,
-        latestCryptoRatesConsumer: (latestCryptoRatesConsumer) => false,
     };
 
     constructor(props, context) {
         super(props, context);
         this.state = {
             assets: props.savedState || [],
-            rates: props.initialRates || [],
-            cryptoRates: props.initialCryptoRates || [],
             chartType: props.chartType || "total",
+            activeResultsTab: props.activeResultsTab || "first",
         };
-        this.props.latestAssetsConsumer(assets => this.setState({assets}));
-        this.props.latestRatesConsumer(rates => this.setState({rates}));
-        this.props.latestCryptoRatesConsumer(cryptoRates => this.setState({cryptoRates}));
+    }
+
+    componentDidMount() {
+        unmount = false;
+        assetsRepository.subscribeOnChange(
+            assets => !unmount && this.setState({assets: assets.assets}));
+        fiatRatesRepository.subscribeOnChange(
+            fiatRates => !unmount && this.setState({fiatRates: fiatRates}));
+        cryptoRatesRepository.subscribeOnChange(
+            cryptoRates => !unmount && this.setState({cryptoRates: cryptoRates}));
+        historyRepository.subscribeOnChange(
+            history => !unmount && this.setState({historyData: history}))
+    }
+
+    componentWillUnmount() {
+        unmount = true;
+        rates.shutDown();
     }
 
     render() {
-        if (!this.state.assets
-            || !this.state.rates
-            || !this.state.rates.length
-            || !this.state.cryptoRates
-            || !this.state.cryptoRates.length
+        if (!this.state.assets || !rates.isReady()
         ) {
             return null;
         }
@@ -64,6 +76,9 @@ export default class ResultsWrapper extends React.Component {
         return [{
             name: 'total amount in currencies',
             buildInnerResult: (key, data) => {
+                if (this.state.activeResultsTab !== "first") {
+                    return null
+                }
                 const assetGroups = [
                     data.cash,
                     data["non-cash"],
@@ -76,7 +91,12 @@ export default class ResultsWrapper extends React.Component {
                         return result;
                     }, {});
 
-                return <div key={key} className={"total-amount-in-one-currency--container"}>{
+                return <div
+                    key={key}
+                    style={
+                        this.state.goToNextBlock === "requested" ? {} : {} // todo: finish implementation
+                    }
+                    className={"total-amount-in-one-currency--container"}>{
                     Object.entries(currenciesBuffer).map(
                         currencyCodeToType => this.buildCurrencyTotalResult(assetGroups, currencyCodeToType)
                     )
@@ -85,6 +105,9 @@ export default class ResultsWrapper extends React.Component {
         }, {
             name: 'balance',
             buildInnerResult: (key, data) => {
+                if (this.state.activeResultsTab !== "first") {
+                    return null
+                }
                 let assets = data.cash.assets
                     .concat(data["non-cash"].assets)
                     .concat(data.crypto.assets)
@@ -314,6 +337,10 @@ export default class ResultsWrapper extends React.Component {
                     title: {
                         text: '',
                     },
+                    tooltip: {
+                        pointFormat: `<tspan style="color:{point.color}" x="8" dy="15">●</tspan>
+                                      <span>{series.name}</span>: <b>{point.y:,.2f} USD</b> ({point.percentage:.2f}%)<br/>`,
+                    },
                     accessibility: {
                         announceNewData: {
                             enabled: true
@@ -352,6 +379,21 @@ export default class ResultsWrapper extends React.Component {
                     "#b7e4c7",
                     "#d8f3dc",
                 ];
+
+                const buildGoToNext = () => this.state.activeResultsTab === "first"
+                    ? <div key={"go-to-next"}
+                           onClick={() => this.setState({
+                               activeResultsTab: "timelapse",
+                           })}>
+                        <img className={"go-to-next-block--button"}
+                             alt="go to next analysis block view"
+                             title={"go to next block"}
+                             src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"/>
+                        <span style={{display: "none",}}>
+                             <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
+                         </span>
+                    </div> : null;
+
                 return <div key={key} className={"balance-results-container"}>
                     <div className={"balance-circle-container"}>
                         <div className={"balance-circle-chart"}>
@@ -445,7 +487,173 @@ export default class ResultsWrapper extends React.Component {
                             </div>
                         </div>
                     </div>
+                    {buildGoToNext()}
                 </div>
+            }
+        }, {
+            name: 'timelapse',
+            buildInnerResult: (key, data) => {
+                if (!data.cash.assets
+                    .concat(data["non-cash"].assets)
+                    .concat(data.crypto.assets).length) {
+                    return null
+                }
+                const buildGoToPrev = () => this.state.activeResultsTab === "timelapse"
+                    ? <div key={"go-to-prev"}
+                           onClick={() => this.setState({
+                               activeResultsTab: "first",
+                           })}>
+                        <img className={"go-to-prev-block--button"}
+                             alt="go to prev analysis block view"
+                             title={"go to prev block"}
+                             src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"/>
+                        <span style={{display: "none",}}>
+                             <a href="https://icons8.com/icon/81122/double-right">Double Right icon by Icons8</a>
+                         </span>
+                    </div> : null;
+                const historyChartsData = historyService.readHistory();
+                const historySeries = historyChartsData.series;
+
+                const buildGoToNext = () => this.state.activeResultsTab === "timelapse"
+                    ? <div key={"go-to-next"}
+                           onClick={() => {
+                               this.setState({
+                                   activeResultsTab: "timelapse",
+                               })
+                           }}>
+                        <img className={"go-to-next-block--button"}
+                             alt="go to next analysis block view"
+                             title={"go to next block"}
+                             src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"/>
+                        <span style={{display: "none",}}>
+                             <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
+                         </span>
+                    </div> : null;
+
+                const buildChronologyCharts = () => this.state.activeResultsTab === "timelapse"
+                    ? <div key={key} className={"results-timelapse--block"}>
+                        <div className="results-timelapse--container">
+                            <HighchartsReact
+                                key={"total-history-chart"}
+                                highcharts={(function (newConf) {
+                                    newConf.theme.colors = [
+                                        "#1ea267",
+                                        "#b7e4c7",
+                                        "#ffe066",
+                                        "#245741",
+                                        "#f25f5c",
+                                        "#eafce0",
+                                        "#247ba0",
+                                        "#70c1b3",
+                                    ];
+                                    newConf.setOptions(newConf.theme);
+                                    return newConf
+                                })({...Highcharts})}
+                                options={{
+                                    chart: {
+                                        height: '33%',
+                                        type: 'area',
+                                        zoomType: 'x',
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        type: 'datetime',
+                                        tickmarkPlacement: 'on',
+                                    },
+                                    yAxis: {
+                                        title: {
+                                            text: ''
+                                        },
+                                    },
+                                    tooltip: {
+                                        valueSuffix: ' USD'
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            marker: {
+                                                enabled: false,
+                                            }
+                                        },
+                                        area: {
+                                            stacking: 'normal',
+                                            lineColor: '#666666',
+                                            lineWidth: 1,
+                                            marker: {
+                                                lineWidth: 1,
+                                                lineColor: '#666666'
+                                            }
+                                        }
+                                    },
+                                    series: historySeries,
+                                    legend: {
+                                        enabled: false
+                                    },
+                                }}
+                            />
+                            <HighchartsReact
+                                key={"timelapse-chart"}
+                                highcharts={Highcharts}
+                                options={{
+                                    chart: {
+                                        height: '30%',
+                                        type: 'area',
+                                        zoomType: 'x',
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    subtitle: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        type: 'datetime',
+                                    },
+                                    yAxis: {
+                                        labels: {
+                                            format: '{value}%'
+                                        },
+                                        title: {
+                                            enabled: false
+                                        }
+                                    },
+                                    legend: {
+                                        enabled: false
+                                    },
+                                    tooltip: {
+                                        pointFormat: `<tspan style="color:{point.color}" x="8" dy="15">●</tspan>
+                                            <span>{series.name}</span>: <b>
+                                            {point.percentage:.2f}%</b>
+                                             {point.y:,.2f} USD<br/>`,
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            marker: {
+                                                enabled: false,
+                                            }
+                                        },
+                                        area: {
+                                            stacking: 'percent',
+                                            lineColor: '#ffffff',
+                                            lineWidth: 1,
+                                            marker: {
+                                                lineWidth: 1,
+                                                lineColor: '#ffffff'
+                                            },
+                                        }
+                                    },
+                                    series: historySeries,
+                                }}
+                            />
+                        </div>
+                    </div> : null;
+
+                return [
+                    buildGoToPrev(),
+                    buildChronologyCharts(),
+                    buildGoToNext(),
+                ]
             }
         }]
     }

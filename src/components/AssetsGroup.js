@@ -4,11 +4,12 @@ import './Asset.css'
 import AssetDTO from "./AssetDTO";
 import NumberFormat from "react-number-format";
 import noExponents from "../extensions/noExponents";
+import uuidGenerator from "../extensions/uuid-generator";
 
 export class AssetsGroup extends React.Component {
 
     static defaultProps = {
-        spawnMenu: ({onCurrencySelected}) => false,
+        spawnMenu: ({onSettingsSet}) => false,
         saveStateFunction: () => false,
         group: {
             type: 'crypto',
@@ -44,6 +45,8 @@ export class AssetsGroup extends React.Component {
     buildNewAssetItem() {
         const props = {
             key: "new-" + this.props.group.type,
+            name: this.state.newAsset?.name || "",
+            description: this.state.newAsset?.description || "",
             currencyCode: (this.state.newAsset?.currency)
                 || buildTemplateAssetDTO(this.props.group.type).currency,
         };
@@ -96,6 +99,9 @@ export class AssetsGroup extends React.Component {
                             this.props.group.type,
                             props.valueAsNumber,
                             props.currencyCode,
+                            props.name,
+                            props.description,
+                            this.state.newAsset.id,
                         ));
                     }}
                     className={"accept-new-asset-button positive-button button"}>✔</button>,
@@ -244,10 +250,13 @@ export class AssetsGroup extends React.Component {
 
     _onAddAssetButtonClick() {
         this.props.spawnMenu({
-            onCurrencySelected: currency => {
+            onSettingsSet: settings => {
                 this.setState({
                     newAsset: {
-                        currency: currency
+                        id: settings.id || generateNewAssetId(),
+                        currency: settings.currencyCode,
+                        name: settings.name,
+                        description: settings.description,
                     }
                 })
             }
@@ -256,22 +265,9 @@ export class AssetsGroup extends React.Component {
 }
 
 function buildTemplateAssetDTO(type) {
-    return buildDefaultState(type).assets[0];
+    return new AssetDTO(type, 0, "");
 }
 
-function buildDefaultState(type) {
-    return {
-        cash: {
-            type: 'cash',
-            assets: [new AssetDTO('cash', 0, "USD")],
-        },
-        "non-cash": {
-            type: 'non-cash',
-            assets: [new AssetDTO('non-cash', 0, "USD")],
-        },
-        crypto: {
-            type: 'crypto',
-            assets: [new AssetDTO('crypto', 0, "BTC")],
-        },
-    }[type]
+function generateNewAssetId() {
+    return uuidGenerator.generateUUID();
 }

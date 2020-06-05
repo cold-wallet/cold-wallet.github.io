@@ -33,7 +33,9 @@
 }
 
 .new-asset-menu--body {
-  height: 95%;
+  overflow-y: auto;
+  overflow-x: inherit;
+  height: 90%;
   width: 98%;
   padding: 0 1% 0 1%;
 }
@@ -91,3 +93,47 @@
   font-size: 18px;
   padding: 1%;
 }
+
+.new-asset-menu--data {
+  padding: 5%;
+}
+
+.new-asset-menu--data-description-input {
+  max-width: 90%;
+  min-width: 90%;
+  min-height: 100px;
+}
+
+.new-asset-menu--data-description-input,
+.new-asset-menu--data-name-input {
+  width: 90%;
+  padding: 1%;
+}
+
+.new-asset-menu--data-controls {
+  min-width: 20%;
+  padding: 2%;
+  margin: 1%;
+}
+
+.new-asset-menu--data-confirm {
+}
+
+.new-asset-menu--data-cancel {
+}
+
+.new-asset-menu--data-description-input-label,
+.new-asset-menu--data-name-input-label {
+  padding: 1%;
+}
+
+.new-asset-menu--data-description-input-label-wrapper {
+  padding: 5% 0;
+}
+
+.new-asset-menu--data-action-buttons-wrapper {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-evenly;
+}
+

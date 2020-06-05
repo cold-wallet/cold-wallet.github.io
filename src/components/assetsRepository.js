@@ -1,14 +1,23 @@
-import historyService from "./historyService";
+import LocalStorageRepository from "./LocalStorageRepository";
 
-const dataStoreName = 'data';
+const assetsRepository = LocalStorageRepository.builder()
+    .name('data')
+    .nullObject({
+        assets: {
+            cash: {
+                type: 'cash',
+                assets: [],
+            },
+            "non-cash": {
+                type: 'non-cash',
+                assets: [],
+            },
+            crypto: {
+                type: 'crypto',
+                assets: [],
+            },
+        },
+    })
+    .build();
 
-export default {
-    getLatest() {
-        return JSON.parse(localStorage.getItem(dataStoreName)) || {};
-    },
-
-    save(data) {
-        localStorage.setItem(dataStoreName, JSON.stringify(data));
-        historyService.updateHistory(data);
-    }
-}
+export default assetsRepository

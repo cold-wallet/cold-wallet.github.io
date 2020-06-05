@@ -83,36 +83,114 @@ function getListOfTopCurrenciesByType(type) {
     }
 }
 
-export function NewAssetMenu({hideMenu, assetType, onCurrencySelected}) {
-    return (
-        <div className={"new-asset-menu-wrapper"}>
-            <div className={"new-asset-menu-shadow"} onClick={hideMenu}/>
-            <div className={"new-asset-menu"}>
-                <div className={"new-asset-menu--header"}>
-                    <div className={"new-asset-menu--header-title"}>Choose currency of new asset</div>
-                    {/*<button className={"new-asset-menu--close-button negative-button"} onClick={hideMenu}>✖</button>*/}
-                </div>
-                <div className={"new-asset-menu--body"}>
-                    <div className={"asset-pics--container"}>
-                        {
-                            getListOfTopCurrenciesByType(assetType).map((currency, i) =>
-                                <div key={i}
-                                     title={currency.name}
-                                     onClick={() => {
-                                         onCurrencySelected(currency.code);
-                                         hideMenu();
-                                     }}
-                                     className={"asset-pic--container"}>
-                                    <div className={"asset-pic--image"}>{currency.htmlCode}</div>
-                                    <div className={"asset-pic--name"}>{currency.code}</div>
-                                </div>
-                            )
-                        }
+export class NewAssetMenu extends React.Component {
+    static defaultProps = {
+        hideMenu: () => false,
+        assetType: '',
+        onSettingsSet: () => false,
+    };
+
+    state = {};
+
+    onCurrencySelected({currencyCode}) {
+        this.setState({
+            bufferCurrency: currencyCode,
+
+        })
+    }
+
+    render() {
+        return (
+            <div className={"new-asset-menu-wrapper"}>
+                <div className={"new-asset-menu-shadow"} onClick={this.props.hideMenu}/>
+                <div className={"new-asset-menu"}>
+                    <div className={"new-asset-menu--header"}>
+                        <div className={"new-asset-menu--header-title"}>Choose currency of new asset</div>
+                        {/*<button className={"new-asset-menu--close-button negative-button"} onClick={hideMenu}>✖</button>*/}
                     </div>
-                    <div className={"find-asset--container"}>
-                    </div>
+                    <div className={"new-asset-menu--body"}>{[
+                        this.state.bufferCurrency ? null : <div key={"currency-select"}>
+                            <div className={"asset-pics--container"}>
+                                {
+                                    getListOfTopCurrenciesByType(this.props.assetType).map((currency, i) =>
+                                        <div key={i}
+                                             title={currency.name}
+                                             onClick={() => {
+                                                 this.onCurrencySelected({
+                                                     currencyCode: currency.code,
+                                                 });
+                                             }}
+                                             className={"asset-pic--container"}>
+                                            <div className={"asset-pic--image"}>{currency.htmlCode}</div>
+                                            <div className={"asset-pic--name"}>{currency.code}</div>
+                                        </div>
+                                    )
+                                }
+                            </div>
+                            <div className={"find-asset--container"}>
+                            </div>
+                        </div>,
+                        this.state.bufferCurrency ? this.buildDataMenu() : null,
+                    ]}</div>
                 </div>
             </div>
-        </div>
-    )
+        )
+    }
+
+    buildDataMenu() {
+        let nameInput, descrInput;
+        return (<div className={"new-asset-menu--data"} key={"inputs"}>
+            <div><label>
+                <div className="new-asset-menu--data-name-input-label">Short name:</div>
+                <input
+                    ref={instance => {
+                        nameInput = instance;
+                        if (nameInput) {
+                            nameInput.focus && nameInput.focus();
+                            nameInput.value = this.state.bufferCurrency + " amount";
+                        }
+                    }}
+                    type="text"
+                    className={"new-asset-menu--data-name-input"}/>
+            </label></div>
+            <div className={"new-asset-menu--data-description-input-label-wrapper"}>
+                <label>
+                    <div className="new-asset-menu--data-description-input-label">Description:</div>
+                    <textarea
+                        className={"new-asset-menu--data-description-input"}
+                        ref={instance => descrInput = instance}
+                    /></label>
+            </div>
+            <div className="new-asset-menu--data-action-buttons-wrapper">
+                <button
+                    className="new-asset-menu--data-controls new-asset-menu--data-confirm"
+                    onClick={() => {
+                        if (!nameInput.value) {
+                            return
+                        }
+                        const currencyCode = this.state.bufferCurrency;
+                        this.setState({
+                            bufferCurrency: null,
+                        });
+                        this.props.onSettingsSet({
+                            currencyCode: currencyCode,
+                            name: nameInput.value,
+                            description: descrInput.value || "",
+                        });
+                        this.props.hideMenu();
+                    }}>Confirm
+                </button>
+                <button
+                    className="new-asset-menu--data-controls new-asset-menu--data-cancel"
+                    onClick={() => {
+                        this.setState({
+                            bufferCurrency: null,
+                        });
+                        this.props.hideMenu();
+                    }}
+                >Cancel
+                </button>
+            </div>
+        </div>)
+    }
 }

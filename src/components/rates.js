@@ -1,23 +1,22 @@
 import axios from "axios";
-import historyService from "./historyService";
 import currencies from "../resources/currencies-iso-4217";
+import fiatRatesRepository from "./FiatRatesRepository";
+import cryptoRatesRepository from "./CryptoRatesRepository";
 
 const uahNumCode = 980;
 const BTC = "BTC";
-const USD = "USD";
 const EUR = "EUR";
 
-const cryptoRatesStoreName = 'crypto-rates';
-const ratesStoreName = 'rates';
 const milli = 1000;
 const startTimeout = 20 * milli;
 const timeoutStep = 5 * milli;
 const endTimeout = 5 * milli;
 let currentTimeout = startTimeout;
 let currentCryptoTimeout = 30 * milli;
-const _buffer = {};
 let savedRates = null;
 let savedCryptoRates = null;
+
+const futures = [];
 
 (function fetchLatestRates() {
     try {
@@ -29,11 +28,12 @@ let savedCryptoRates = null;
                     && (fiatRates = response.data)
                     && !fiatRates.errorDescription
                     && fiatRates.length
-                    && (fiatRates !== savedRates)
                 ) {
-                    storeFiatRates(fiatRates);
-                    _buffer.latestRatesConsumer && _buffer.latestRatesConsumer(fiatRates);
-                    savedRates = fiatRates;
+                    if (fiatRates !== savedRates) {
+                        storeFiatRates(fiatRates);
+                        savedRates = fiatRates;
+                    }
+                    futures.push(setTimeout(fetchLatestRates, 300_000))
                 } else {
                     console.warn("Fetching latest rates failed", response);
                     throw response
@@ -54,10 +54,34 @@ let savedCryptoRates = null;
     }
 })();
 
-function storeFiatRates(fiatRates) {
-    localStorage.setItem(ratesStoreName, JSON.stringify(fiatRates));
-    historyService.refreshHistory();
-}
+(function fetchLatestCryptoCurrenciesRates() {
+    try {
+        axios.get("https://api.binance.com/api/v1/ticker/price")
+            .then(response => {
+                let cryptoRates;
+                if (response
+                    && (response.status === 200)
+                    && (cryptoRates = response.data)
+                ) {
+                    if (cryptoRates !== savedCryptoRates) {
+                        storeCryptoRates(cryptoRates);
+                        savedCryptoRates = cryptoRates;
+                    }
+                    futures.push(setTimeout(fetchLatestCryptoCurrenciesRates, 60_000))
+                } else {
+                    console.warn("Fetching latest cryptoRates failed", response);
+                    throw response
+                }
+            })
+            .catch(e => {
+                console.warn(e);
+                console.log(`Will re-fetch cryptoRates after timeout: ${currentCryptoTimeout / milli}s`);
+                setTimeout(fetchLatestCryptoCurrenciesRates, currentCryptoTimeout);
+            })
+    } catch (e) {
+        console.error(e);
+    }
+})();
 
 function getCryptoPrice(left, right) {
     const ticker = getCryptoRates().filter(r => r.symbol === `${left}${right}`)[0] || {};
@@ -93,7 +117,7 @@ function transformCryptoToCrypto(asset, resultCurrencyCode) {
 }
 
 function findFiatRate(left, right) {
-    const rate = getRates().filter(r => (r.currencyCodeA === left)
+    const rate = getFiatRates().filter(r => (r.currencyCodeA === left)
         && (r.currencyCodeB === right))[0];
 
     return rate.rateCross || ((rate.rateBuy + rate.rateSell) / 2);
@@ -124,10 +148,6 @@ function transformFiatToFiat({amount, currency}, outputCurrency) {
 
     const rateCross = findFiatRate(outputCurrencyNumCode, uahNumCode);
     return amountInUah / rateCross;
-}
-
-function getRates() {
-    return JSON.parse(localStorage.getItem(ratesStoreName)) || [];
 }
 
 function transformCryptoToFiat(cryptoAsset, outputFiatCurrencyCode) {
@@ -170,16 +190,28 @@ function transformFiatToCrypto(fiatAsset, outputCryptoCurrencyCode) {
     return 0;
 }
 
+function storeFiatRates(fiatRates) {
+    fiatRatesRepository.save(fiatRates);
+}
+
+function getFiatRates() {
+    return fiatRatesRepository.getLatest()
+}
+
+function storeCryptoRates(cryptoRates) {
+    cryptoRatesRepository.save(cryptoRates)
+}
+
 function getCryptoRates() {
-    return JSON.parse(localStorage.getItem(cryptoRatesStoreName)) || [];
+    return cryptoRatesRepository.getLatest()
 }
 
 export default {
     isReady() {
-        return getRates().length
+        return getFiatRates().length && getCryptoRates().length
     },
-    extractRates() {
-        return getRates()
+    extractFiatRates() {
+        return getFiatRates()
     },
     extractCryptoRates() {
         return getCryptoRates()
@@ -195,41 +227,8 @@ export default {
             ? transformCryptoToCrypto(asset, currencyCode)
             : transformFiatToCrypto(asset, currencyCode)
             ;
+    },
+    shutDown() {
+        futures.forEach(clearTimeout)
     }
 };
-
-(function fetchLatestCryptoCurrenciesRates() {
-    try {
-        axios.get("https://api.binance.com/api/v1/ticker/price")
-            .then(response => {
-                let cryptoRates;
-                if (response
-                    && (response.status === 200)
-                    && (cryptoRates = response.data)
-                    && (cryptoRates !== savedCryptoRates)
-                ) {
-                    storeCryptoRates(cryptoRates);
-                    try {
-                        _buffer.latestCryptoRatesConsumer && _buffer.latestCryptoRatesConsumer(cryptoRates);
-                    } catch (e) {
-                        console.error(e);
-                    }
-                } else {
-                    console.warn("Fetching latest cryptoRates failed", response);
-                    throw response
-                }
-            })
-            .catch(e => {
-                console.warn(e);
-                console.log(`Will re-fetch cryptoRates after timeout: ${currentCryptoTimeout / milli}s`);
-                setTimeout(fetchLatestCryptoCurrenciesRates, currentCryptoTimeout);
-            })
-    } catch (e) {
-        console.error(e);
-    }
-})();
-
-function storeCryptoRates(cryptoRates) {
-    localStorage.setItem(cryptoRatesStoreName, JSON.stringify(cryptoRates));
-    historyService.refreshHistory();
-}

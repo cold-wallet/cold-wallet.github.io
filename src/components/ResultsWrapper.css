@@ -119,3 +119,39 @@
 .circle-chart-type--text {
   text-align: center;
 }
+
+.go-to-prev-block--button {
+  right: 67%;
+}
+
+.go-to-next-block--button {
+  right: 0;
+}
+
+.go-to-prev-block--button,
+.go-to-next-block--button {
+  opacity: 0.5;
+  top: 40%;
+  height: 20%;
+  width: 8%;
+  position: absolute;
+  cursor: pointer;
+  background: radial-gradient(at center center, rgb(64, 145, 108) 0%, rgba(64, 145, 108, 0) 53%);
+}
+
+.go-to-prev-block--button:hover,
+.go-to-next-block--button:hover {
+  opacity: 1;
+}
+
+.results-timelapse--block {
+  padding: 5% 0 0 9%;
+  width: 82%;
+  display: flex;
+  flex-flow: column;
+}
+
+.results-timelapse--container {
+  width: 100%;
+  height: 100%;
+}
