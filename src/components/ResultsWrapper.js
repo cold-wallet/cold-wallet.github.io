@@ -8,14 +8,14 @@ import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import './../extensions/highChartTheme'
 import rates from "./rates";
-// -> Load Highcharts modules
 import highCharts3d from 'highcharts/highcharts-3d'
 import assetsRepository from "./assetsRepository";
 import historyService from "./historyService";
 import fiatRatesRepository from "./FiatRatesRepository";
 import cryptoRatesRepository from "./CryptoRatesRepository";
 import historyRepository from "./HistoryRepository";
-//
+
+// -> Load Highcharts modules
 highCharts3d(Highcharts);
 
 const BTC = "BTC";
@@ -502,38 +502,8 @@ export default class ResultsWrapper extends React.Component {
                     .concat(data.crypto.assets).length) {
                     return null
                 }
-                const buildGoToPrev = () => this.state.activeResultsTab === "timelapse"
-                    ? <div key={"go-to-prev"}
-                           onClick={() => this.setState({
-                               activeResultsTab: "first",
-                           })}>
-                        <img className={"go-to-prev-block--button"}
-                             alt="go to prev analysis block view"
-                             title={"go to prev block"}
-                             src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"/>
-                        <span style={{display: "none",}}>
-                             <a href="https://icons8.com/icon/81122/double-right">Double Right icon by Icons8</a>
-                         </span>
-                    </div> : null;
                 const historyChartsData = historyService.readHistory();
                 const historySeries = historyChartsData.series;
-
-                const buildGoToNext = () => this.state.activeResultsTab === "timelapse"
-                    ? <div key={"go-to-next"}
-                           onClick={() => {
-                               this.setState({
-                                   activeResultsTab: "timelapse-percents",
-                               })
-                           }}>
-                        <img className={"go-to-next-block--button"}
-                             alt="go to next analysis block view"
-                             title={"go to next block"}
-                             src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"/>
-                        <span style={{display: "none",}}>
-                             <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
-                         </span>
-                    </div> : null;
-
                 const buildChronologyCharts = () => this.state.activeResultsTab === "timelapse"
                     ? <div key={key} className={"results-timelapse--block"}>
                         <div className="results-timelapse--container">
@@ -600,9 +570,9 @@ export default class ResultsWrapper extends React.Component {
                     </div> : null;
 
                 return [
-                    buildGoToPrev(),
+                    this.buildButton_GoToPrev("timelapse", "first"),
                     buildChronologyCharts(),
-                    buildGoToNext(),
+                    this.buildButton_GoToNext("timelapse", "timelapse-percents"),
                 ]
             }
         }, {
@@ -613,38 +583,8 @@ export default class ResultsWrapper extends React.Component {
                     .concat(data.crypto.assets).length) {
                     return null
                 }
-                const buildGoToPrev = () => this.state.activeResultsTab === "timelapse-percents"
-                    ? <div key={"go-to-prev"}
-                           onClick={() => this.setState({
-                               activeResultsTab: "timelapse",
-                           })}>
-                        <img className={"go-to-prev-block--button"}
-                             alt="go to prev analysis block view"
-                             title={"go to prev block"}
-                             src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"/>
-                        <span style={{display: "none",}}>
-                             <a href="https://icons8.com/icon/81122/double-right">Double Right icon by Icons8</a>
-                         </span>
-                    </div> : null;
                 const historyChartsData = historyService.readHistory();
                 const historySeries = historyChartsData.series;
-
-                const buildGoToNext = () => this.state.activeResultsTab === "timelapse-percents"
-                    ? <div key={"go-to-next"}
-                           onClick={() => {
-                               this.setState({
-                                   activeResultsTab: "timelapse-percents",
-                               })
-                           }}>
-                        <img className={"go-to-next-block--button"}
-                             alt="go to next analysis block view"
-                             title={"go to next block"}
-                             src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"/>
-                        <span style={{display: "none",}}>
-                             <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
-                         </span>
-                    </div> : null;
-
                 const buildChronologyCharts = () => this.state.activeResultsTab === "timelapse-percents"
                     ? <div key={key} className={"results-timelapse-percents--block"}>
                         <div className="results-timelapse-percents--container">
@@ -706,12 +646,45 @@ export default class ResultsWrapper extends React.Component {
                     </div> : null;
 
                 return [
-                    buildGoToPrev(),
+                    this.buildButton_GoToPrev("timelapse-percents", "timelapse"),
                     buildChronologyCharts(),
-                    buildGoToNext(),
+                    this.buildButton_GoToNext("timelapse-percents", "timelapse-percents"),
                 ]
             }
         }]
+    }
+
+    buildButton_GoToNext(activeTab, newTab) {
+        return this.state.activeResultsTab === activeTab
+            ? <div key={"go-to-next"}
+                   onClick={() => {
+                       this.setState({
+                           activeResultsTab: newTab,
+                       })
+                   }}>
+                <img className={"go-to-next-block--button"}
+                     alt="go to next analysis block view"
+                     title={"go to next block"}
+                     src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"/>
+                <span style={{display: "none",}}>
+                             <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
+                         </span>
+            </div> : null
+    }
+
+    buildButton_GoToPrev(activeTab, newTab) {
+        return this.state.activeResultsTab === activeTab ? <div key={"go-to-prev"}
+                                                                onClick={() => this.setState({
+                                                                    activeResultsTab: newTab,
+                                                                })}>
+            <img className={"go-to-prev-block--button"}
+                 alt="go to prev analysis block view"
+                 title={"go to prev block"}
+                 src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"/>
+            <span style={{display: "none",}}>
+                             <a href="https://icons8.com/icon/81122/double-right">Double Right icon by Icons8</a>
+                         </span>
+        </div> : null;
     }
 
     buildCurrencyTotalResult(assetGroups, currencyCodeToType) {
