@@ -191,7 +191,11 @@ function transformFiatToCrypto(fiatAsset, outputCryptoCurrencyCode) {
 }
 
 function storeFiatRates(fiatRates) {
-    fiatRatesRepository.save(fiatRates);
+    try {
+        fiatRatesRepository.save(fiatRates);
+    } catch (e) {
+        console.error(e)
+    }
 }
 
 function getFiatRates() {
