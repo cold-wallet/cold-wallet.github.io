@@ -46,8 +46,12 @@ export default class ResultsWrapper extends React.Component {
             fiatRates => !unmount && this.setState({fiatRates: fiatRates}));
         cryptoRatesRepository.subscribeOnChange(
             cryptoRates => !unmount && this.setState({cryptoRates: cryptoRates}));
-        historyRepository.subscribeOnChange(
-            history => !unmount && this.setState({historyData: history}))
+        try {
+            historyRepository.subscribeOnChange(
+                history => !unmount && this.setState({historyData: history}))
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     componentWillUnmount() {
