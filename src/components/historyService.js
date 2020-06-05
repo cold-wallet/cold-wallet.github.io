@@ -36,7 +36,7 @@ const historyService = {
             });
         let newSeries = Object.values(currentNamed);
 
-        if (newSeries.length > 3 && isNothingNew(lastHistory.series, newSeries)) {
+        if (newSeries[0].data.length > 3 && isNothingNew(lastHistory.series, newSeries)) {
             newSeries = prolongData(lastHistory.series, newSeries)
         }
 
