@@ -568,7 +568,7 @@ export default class ResultsWrapper extends React.Component {
                                     },
                                 }}
                             />
-                            <div className="chart-currencies-switch-controls-wrapper">1</div>
+                            <div className="chart-currencies-switch-controls-wrapper"></div>
                         </div>
                     </div> : null;
 
@@ -645,7 +645,7 @@ export default class ResultsWrapper extends React.Component {
                                     series: historySeries,
                                 }}
                             />
-                            <div className="chart-currencies-switch-controls-wrapper">2</div>
+                            <div className="chart-currencies-switch-controls-wrapper"></div>
                         </div>
                     </div> : null;
 
@@ -714,7 +714,7 @@ export default class ResultsWrapper extends React.Component {
                                     },
                                 }}
                             />
-                            <div className="chart-currencies-switch-controls-wrapper">3</div>
+                            <div className="chart-currencies-switch-controls-wrapper"></div>
                         </div>
                     </div> : null;
 
