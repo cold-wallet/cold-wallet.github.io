@@ -218,6 +218,9 @@ function getCryptoRates() {
 }
 
 export default {
+    isFiat(currencyStrCode) {
+        return !!currencies[currencyStrCode];
+    },
     isReady() {
         return getFiatRates().length && getCryptoRates().length
     },

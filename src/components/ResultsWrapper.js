@@ -87,7 +87,8 @@ export default class ResultsWrapper extends React.Component {
                     data["non-cash"],
                     data.crypto,
                 ];
-                const currenciesBuffer = data.cash.assets.concat(data["non-cash"].assets)
+                const currenciesBuffer = [].concat(data.cash.assets)
+                    .concat(data["non-cash"].assets)
                     .concat(data.crypto.assets)
                     .reduce((result, asset) => {
                         result[asset.currency] = asset.type;
@@ -496,15 +497,22 @@ export default class ResultsWrapper extends React.Component {
         }, {
             name: 'timelapse',
             buildInnerResult: (key, data) => {
-                if (!data.cash.assets
-                        .concat(data["non-cash"].assets)
-                        .concat(data.crypto.assets).length
-                    || (this.state.activeResultsTab !== "timelapse")
+                const allAssets = [].concat(data.cash.assets)
+                    .concat(data["non-cash"].assets)
+                    .concat(data.crypto.assets);
+                if (!allAssets.length || (this.state.activeResultsTab !== "timelapse")
                 ) {
                     return null
                 }
+                const currencies = Object.keys(allAssets.reduce((result, asset) => {
+                    result[asset.currency] = asset.type;
+                    return result;
+                }, {}));
                 const historyChartsData = historyService.readHistory();
-                const historySeries = historyChartsData.series;
+                const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
+                const historySeries = Object.values(
+                    historyChartsData.partialPerCurrencies[currentCurrency] || {}
+                );
                 const buildChronologyChart = () => this.state.activeResultsTab === "timelapse"
                     ? <div key={key} className={"results-timelapse--block"}>
                         <div className="results-timelapse--container">
@@ -543,7 +551,7 @@ export default class ResultsWrapper extends React.Component {
                                         },
                                     },
                                     tooltip: {
-                                        valueSuffix: ' USD'
+                                        valueSuffix: ' ' + currentCurrency
                                     },
                                     plotOptions: {
                                         series: {
@@ -567,7 +575,19 @@ export default class ResultsWrapper extends React.Component {
                                     },
                                 }}
                             />
-                            <div className="chart-currencies-switch-controls-wrapper"></div>
+                            <div className="chart-currencies-switch-controls-wrapper">{
+                                currencies.map((currency, i) => (
+                                    <div key={i} className="chart-currencies-switch-controls--container"
+                                         onClick={event => {
+                                             this.setState({chartsCurrencySelected: currency})
+                                         }}
+                                    >
+                                        <div className="chart-currencies-switch-controls--image"/>
+                                        <span className="chart-currencies-switch-controls--title">{currency}</span>
+                                    </div>
+                                ))
+                            }</div>
+
                         </div>
                     </div> : null;
 
@@ -580,15 +600,23 @@ export default class ResultsWrapper extends React.Component {
         }, {
             name: 'timelapse-percents',
             buildInnerResult: (key, data) => {
-                if (!data.cash.assets
-                        .concat(data["non-cash"].assets)
-                        .concat(data.crypto.assets).length
+                const allAssets = [].concat(data.cash.assets)
+                    .concat(data["non-cash"].assets)
+                    .concat(data.crypto.assets);
+                if (!allAssets.length
                     || (this.state.activeResultsTab !== "timelapse-percents")
                 ) {
                     return null
                 }
+                const currencies = Object.keys(allAssets.reduce((result, asset) => {
+                    result[asset.currency] = asset.type;
+                    return result;
+                }, {}));
                 const historyChartsData = historyService.readHistory();
-                const historySeries = historyChartsData.series;
+                const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
+                const historySeries = Object.values(
+                    historyChartsData.partialPerCurrencies[currentCurrency] || {}
+                );
                 const buildChronologyPercentageChart = () => this.state.activeResultsTab === "timelapse-percents"
                     ? <div key={key} className={"results-timelapse-percents--block"}>
                         <div className="results-timelapse-percents--container">
@@ -625,7 +653,7 @@ export default class ResultsWrapper extends React.Component {
                                         pointFormat: `<tspan style="color:{point.color}" x="8" dy="15">●</tspan>
                                             <span>{series.name}</span>: <b>
                                             {point.percentage:.2f}%</b>
-                                             {point.y:,.2f} USD<br/>`,
+                                             {point.y:,.2f} ${currentCurrency}<br/>`,
                                     },
                                     plotOptions: {
                                         series: {
@@ -646,7 +674,18 @@ export default class ResultsWrapper extends React.Component {
                                     series: historySeries,
                                 }}
                             />
-                            <div className="chart-currencies-switch-controls-wrapper"></div>
+                            <div className="chart-currencies-switch-controls-wrapper">{
+                                currencies.map((currency, i) => (
+                                    <div key={i} className="chart-currencies-switch-controls--container"
+                                         onClick={event => {
+                                             this.setState({chartsCurrencySelected: currency})
+                                         }}
+                                    >
+                                        <div className="chart-currencies-switch-controls--image"/>
+                                        <span className="chart-currencies-switch-controls--title">{currency}</span>
+                                    </div>
+                                ))
+                            }</div>
                         </div>
                     </div> : null;
 
@@ -660,16 +699,19 @@ export default class ResultsWrapper extends React.Component {
             name: 'timelapse-total',
             buildInnerResult: (key, data) => {
                 const historyChartsData = historyService.readHistory();
-                const currencies = Object.keys(historyChartsData.totalSeriesNamed || {});
-                if (!data.cash.assets
-                        .concat(data["non-cash"].assets)
-                        .concat(data.crypto.assets).length
-                    || (this.state.activeResultsTab !== "timelapse-total")
-                    || !currencies.length
+                const allAssets = [].concat(data.cash.assets)
+                    .concat(data["non-cash"].assets)
+                    .concat(data.crypto.assets);
+                const currencies = Object.keys(allAssets.reduce((result, asset) => {
+                    result[asset.currency] = asset.type;
+                    return result;
+                }, {}));
+                if (!allAssets.length || (this.state.activeResultsTab !== "timelapse-total")
                 ) {
                     return null
                 }
-                const historyTotalSeries = historyChartsData.totalSeriesNamed[this.state.chartsCurrencySelected || "USD"] || [];
+                const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
+                const historyTotalSeries = historyChartsData.totalSeriesNamed[currentCurrency] || [];
                 const buildChronologyTotalChart = () => (
                     <div key={key} className={"results-timelapse--block"}>
                         <div className="results-timelapse--container">
@@ -696,7 +738,7 @@ export default class ResultsWrapper extends React.Component {
                                     },
                                     animation: {},
                                     tooltip: {
-                                        valueSuffix: ` ${this.state.chartsCurrencySelected || 'USD'}`
+                                        valueSuffix: ` ${currentCurrency}`
                                     },
                                     plotOptions: {
                                         series: {
@@ -727,10 +769,8 @@ export default class ResultsWrapper extends React.Component {
                                              this.setState({chartsCurrencySelected: currency})
                                          }}
                                          ref={instance => {
-                                             if (instance && (
-                                                 (i === 0) && !this.state.chartsCurrencySelected
-                                                 // || currency === this.state.chartsCurrencySelected
-                                             )) {
+                                             if (instance && ((i === 0) && !this.state.chartsCurrencySelected)
+                                             ) {
                                                  instance.click()
                                              }
                                          }}
