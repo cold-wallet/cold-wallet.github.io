@@ -504,7 +504,7 @@ export default class ResultsWrapper extends React.Component {
                 }
                 const historyChartsData = historyService.readHistory();
                 const historySeries = historyChartsData.series;
-                const buildChronologyCharts = () => this.state.activeResultsTab === "timelapse"
+                const buildChronologyChart = () => this.state.activeResultsTab === "timelapse"
                     ? <div key={key} className={"results-timelapse--block"}>
                         <div className="results-timelapse--container">
                             <HighchartsReact
@@ -571,7 +571,7 @@ export default class ResultsWrapper extends React.Component {
 
                 return [
                     this.buildButton_GoToPrev("timelapse", "first"),
-                    buildChronologyCharts(),
+                    buildChronologyChart(),
                     this.buildButton_GoToNext("timelapse", "timelapse-percents"),
                 ]
             }
@@ -585,7 +585,7 @@ export default class ResultsWrapper extends React.Component {
                 }
                 const historyChartsData = historyService.readHistory();
                 const historySeries = historyChartsData.series;
-                const buildChronologyCharts = () => this.state.activeResultsTab === "timelapse-percents"
+                const buildChronologyPercentageChart = () => this.state.activeResultsTab === "timelapse-percents"
                     ? <div key={key} className={"results-timelapse-percents--block"}>
                         <div className="results-timelapse-percents--container">
                             <HighchartsReact
@@ -647,15 +647,15 @@ export default class ResultsWrapper extends React.Component {
 
                 return [
                     this.buildButton_GoToPrev("timelapse-percents", "timelapse"),
-                    buildChronologyCharts(),
-                    this.buildButton_GoToNext("timelapse-percents", "timelapse-percents"),
+                    buildChronologyPercentageChart(),
+                    this.buildButton_GoToNext("timelapse-percents", "timelapse-total"),
                 ]
             }
         }]
     }
 
     buildButton_GoToNext(activeTab, newTab) {
-        return this.state.activeResultsTab === activeTab
+        return (this.state.activeResultsTab === activeTab
             ? <div key={"go-to-next"}
                    onClick={() => {
                        this.setState({
@@ -669,22 +669,23 @@ export default class ResultsWrapper extends React.Component {
                 <span style={{display: "none",}}>
                              <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
                          </span>
-            </div> : null
+            </div> : null)
     }
 
     buildButton_GoToPrev(activeTab, newTab) {
-        return this.state.activeResultsTab === activeTab ? <div key={"go-to-prev"}
-                                                                onClick={() => this.setState({
-                                                                    activeResultsTab: newTab,
-                                                                })}>
-            <img className={"go-to-prev-block--button"}
-                 alt="go to prev analysis block view"
-                 title={"go to prev block"}
-                 src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"/>
-            <span style={{display: "none",}}>
+        return (this.state.activeResultsTab === activeTab
+            ? <div key={"go-to-prev"}
+                   onClick={() => this.setState({
+                       activeResultsTab: newTab,
+                   })}>
+                <img className={"go-to-prev-block--button"}
+                     alt="go to prev analysis block view"
+                     title={"go to prev block"}
+                     src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"/>
+                <span style={{display: "none",}}>
                              <a href="https://icons8.com/icon/81122/double-right">Double Right icon by Icons8</a>
                          </span>
-        </div> : null;
+            </div> : null)
     }
 
     buildCurrencyTotalResult(assetGroups, currencyCodeToType) {
