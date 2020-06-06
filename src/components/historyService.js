@@ -11,6 +11,9 @@ const historyService = {
     },
 
     updateHistory({assets}) {
+        if (!rates.isReady()) {
+            return
+        }
         const now = Date.now();
         const lastHistory = this.readHistory();
         const prev = (lastHistory.series
@@ -62,19 +65,16 @@ const historyService = {
             });
         });
 
-        let newTotalSeries = [currentTotalNamed["USD"]];
-
-        if (newSeries[0].data.length > 3 && isNothingNew(lastHistory.series, newSeries)) {
-            newSeries = prolongData(lastHistory.series, newSeries);
-        }
-
-        if (newTotalSeries[0].data.length > 3 && isNothingNew(lastHistory.totalSeries, newTotalSeries)) {
-            newTotalSeries = prolongData(lastHistory.totalSeries, newTotalSeries);
+        if (newSeries[0] && newSeries[0].data.length > 3 && isNothingNew(newSeries)) {
+            newSeries = optimiseData(newSeries);
+            Object.entries(activeCurrenciesToNewData).forEach(entry => {
+                const cur = entry[0];
+                activeCurrenciesToNewData[cur] = optimiseData([currentTotalNamed[cur]])[0]
+            });
         }
 
         const history = {
             series: newSeries,
-            totalSeries: newTotalSeries,
             totalSeriesNamed: currentTotalNamed,
             named: currentNamed,
         };
@@ -88,20 +88,18 @@ cryptoRatesRepository.subscribeOnChange(cryptoRates => historyService.updateHist
 
 export default historyService
 
-function isNothingNew(oldSeries, newSeries) {
-    const prevOld = oldSeries.map(s => s.data[s.data.length - 2][1]).toString();
-    const lastOld = oldSeries.map(s => s.data[s.data.length - 1][1]).toString();
-    const newOnes = newSeries.map(s => s.data[s.data.length - 1][1]).toString();
+function isNothingNew(series) {
+    const prevOld = series.map(s => s.data[s.data.length - 3][1]).toString();
+    const lastOld = series.map(s => s.data[s.data.length - 2][1]).toString();
+    const newOnes = series.map(s => s.data[s.data.length - 1][1]).toString();
     return prevOld === lastOld && lastOld === newOnes;
 }
 
-function prolongData(oldSeries, newSeries) {
-    if (!oldSeries.length) {
-        return newSeries
-    }
-    const newLatest = newSeries.map(s => s.data[s.data.length - 1]);
-    return oldSeries.map((s, i) => {
-        s.data[s.data.length - 1][0] = newLatest[i][0];
-        return s
+function optimiseData(series) {
+    series.forEach(datum => {
+        const last = datum.data.pop();
+        datum.data.pop(); // this one is thrown away
+        datum.data.push(last);
     });
+    return series
 }

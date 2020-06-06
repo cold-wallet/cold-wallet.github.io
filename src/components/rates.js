@@ -17,8 +17,12 @@ let savedRates = null;
 let savedCryptoRates = null;
 
 const futures = [];
+let terminated = false;
 
 (function fetchLatestRates() {
+    if (terminated) {
+        return
+    }
     try {
         axios.get("https://api.monobank.ua/bank/currency")
             .then(response => {
@@ -29,7 +33,7 @@ const futures = [];
                     && !fiatRates.errorDescription
                     && fiatRates.length
                 ) {
-                    if (fiatRates !== savedRates) {
+                    if (fiatRates !== savedRates && !terminated) {
                         storeFiatRates(fiatRates);
                         savedRates = fiatRates;
                     }
@@ -55,6 +59,9 @@ const futures = [];
 })();
 
 (function fetchLatestCryptoCurrenciesRates() {
+    if (terminated) {
+        return
+    }
     try {
         axios.get("https://api.binance.com/api/v1/ticker/price")
             .then(response => {
@@ -63,7 +70,7 @@ const futures = [];
                     && (response.status === 200)
                     && (cryptoRates = response.data)
                 ) {
-                    if (cryptoRates !== savedCryptoRates) {
+                    if (cryptoRates !== savedCryptoRates && !terminated) {
                         storeCryptoRates(cryptoRates);
                         savedCryptoRates = cryptoRates;
                     }
@@ -229,15 +236,14 @@ export default {
         return asset.type === "crypto"
             ? transformCryptoToFiat(asset, currencyCode)
             : transformFiatToFiat(asset, currencyCode)
-            ;
     },
     transformAssetValueToCrypto(asset, currencyCode) {
         return asset.type === "crypto"
             ? transformCryptoToCrypto(asset, currencyCode)
             : transformFiatToCrypto(asset, currencyCode)
-            ;
     },
     shutDown() {
+        terminated = true;
         futures.forEach(clearTimeout)
     }
 };

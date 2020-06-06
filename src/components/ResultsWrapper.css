@@ -157,3 +157,21 @@
   width: 100%;
   height: 100%;
 }
+
+.chart-currencies-switch-controls-wrapper {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-evenly;
+}
+
+.chart-currencies-switch-controls--container {
+  cursor: pointer;
+  padding: 2%;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-evenly;
+}
+
+.chart-currencies-switch-controls--title {
+  width: 100%;
+}
