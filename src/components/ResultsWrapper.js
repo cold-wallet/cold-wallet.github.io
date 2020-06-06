@@ -60,8 +60,6 @@ export default class ResultsWrapper extends React.Component {
     }
 
     render() {
-        console.log(this.props);
-        console.log(this.state);
         if (!this.state.assets || !rates.isReady()
         ) {
             return null;
