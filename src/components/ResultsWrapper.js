@@ -60,6 +60,8 @@ export default class ResultsWrapper extends React.Component {
     }
 
     render() {
+        console.log(this.props);
+        console.log(this.state);
         if (!this.state.assets || !rates.isReady()
         ) {
             return null;
@@ -566,6 +568,7 @@ export default class ResultsWrapper extends React.Component {
                                     },
                                 }}
                             />
+                            <div className="chart-currencies-switch-controls-wrapper">1</div>
                         </div>
                     </div> : null;
 
@@ -642,6 +645,7 @@ export default class ResultsWrapper extends React.Component {
                                     series: historySeries,
                                 }}
                             />
+                            <div className="chart-currencies-switch-controls-wrapper">2</div>
                         </div>
                     </div> : null;
 
@@ -649,6 +653,75 @@ export default class ResultsWrapper extends React.Component {
                     this.buildButton_GoToPrev("timelapse-percents", "timelapse"),
                     buildChronologyPercentageChart(),
                     this.buildButton_GoToNext("timelapse-percents", "timelapse-total"),
+                ]
+            }
+        }, {
+            name: 'timelapse-total',
+            buildInnerResult: (key, data) => {
+                if (!data.cash.assets
+                    .concat(data["non-cash"].assets)
+                    .concat(data.crypto.assets).length) {
+                    return null
+                }
+                const historyChartsData = historyService.readHistory();
+                const historyTotalSeries = historyChartsData.totalSeries || [];
+                const buildChronologyTotalChart = () => this.state.activeResultsTab === "timelapse-total"
+                    ? <div key={key} className={"results-timelapse--block"}>
+                        <div className="results-timelapse--container">
+                            <HighchartsReact
+                                key={"timelapse-total-chart"}
+                                highcharts={Highcharts}
+                                options={{
+                                    chart: {
+                                        height: '60%',
+                                        type: 'area',
+                                        zoomType: 'x',
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        type: 'datetime',
+                                        tickmarkPlacement: 'on',
+                                    },
+                                    yAxis: {
+                                        title: {
+                                            text: ''
+                                        },
+                                    },
+                                    tooltip: {
+                                        valueSuffix: ' USD'
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            marker: {
+                                                enabled: false,
+                                            }
+                                        },
+                                        area: {
+                                            stacking: 'normal',
+                                            lineColor: '#666666',
+                                            lineWidth: 1,
+                                            marker: {
+                                                lineWidth: 1,
+                                                lineColor: '#666666'
+                                            }
+                                        }
+                                    },
+                                    series: historyTotalSeries,
+                                    legend: {
+                                        enabled: false
+                                    },
+                                }}
+                            />
+                            <div className="chart-currencies-switch-controls-wrapper">3</div>
+                        </div>
+                    </div> : null;
+
+                return [
+                    this.buildButton_GoToPrev("timelapse-total", "timelapse-percents"),
+                    buildChronologyTotalChart(),
+                    this.buildButton_GoToNext("timelapse-total", "timelapse-total"),
                 ]
             }
         }]

@@ -1,12 +1,12 @@
 import LocalStorageRepository from "./LocalStorageRepository";
-import assetsRepository from "./assetsRepository";
 
 const historyRepository = LocalStorageRepository.builder()
     .name('history')
     .nullObjectSupplier(() => ({
         series: [],
+        totalSeries: [],
+        totalSeriesNamed: {},
         named: {},
-        assets: assetsRepository.getLatest(),
     }))
     .build();
 
