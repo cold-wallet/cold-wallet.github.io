@@ -21,7 +21,7 @@ const historyService = {
             && lastHistory.series[0].data
             && lastHistory.series[0].data.length)
             ? lastHistory.series[0].data[lastHistory.series[0].data.length - 1][0]
-            : now - 10_000;
+            : now - 1_000;
         const currentNamed = lastHistory.named;
         const allAssets = [].concat(assets.cash.assets.concat(assets["non-cash"].assets).concat(assets.crypto.assets));
         const partialPerCurrencies = lastHistory.partialPerCurrencies || {};
