@@ -220,6 +220,11 @@ export default {
     extractCryptoRates() {
         return getCryptoRates()
     },
+    transformAssetValue(asset, resultCurrencyCode, resultType) {
+        return resultType === "crypto"
+            ? this.transformAssetValueToCrypto(asset, resultCurrencyCode)
+            : this.transformAssetValueToFiat(asset, resultCurrencyCode)
+    },
     transformAssetValueToFiat(asset, currencyCode) {
         return asset.type === "crypto"
             ? transformCryptoToFiat(asset, currencyCode)
