@@ -52,12 +52,13 @@ const historyService = {
         });
         allAssets.forEach(asset => {
             newTotalDataPerCurrency.forEach(info => {
-                const amount = numberFormat(rates.transformAssetValue(
+                const amount = rates.transformAssetValue(
                     asset, info.currency, info.__type
-                ), 2);
+                );
                 const last = info.data.length - 1;
                 info.name = info.currency;
-                info.data[last][1] = numberFormat(info.data[last][1] + amount, 2);
+                info.data[last][1] = numberFormat(info.data[last][1] + amount,
+                    info.__type === "crypto" ? 8 : 2);
             });
         });
 
