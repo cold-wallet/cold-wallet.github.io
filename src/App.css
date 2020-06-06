@@ -1,6 +1,7 @@
 .dashboard {
   display: flex;
   height: 100%;
+  background-color: #6F9F98;
 }
 
 .App {
