@@ -9,6 +9,7 @@ import HighchartsReact from 'highcharts-react-official'
 import './../extensions/highChartTheme'
 import rates from "./rates";
 import highCharts3d from 'highcharts/highcharts-3d'
+import treemap from 'highcharts/modules/treemap'
 import assetsRepository from "./assetsRepository";
 import historyService from "./historyService";
 import fiatRatesRepository from "./FiatRatesRepository";
@@ -23,6 +24,7 @@ import bchIcon from "../resources/currencies/bch.png";
 
 // -> Load Highcharts modules
 highCharts3d(Highcharts);
+treemap(Highcharts);
 
 const BTC = "BTC";
 const USD = "USD";
@@ -512,8 +514,7 @@ export default class ResultsWrapper extends React.Component {
                 const allAssets = [].concat(data.cash.assets)
                     .concat(data["non-cash"].assets)
                     .concat(data.crypto.assets);
-                if (!allAssets.length || (this.state.activeResultsTab !== "timelapse")
-                ) {
+                if (!allAssets.length || (this.state.activeResultsTab !== "timelapse")) {
                     return null
                 }
                 const currencyToType = allAssets.reduce((result, asset) => {
@@ -606,9 +607,7 @@ export default class ResultsWrapper extends React.Component {
                 const allAssets = [].concat(data.cash.assets)
                     .concat(data["non-cash"].assets)
                     .concat(data.crypto.assets);
-                if (!allAssets.length
-                    || (this.state.activeResultsTab !== "timelapse-percents")
-                ) {
+                if (!allAssets.length || (this.state.activeResultsTab !== "timelapse-percents")) {
                     return null
                 }
                 const currencyToType = allAssets.reduce((result, asset) => {
@@ -702,8 +701,7 @@ export default class ResultsWrapper extends React.Component {
                     return result;
                 }, {});
                 const currencies = Object.keys(currencyToType);
-                if (!allAssets.length || (this.state.activeResultsTab !== "timelapse-total")
-                ) {
+                if (!allAssets.length || (this.state.activeResultsTab !== "timelapse-total")) {
                     return null
                 }
                 if (!this.state.chartsCurrencySelected) {
@@ -778,7 +776,117 @@ export default class ResultsWrapper extends React.Component {
                 return [
                     this.buildButton_GoToPrev("timelapse-total", "timelapse-percents"),
                     buildChronologyTotalChart(),
-                    this.buildButton_GoToNext("timelapse-total", "timelapse-total"),
+                    this.buildButton_GoToNext("timelapse-total", "balance-treemap"),
+                ]
+            }
+        }, {
+            name: 'balance-treemap',
+            buildInnerResult: (key, data) => {
+                const allAssets = [].concat(data.cash.assets)
+                    .concat(data["non-cash"].assets)
+                    .concat(data.crypto.assets);
+                if (!allAssets.length || (this.state.activeResultsTab !== "balance-treemap")) {
+                    return null
+                }
+                if (!this.state.chartsCurrencySelected) {
+                    setTimeout(() => this.setState({chartsCurrencySelected: currencies[0]}));
+                }
+                const currencyToType = allAssets.reduce((result, asset) => {
+                    result[asset.currency] = asset.type;
+                    return result;
+                }, {});
+                const currencies = Object.keys(currencyToType);
+                const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
+                const currentType = currencyToType[currentCurrency];
+                const afterDecimalPoint = currentType === "crypto" ? 8 : 2;
+                let totalValue = 0;
+                const colors = [
+                    "#245741",
+                    "#2d6a4f",
+                    "#357a5b",
+                    "#41926d",
+                    "#5bac85",
+                    "#6ab791",
+                    "#78c19c",
+                    "#98d3b2",
+                    "#b7e4c7",
+                    "#d8f3dc",
+                ];
+                let series = {
+                    type: "treemap",
+                    layoutAlgorithm: 'squarified',
+                    data: allAssets
+                        .map((asset, i) => {
+                            const value = rates.transformAssetValue(asset, currentCurrency, currentType);
+                            totalValue += value;
+                            let colorIndex = i;
+                            while (colorIndex > (colors.length - 1)) {
+                                colorIndex -= colors.length
+                            }
+                            return {
+                                value: value,
+                                name: asset.name,
+                                color: colors[colorIndex] || colors[0],
+                            }
+                        })
+                        .sort((a, b) => b.value - a.value)
+                        .map((asset, i) => {
+                            asset.percentage = (asset.value * 100) / totalValue;
+                            return asset
+                        }),
+                };
+
+                const buildChronologyPercentageChart = () => this.state.activeResultsTab === "balance-treemap"
+                    ? <div key={key} className={"results-timelapse-percents--block"}>
+                        <div className="results-timelapse-percents--container">
+                            <HighchartsReact
+                                key={"balance-treemap-chart"}
+                                highcharts={Highcharts}
+                                options={{
+                                    chart: {
+                                        height: '60%',
+                                        type: 'treemap',
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    subtitle: {
+                                        text: ''
+                                    },
+                                    tooltip: {
+                                        pointFormat: `<tspan style="color:{point.color}" x="8" dy="15">●</tspan>
+                                             <span>{point.name}</span>: <b>{point.percentage:.2f}%</b>
+                                            {point.value:,.${afterDecimalPoint}f} ${currentCurrency}<br/>`,
+                                    },
+                                    series: series,
+                                    plotOptions: {
+                                        treemap: {
+                                            colors: [
+                                                "#245741",
+                                                "#2d6a4f",
+                                                "#357a5b",
+                                                "#5bac85",
+                                                "#b7e4c7",
+                                                "#d8f3dc",
+                                                "#6ab791",
+                                                "#41926d",
+                                                "#78c19c",
+                                                "#98d3b2",
+                                            ],
+                                        }
+                                    }
+                                }}
+                            />
+                            {buildCurrenciesSwitchControls(currencyToType, currency => {
+                                this.setState({chartsCurrencySelected: currency})
+                            })}
+                        </div>
+                    </div> : null;
+
+                return [
+                    this.buildButton_GoToPrev("balance-treemap", "timelapse-total"),
+                    buildChronologyPercentageChart(),
+                    this.buildButton_GoToNext("balance-treemap", "balance-treemap"),
                 ]
             }
         }]
