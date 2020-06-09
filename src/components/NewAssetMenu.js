@@ -108,30 +108,31 @@ export class NewAssetMenu extends React.Component {
                         <div className={"new-asset-menu--header-title"}>Choose currency of new asset</div>
                         {/*<button className={"new-asset-menu--close-button negative-button"} onClick={hideMenu}>✖</button>*/}
                     </div>
-                    <div className={"new-asset-menu--body"}>{[
-                        this.state.bufferCurrency ? null : <div key={"currency-select"}>
-                            <div className={"asset-pics--container"}>
-                                {
-                                    getListOfTopCurrenciesByType(this.props.assetType).map((currency, i) =>
-                                        <div key={i}
-                                             title={currency.name}
-                                             onClick={() => {
-                                                 this.onCurrencySelected({
-                                                     currencyCode: currency.code,
-                                                 });
-                                             }}
-                                             className={"asset-pic--container"}>
-                                            <div className={"asset-pic--image"}>{currency.htmlCode}</div>
-                                            <div className={"asset-pic--name"}>{currency.code}</div>
-                                        </div>
-                                    )
-                                }
+                    <div className={"new-asset-menu--body"}>{
+                        this.state.bufferCurrency
+                            ? this.buildDataMenu()
+                            : <div key={"currency-select"}>
+                                <div className={"asset-pics--container"}>
+                                    {
+                                        getListOfTopCurrenciesByType(this.props.assetType).map((currency, i) =>
+                                            <div key={i}
+                                                 title={currency.name}
+                                                 onClick={() => {
+                                                     this.onCurrencySelected({
+                                                         currencyCode: currency.code,
+                                                     });
+                                                 }}
+                                                 className={"asset-pic--container"}>
+                                                <div className={"asset-pic--image"}>{currency.htmlCode}</div>
+                                                <div className={"asset-pic--name"}>{currency.code}</div>
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                                <div className={"find-asset--container"}>
+                                </div>
                             </div>
-                            <div className={"find-asset--container"}>
-                            </div>
-                        </div>,
-                        this.state.bufferCurrency ? this.buildDataMenu() : null,
-                    ]}</div>
+                    }</div>
                 </div>
             </div>
         )

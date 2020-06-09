@@ -14,6 +14,12 @@ import historyService from "./historyService";
 import fiatRatesRepository from "./FiatRatesRepository";
 import cryptoRatesRepository from "./CryptoRatesRepository";
 import historyRepository from "./HistoryRepository";
+import btcIcon from "../resources/currencies/btc.png";
+import ethIcon from "../resources/currencies/eth.png";
+import usdtIcon from "../resources/currencies/usdt.png";
+import ltcIcon from "../resources/currencies/ltc.png";
+import eosIcon from "../resources/currencies/eos.png";
+import bchIcon from "../resources/currencies/bch.png";
 
 // -> Load Highcharts modules
 highCharts3d(Highcharts);
@@ -337,6 +343,9 @@ export default class ResultsWrapper extends React.Component {
                             alpha: 35,
                             beta: 0
                         },
+                        style: {
+                            width: "100%",
+                        },
                     },
                     title: {
                         text: '',
@@ -386,113 +395,116 @@ export default class ResultsWrapper extends React.Component {
 
                 const buildGoToNext = () => this.state.activeResultsTab === "first"
                     ? <div key={"go-to-next"}
-                           onClick={() => this.setState({
-                               activeResultsTab: "timelapse",
-                           })}>
+                           className="go-to-button-block--container">
                         <img className={"go-to-next-block--button"}
                              alt="go to next analysis block view"
                              title={"go to next block"}
-                             src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"/>
+                             src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"
+                             onClick={() => this.setState({
+                                 activeResultsTab: "timelapse",
+                             })}/>
                         <span style={{display: "none",}}>
                              <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
                          </span>
                     </div> : null;
 
-                return <div key={key} className={"balance-results-container"}>
-                    <div className={"balance-circle-container"}>
-                        <div className={"balance-circle-chart"}>
-                            <HighchartsReact
-                                key={"highChart"}
-                                highcharts={Highcharts}
-                                options={options}
-                            />
+                return [
+                    <div key={key} className={"balance-results-container"}>
+                        <div className={"balance-circle-container"}>
+                            <div className={"balance-circle-chart"}>
+                                <HighchartsReact
+                                    key={"highChart"}
+                                    highcharts={Highcharts}
+                                    options={options}
+                                />
+                            </div>
+                            <div className="circle-chart-type--select-container">
+                                <div className={"circle-chart-type--item" +
+                                (this.state.chartType === "total" ? " circle-chart-type--item--active" : "")
+                                }
+                                     onClick={() => this.setState({chartType: "total"})}
+                                >
+                                    <div className={"circle-chart-type--item-wrapper"}><VictoryPie
+                                        data={[{
+                                            x: USD,
+                                            y: 0.5,
+                                        }, {
+                                            x: BTC,
+                                            y: 1,
+                                        }, {
+                                            x: USD,
+                                            y: 1.2,
+                                        }, {
+                                            x: EUR,
+                                            y: 1.5,
+                                        }]}
+                                        style={{labels: {fontSize: 45, fontWeight: "bold"}}}
+                                        labelComponent={<VictoryLabel/>}
+                                        labelRadius={40}
+                                        animate={{
+                                            duration: 1000
+                                        }}
+                                        colorScale={colorScale}
+                                    /></div>
+                                    <div className="circle-chart-type--text">Total picture</div>
+                                </div>
+                                <div className={"circle-chart-type--item" +
+                                (this.state.chartType === "per-currency" ? " circle-chart-type--item--active" : "")
+                                }
+                                     onClick={() => this.setState({chartType: "per-currency"})}
+                                >
+                                    <div className={"circle-chart-type--item-wrapper"}><VictoryPie
+                                        data={[{
+                                            x: BTC,
+                                            y: 1,
+                                        }, {
+                                            x: USD,
+                                            y: 1.2,
+                                        }, {
+                                            x: EUR,
+                                            y: 1.5,
+                                        }]}
+                                        style={{labels: {fontSize: 45, fontWeight: "bold"}}}
+                                        labelComponent={<VictoryLabel/>}
+                                        labelRadius={40}
+                                        animate={{
+                                            duration: 1000
+                                        }}
+                                        colorScale={colorScale}
+                                    /></div>
+                                    <span className="circle-chart-type--text">Balance per currency</span>
+                                </div>
+                                <div className={"circle-chart-type--item" +
+                                (this.state.chartType === "per-type" ? " circle-chart-type--item--active" : "")
+                                }
+                                     onClick={() => this.setState({chartType: "per-type"})}
+                                >
+                                    <div className={"circle-chart-type--item-wrapper"}><VictoryPie
+                                        data={[{
+                                            x: "cash",
+                                            y: 0.5,
+                                        }, {
+                                            x: "non-cash",
+                                            y: 1,
+                                        }, {
+                                            x: "crypto",
+                                            y: 0.8,
+                                        }]}
+                                        style={{labels: {fontSize: 45, fontWeight: "bold"}}}
+                                        labelComponent={<VictoryLabel/>}
+                                        labelRadius={40}
+                                        animate={{
+                                            duration: 1000
+                                        }}
+                                        colorScale={colorScale}
+                                    /></div>
+                                    <div className="circle-chart-type--text">Balance per type</div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="circle-chart-type--select-container">
-                            <div className={"circle-chart-type--item" +
-                            (this.state.chartType === "total" ? " circle-chart-type--item--active" : "")
-                            }
-                                 onClick={() => this.setState({chartType: "total"})}
-                            >
-                                <div className={"circle-chart-type--item-wrapper"}><VictoryPie
-                                    data={[{
-                                        x: USD,
-                                        y: 0.5,
-                                    }, {
-                                        x: BTC,
-                                        y: 1,
-                                    }, {
-                                        x: USD,
-                                        y: 1.2,
-                                    }, {
-                                        x: EUR,
-                                        y: 1.5,
-                                    }]}
-                                    style={{labels: {fontSize: 45, fontWeight: "bold"}}}
-                                    labelComponent={<VictoryLabel/>}
-                                    labelRadius={40}
-                                    animate={{
-                                        duration: 1000
-                                    }}
-                                    colorScale={colorScale}
-                                /></div>
-                                <div className="circle-chart-type--text">Total picture</div>
-                            </div>
-                            <div className={"circle-chart-type--item" +
-                            (this.state.chartType === "per-currency" ? " circle-chart-type--item--active" : "")
-                            }
-                                 onClick={() => this.setState({chartType: "per-currency"})}
-                            >
-                                <div className={"circle-chart-type--item-wrapper"}><VictoryPie
-                                    data={[{
-                                        x: BTC,
-                                        y: 1,
-                                    }, {
-                                        x: USD,
-                                        y: 1.2,
-                                    }, {
-                                        x: EUR,
-                                        y: 1.5,
-                                    }]}
-                                    style={{labels: {fontSize: 45, fontWeight: "bold"}}}
-                                    labelComponent={<VictoryLabel/>}
-                                    labelRadius={40}
-                                    animate={{
-                                        duration: 1000
-                                    }}
-                                    colorScale={colorScale}
-                                /></div>
-                                <span className="circle-chart-type--text">Balance per currency</span>
-                            </div>
-                            <div className={"circle-chart-type--item" +
-                            (this.state.chartType === "per-type" ? " circle-chart-type--item--active" : "")
-                            }
-                                 onClick={() => this.setState({chartType: "per-type"})}
-                            >
-                                <div className={"circle-chart-type--item-wrapper"}><VictoryPie
-                                    data={[{
-                                        x: "cash",
-                                        y: 0.5,
-                                    }, {
-                                        x: "non-cash",
-                                        y: 1,
-                                    }, {
-                                        x: "crypto",
-                                        y: 0.8,
-                                    }]}
-                                    style={{labels: {fontSize: 45, fontWeight: "bold"}}}
-                                    labelComponent={<VictoryLabel/>}
-                                    labelRadius={40}
-                                    animate={{
-                                        duration: 1000
-                                    }}
-                                    colorScale={colorScale}
-                                /></div>
-                                <div className="circle-chart-type--text">Balance per type</div>
-                            </div>
-                        </div>
-                    </div>
-                    {buildGoToNext()}
-                </div>
+                    </div>,
+                    buildGoToNext(),
+                ]
             }
         }, {
             name: 'timelapse',
@@ -504,10 +516,11 @@ export default class ResultsWrapper extends React.Component {
                 ) {
                     return null
                 }
-                const currencies = Object.keys(allAssets.reduce((result, asset) => {
+                const currencyToType = allAssets.reduce((result, asset) => {
                     result[asset.currency] = asset.type;
                     return result;
-                }, {}));
+                }, {});
+                const currencies = Object.keys(currencyToType);
                 const historyChartsData = historyService.readHistory();
                 const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
                 const historySeries = Object.values(
@@ -575,19 +588,9 @@ export default class ResultsWrapper extends React.Component {
                                     },
                                 }}
                             />
-                            <div className="chart-currencies-switch-controls-wrapper">{
-                                currencies.map((currency, i) => (
-                                    <div key={i} className="chart-currencies-switch-controls--container"
-                                         onClick={event => {
-                                             this.setState({chartsCurrencySelected: currency})
-                                         }}
-                                    >
-                                        <div className="chart-currencies-switch-controls--image"/>
-                                        <span className="chart-currencies-switch-controls--title">{currency}</span>
-                                    </div>
-                                ))
-                            }</div>
-
+                            {buildCurrenciesSwitchControls(currencyToType, currency => {
+                                this.setState({chartsCurrencySelected: currency})
+                            })}
                         </div>
                     </div> : null;
 
@@ -608,10 +611,11 @@ export default class ResultsWrapper extends React.Component {
                 ) {
                     return null
                 }
-                const currencies = Object.keys(allAssets.reduce((result, asset) => {
+                const currencyToType = allAssets.reduce((result, asset) => {
                     result[asset.currency] = asset.type;
                     return result;
-                }, {}));
+                }, {});
+                const currencies = Object.keys(currencyToType);
                 const historyChartsData = historyService.readHistory();
                 const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
                 const historySeries = Object.values(
@@ -674,18 +678,9 @@ export default class ResultsWrapper extends React.Component {
                                     series: historySeries,
                                 }}
                             />
-                            <div className="chart-currencies-switch-controls-wrapper">{
-                                currencies.map((currency, i) => (
-                                    <div key={i} className="chart-currencies-switch-controls--container"
-                                         onClick={event => {
-                                             this.setState({chartsCurrencySelected: currency})
-                                         }}
-                                    >
-                                        <div className="chart-currencies-switch-controls--image"/>
-                                        <span className="chart-currencies-switch-controls--title">{currency}</span>
-                                    </div>
-                                ))
-                            }</div>
+                            {buildCurrenciesSwitchControls(currencyToType, currency => {
+                                this.setState({chartsCurrencySelected: currency})
+                            })}
                         </div>
                     </div> : null;
 
@@ -702,13 +697,17 @@ export default class ResultsWrapper extends React.Component {
                 const allAssets = [].concat(data.cash.assets)
                     .concat(data["non-cash"].assets)
                     .concat(data.crypto.assets);
-                const currencies = Object.keys(allAssets.reduce((result, asset) => {
+                const currencyToType = allAssets.reduce((result, asset) => {
                     result[asset.currency] = asset.type;
                     return result;
-                }, {}));
+                }, {});
+                const currencies = Object.keys(currencyToType);
                 if (!allAssets.length || (this.state.activeResultsTab !== "timelapse-total")
                 ) {
                     return null
+                }
+                if (!this.state.chartsCurrencySelected) {
+                    setTimeout(() => this.setState({chartsCurrencySelected: currencies[0]}));
                 }
                 const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
                 const historyTotalSeries = historyChartsData.totalSeriesNamed[currentCurrency] || [];
@@ -770,24 +769,9 @@ export default class ResultsWrapper extends React.Component {
                                     },
                                 }}
                             />
-                            <div className="chart-currencies-switch-controls-wrapper">{
-                                currencies.map((currency, i) => (
-                                    <div key={i} className="chart-currencies-switch-controls--container"
-                                         onClick={event => {
-                                             this.setState({chartsCurrencySelected: currency})
-                                         }}
-                                         ref={instance => {
-                                             if (instance && ((i === 0) && !this.state.chartsCurrencySelected)
-                                             ) {
-                                                 instance.click()
-                                             }
-                                         }}
-                                    >
-                                        <div className="chart-currencies-switch-controls--image"/>
-                                        <span className="chart-currencies-switch-controls--title">{currency}</span>
-                                    </div>
-                                ))
-                            }</div>
+                            {buildCurrenciesSwitchControls(currencyToType, currency => {
+                                this.setState({chartsCurrencySelected: currency})
+                            })}
                         </div>
                     </div>);
 
@@ -802,34 +786,35 @@ export default class ResultsWrapper extends React.Component {
 
     buildButton_GoToNext(activeTab, newTab) {
         return (this.state.activeResultsTab === activeTab
-            ? <div key={"go-to-next"}
-                   onClick={() => {
-                       this.setState({
-                           activeResultsTab: newTab,
-                           chartsCurrencySelected: null,
-                       })
-                   }}>
+            ? <div key={"go-to-next"} className="go-to-button-block--container">
                 <img className={"go-to-next-block--button"}
                      alt="go to next analysis block view"
                      title={"go to next block"}
-                     src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"/>
+                     src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"
+                     onClick={() => {
+                         this.setState({
+                             activeResultsTab: newTab,
+                             chartsCurrencySelected: null,
+                         })
+                     }}/>
                 <span style={{display: "none",}}>
-                             <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
-                         </span>
+                    <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
+                </span>
             </div> : null)
     }
 
     buildButton_GoToPrev(activeTab, newTab) {
         return (this.state.activeResultsTab === activeTab
             ? <div key={"go-to-prev"}
-                   onClick={() => this.setState({
-                       activeResultsTab: newTab,
-                       chartsCurrencySelected: null,
-                   })}>
+                   className="go-to-button-block--container">
                 <img className={"go-to-prev-block--button"}
                      alt="go to prev analysis block view"
                      title={"go to prev block"}
-                     src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"/>
+                     src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"
+                     onClick={() => this.setState({
+                         activeResultsTab: newTab,
+                         chartsCurrencySelected: null,
+                     })}/>
                 <span style={{display: "none",}}>
                              <a href="https://icons8.com/icon/81122/double-right">Double Right icon by Icons8</a>
                          </span>
@@ -901,4 +886,91 @@ function addCommas(toMe) {
     return noExponents(toMe)
         .toString()
         .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+}
+
+function buildCurrenciesSwitchControls(currencyToType, onCurrencySelected) {
+    const currencyToInfo = getListOfTopCurrenciesByType();
+    return <div className="chart-currencies-switch-controls-wrapper">{
+        Object.keys(currencyToType).map((currency, i) => {
+            const info = currencyToInfo[currency];
+            return <div key={i}
+                        title={info.name}
+                        onClick={() => onCurrencySelected(currency)}
+                        className={"chart-currencies-switch-controls--container"}>
+                <div className="chart-currencies-switch-controls--currency-icon-wrapper">{info.htmlCode}</div>
+                <div className={"asset-pic--name"}>{info.code}</div>
+            </div>
+        })}</div>
+}
+
+function getListOfTopCurrenciesByType() {
+    const result = {
+        "BTC": {
+            name: "Bitcoin",
+            code: "BTC",
+            icon: btcIcon,
+        },
+        "ETH": {
+            name: "Ethereum",
+            code: "ETH",
+            icon: ethIcon,
+        },
+        "USDT": {
+            name: "Tether",
+            code: "USDT",
+            icon: usdtIcon,
+        },
+        "LTC": {
+            name: "Litecoin",
+            code: "LTC",
+            icon: ltcIcon,
+        },
+        "EOS": {
+            name: "EOS",
+            code: "EOS",
+            icon: eosIcon,
+        },
+        "BCH": {
+            name: "Bitcoin Cash",
+            code: "BCH",
+            icon: bchIcon,
+        },
+    };
+    Object.keys(result).forEach(currency => {
+        const info = result[currency];
+        info.htmlCode = <img className={"asset-pic--image-img"} src={info.icon} alt={info.name}/>;
+    });
+    result["USD"] = {
+        name: "US Dollar",
+        code: "USD",
+        htmlCode: <span className={"chart-currencies-switch-controls--currency-icon asset-currency-icon"}>&#x24;</span>
+    };
+    result["EUR"] = {
+        name: "Euro",
+        code: "EUR",
+        htmlCode: <span className={"chart-currencies-switch-controls--currency-icon asset-currency-icon"}>&euro;</span>
+    };
+    result["GBP"] = {
+        name: "Pound sterling",
+        code: "GBP",
+        htmlCode: <span className={"chart-currencies-switch-controls--currency-icon asset-currency-icon"}>&#xA3;</span>
+    };
+    result["UAH"] = {
+        name: "Ukrainian hryvnia",
+        code: "UAH",
+        htmlCode: <span className={"chart-currencies-switch-controls--currency-icon asset-currency-icon"}>&#8372;</span>
+    };
+    result["PLN"] = {
+        name: "Polish zloty",
+        code: "PLN",
+        htmlCode: <span
+            className={"chart-currencies-switch-controls--currency-icon asset-currency-icon"}>&#122;&#322;</span>
+    };
+    result["RUB"] = {
+        name: "Russian ruble",
+        code: "RUB",
+        htmlCode: <span
+            className={"chart-currencies-switch-controls--currency-icon asset-currency-icon"}>&#x20BD;</span>
+    };
+    return result
 }

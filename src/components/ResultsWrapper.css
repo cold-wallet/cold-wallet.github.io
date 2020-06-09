@@ -81,9 +81,8 @@
 }
 
 .balance-circle-container {
-  width: 90%;
   height: 100%;
-  padding: 0 5%;
+  padding: 0 0 0 5%;
   display: flex;
   flex-flow: column;
   justify-content: space-evenly;
@@ -120,8 +119,18 @@
   text-align: center;
 }
 
-.go-to-prev-block--button {
+.go-to-button-block--container {
+  display: flex;
+  justify-content: center;
+  flex-flow: column;
+  width: 9%;
+}
+
+.go-to-button-block--container .go-to-prev-block--button,
+.go-to-button-block--container .go-to-next-block--button {
   right: 67%;
+  position: inherit;
+  width: 100%;
 }
 
 .go-to-next-block--button {
@@ -146,7 +155,7 @@
 
 .results-timelapse-percents--block,
 .results-timelapse--block {
-  padding: 2% 0 0 9%;
+  padding: 2% 0 0 0;
   width: 82%;
   display: flex;
   flex-flow: column;
@@ -156,12 +165,15 @@
 .results-timelapse--container {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-flow: column;
 }
 
 .chart-currencies-switch-controls-wrapper {
   display: flex;
   flex-flow: row;
   justify-content: space-evenly;
+  height: 15%;
 }
 
 .chart-currencies-switch-controls--container {
@@ -174,4 +186,23 @@
 
 .chart-currencies-switch-controls--title {
   width: 100%;
+}
+
+.chart-currencies-switch-controls--currency-icon-wrapper {
+  padding: 10%;
+  height: 85%;
+}
+
+.chart-currencies-switch-controls--currency-icon-wrapper .chart-currencies-switch-controls--currency-icon {
+  font-size: 330%;
+}
+
+.chart-currencies-switch-controls--container {
+  cursor: pointer;
+  width: 8%;
+  text-align: center;
+  padding: 2%;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-evenly;
 }
