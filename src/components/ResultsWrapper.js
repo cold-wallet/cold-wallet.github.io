@@ -741,20 +741,28 @@ export default class ResultsWrapper extends React.Component {
                                         valueSuffix: ` ${currentCurrency}`
                                     },
                                     plotOptions: {
-                                        series: {
-                                            marker: {
-                                                enabled: false,
-                                            }
-                                        },
                                         area: {
                                             stacking: 'normal',
                                             lineColor: '#666666',
                                             lineWidth: 1,
                                             marker: {
                                                 lineWidth: 1,
-                                                lineColor: '#666666'
-                                            }
-                                        }
+                                                lineColor: '#666666',
+                                                radius: 2,
+                                            },
+                                            states: {
+                                                hover: {
+                                                    lineWidth: 1,
+                                                },
+                                            },
+                                            threshold: null,
+                                        },
+                                        series: {
+                                            softThreshold: true,
+                                            marker: {
+                                                enabled: false,
+                                            },
+                                        },
                                     },
                                     series: historyTotalSeries,
                                     legend: {
