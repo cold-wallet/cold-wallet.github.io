@@ -3,7 +3,7 @@ import './ResultsWrapper.css'
 import NumberFormat from 'react-number-format'
 import {VictoryLabel, VictoryPie} from "victory"
 import noExponents from "../extensions/noExponents";
-import numberFormat from "../extensions/numberFormat";
+import numberFormat, {numberFormatByType} from "../extensions/numberFormat";
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import './../extensions/highChartTheme'
@@ -54,12 +54,17 @@ export default class ResultsWrapper extends React.Component {
             fiatRates => !unmount && this.setState({fiatRates: fiatRates}));
         cryptoRatesRepository.subscribeOnChange(
             cryptoRates => !unmount && this.setState({cryptoRates: cryptoRates}));
-        try {
-            historyRepository.subscribeOnChange(
-                history => !unmount && this.setState({historyData: history}))
-        } catch (e) {
-            console.error(e)
-        }
+        historyRepository.subscribeOnChange(
+            history => {
+                if (!unmount) {
+                    return
+                }
+                try {
+                    this.setState({historyData: history});
+                } catch (e) {
+                    console.error(e)
+                }
+            });
     }
 
     componentWillUnmount() {
@@ -523,7 +528,9 @@ export default class ResultsWrapper extends React.Component {
                 }, {});
                 const currencies = Object.keys(currencyToType);
                 const historyChartsData = historyService.readHistory();
-                const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
+                const currentCurrency = this.state.chartsBufferActiveCurrency
+                    || this.state.chartsCurrencySelected
+                    || currencies[0];
                 const historySeries = Object.values(
                     historyChartsData.partialPerCurrencies[currentCurrency] || {}
                 );
@@ -548,7 +555,10 @@ export default class ResultsWrapper extends React.Component {
                                 })({...Highcharts})}
                                 options={{
                                     chart: {
-                                        height: '60%',
+                                        height: '55%',
+                                        style: {
+                                            height: "100%",
+                                        },
                                         type: 'area',
                                         zoomType: 'x',
                                     },
@@ -590,8 +600,11 @@ export default class ResultsWrapper extends React.Component {
                                 }}
                             />
                             {buildCurrenciesSwitchControls(currencyToType, currency => {
-                                this.setState({chartsCurrencySelected: currency})
-                            })}
+                                this.setState({
+                                    chartsCurrencySelected: currency,
+                                    chartsBufferActiveCurrency: null,
+                                })
+                            }, currentCurrency)}
                         </div>
                     </div> : null;
 
@@ -616,7 +629,9 @@ export default class ResultsWrapper extends React.Component {
                 }, {});
                 const currencies = Object.keys(currencyToType);
                 const historyChartsData = historyService.readHistory();
-                const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
+                const currentCurrency = this.state.chartsBufferActiveCurrency
+                    || this.state.chartsCurrencySelected
+                    || currencies[0];
                 const historySeries = Object.values(
                     historyChartsData.partialPerCurrencies[currentCurrency] || {}
                 );
@@ -628,7 +643,10 @@ export default class ResultsWrapper extends React.Component {
                                 highcharts={Highcharts}
                                 options={{
                                     chart: {
-                                        height: '60%',
+                                        height: '55%',
+                                        style: {
+                                            height: "100%",
+                                        },
                                         type: 'area',
                                         zoomType: 'x',
                                     },
@@ -678,8 +696,11 @@ export default class ResultsWrapper extends React.Component {
                                 }}
                             />
                             {buildCurrenciesSwitchControls(currencyToType, currency => {
-                                this.setState({chartsCurrencySelected: currency})
-                            })}
+                                this.setState({
+                                    chartsCurrencySelected: currency,
+                                    chartsBufferActiveCurrency: null,
+                                })
+                            }, currentCurrency)}
                         </div>
                     </div> : null;
 
@@ -705,9 +726,13 @@ export default class ResultsWrapper extends React.Component {
                     return null
                 }
                 if (!this.state.chartsCurrencySelected) {
-                    setTimeout(() => this.setState({chartsCurrencySelected: currencies[0]}));
+                    setTimeout(() => this.setState({
+                        chartsCurrencySelected: this.state.chartsBufferActiveCurrency || currencies[0]
+                    }));
                 }
-                const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
+                const currentCurrency = this.state.chartsBufferActiveCurrency
+                    || this.state.chartsCurrencySelected
+                    || currencies[0];
                 const historyTotalSeries = historyChartsData.totalSeriesNamed[currentCurrency] || [];
                 const buildChronologyTotalChart = () => (
                     <div key={key} className={"results-timelapse--block"}>
@@ -717,7 +742,10 @@ export default class ResultsWrapper extends React.Component {
                                 highcharts={{...Highcharts}}
                                 options={{
                                     chart: {
-                                        height: '60%',
+                                        height: '55%',
+                                        style: {
+                                            height: "100%",
+                                        },
                                         type: 'area',
                                         zoomType: 'x',
                                     },
@@ -768,8 +796,11 @@ export default class ResultsWrapper extends React.Component {
                                 }}
                             />
                             {buildCurrenciesSwitchControls(currencyToType, currency => {
-                                this.setState({chartsCurrencySelected: currency})
-                            })}
+                                this.setState({
+                                    chartsCurrencySelected: currency,
+                                    chartsBufferActiveCurrency: null,
+                                })
+                            }, currentCurrency)}
                         </div>
                     </div>);
 
@@ -789,14 +820,20 @@ export default class ResultsWrapper extends React.Component {
                     return null
                 }
                 if (!this.state.chartsCurrencySelected) {
-                    setTimeout(() => this.setState({chartsCurrencySelected: currencies[0]}));
+                    // a required thing, chart in not shown for unknown reason until state is updated and
+                    // component will re-render itself correctly
+                    setTimeout(() => this.setState({
+                        chartsCurrencySelected: this.state.chartsBufferActiveCurrency || currencies[0]
+                    }));
                 }
                 const currencyToType = allAssets.reduce((result, asset) => {
                     result[asset.currency] = asset.type;
                     return result;
                 }, {});
                 const currencies = Object.keys(currencyToType);
-                const currentCurrency = this.state.chartsCurrencySelected || currencies[0];
+                const currentCurrency = this.state.chartsBufferActiveCurrency
+                    || this.state.chartsCurrencySelected
+                    || currencies[0];
                 const currentType = currencyToType[currentCurrency];
                 const afterDecimalPoint = currentType === "crypto" ? 8 : 2;
                 let totalValue = 0;
@@ -826,17 +863,23 @@ export default class ResultsWrapper extends React.Component {
                             return {
                                 value: value,
                                 name: asset.name,
+                                currency: asset.currency,
+                                assetName: asset.name,
+                                amount: asset.amount,
+                                assetType: asset.type,
                                 color: colors[colorIndex] || colors[0],
                             }
                         })
                         .sort((a, b) => b.value - a.value)
                         .map((asset, i) => {
                             asset.percentage = (asset.value * 100) / totalValue;
+                            asset.name += ` ${addCommas(numberFormatByType(asset.amount, asset.assetType))}
+                            ${asset.currency}`;
                             return asset
                         }),
                 };
 
-                const buildChronologyPercentageChart = () => this.state.activeResultsTab === "balance-treemap"
+                const buildTotalTreemapChart = () => this.state.activeResultsTab === "balance-treemap"
                     ? <div key={key} className={"results-timelapse-percents--block"}>
                         <div className="results-timelapse-percents--container">
                             <HighchartsReact
@@ -855,7 +898,7 @@ export default class ResultsWrapper extends React.Component {
                                     },
                                     tooltip: {
                                         pointFormat: `<tspan style="color:{point.color}" x="8" dy="15">●</tspan>
-                                             <span>{point.name}</span>: <b>{point.percentage:.2f}%</b>
+                                             <span>{point.assetName}</span>: <b>{point.percentage:.2f}%</b>
                                             {point.value:,.${afterDecimalPoint}f} ${currentCurrency}<br/>`,
                                     },
                                     series: series,
@@ -878,14 +921,17 @@ export default class ResultsWrapper extends React.Component {
                                 }}
                             />
                             {buildCurrenciesSwitchControls(currencyToType, currency => {
-                                this.setState({chartsCurrencySelected: currency})
-                            })}
+                                this.setState({
+                                    chartsCurrencySelected: currency,
+                                    chartsBufferActiveCurrency: null,
+                                })
+                            }, currentCurrency)}
                         </div>
                     </div> : null;
 
                 return [
                     this.buildButton_GoToPrev("balance-treemap", "timelapse-total"),
-                    buildChronologyPercentageChart(),
+                    buildTotalTreemapChart(),
                     this.buildButton_GoToNext("balance-treemap", "balance-treemap"),
                 ]
             }
@@ -902,6 +948,8 @@ export default class ResultsWrapper extends React.Component {
                      onClick={() => {
                          this.setState({
                              activeResultsTab: newTab,
+                             chartsBufferActiveCurrency: this.state.chartsCurrencySelected
+                                 || this.state.chartsBufferActiveCurrency,
                              chartsCurrencySelected: null,
                          })
                      }}/>
@@ -921,6 +969,8 @@ export default class ResultsWrapper extends React.Component {
                      src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"
                      onClick={() => this.setState({
                          activeResultsTab: newTab,
+                         chartsBufferActiveCurrency: this.state.chartsCurrencySelected
+                             || this.state.chartsBufferActiveCurrency,
                          chartsCurrencySelected: null,
                      })}/>
                 <span style={{display: "none",}}>
@@ -996,7 +1046,7 @@ function addCommas(toMe) {
         .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
 }
 
-function buildCurrenciesSwitchControls(currencyToType, onCurrencySelected) {
+function buildCurrenciesSwitchControls(currencyToType, onCurrencySelected, currentCurrency) {
     const currencyToInfo = getListOfTopCurrenciesByType();
     return <div className="chart-currencies-switch-controls-wrapper">{
         Object.keys(currencyToType).map((currency, i) => {
@@ -1004,7 +1054,8 @@ function buildCurrenciesSwitchControls(currencyToType, onCurrencySelected) {
             return <div key={i}
                         title={info.name}
                         onClick={() => onCurrencySelected(currency)}
-                        className={"chart-currencies-switch-controls--container"}>
+                        className={`chart-currencies-switch-controls--container
+                        ${(currency === currentCurrency) && " chart-currencies-switch-controls--container__active"}`}>
                 <div className="chart-currencies-switch-controls--currency-icon-wrapper">{info.htmlCode}</div>
                 <div className={"asset-pic--name"}>{info.code}</div>
             </div>
