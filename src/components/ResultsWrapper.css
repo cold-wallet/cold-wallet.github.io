@@ -109,6 +109,9 @@
 .circle-chart-type--item {
   width: 32%;
   cursor: pointer;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
 }
 
 .circle-chart-type--item-wrapper {
