@@ -16,67 +16,57 @@ const historyService = {
         }
         const now = Date.now();
         const lastHistory = this.readHistory();
-        const prev = (lastHistory.series
-            && lastHistory.series[0]
-            && lastHistory.series[0].data
-            && lastHistory.series[0].data.length)
-            ? lastHistory.series[0].data[lastHistory.series[0].data.length - 1][0]
-            : now - 1_000;
-        const currentNamed = lastHistory.named;
-        const allAssets = [].concat(assets.cash.assets.concat(assets["non-cash"].assets).concat(assets.crypto.assets));
+        const currentTotalNamed = lastHistory.totalSeriesNamed || {};
+        const currentTotalValues = Object.values(currentTotalNamed);
         const partialPerCurrencies = lastHistory.partialPerCurrencies || {};
-        const currencies = Object.keys(allAssets.map(asset => asset.currency)
-            .reduce((a, c) => {
-                a[c] = true;
-                return a
-            }, {}));
+        const prev = (currentTotalValues.length
+            && currentTotalValues[0]
+            && currentTotalValues[0].data
+            && currentTotalValues[0].data.length)
+            ? currentTotalValues[0].data[currentTotalValues[0].data.length - 1][0]
+            : now - 1000;
+        const prevData = prev ? [[prev, 0]] : [];
+        const allAssets = [].concat(assets.cash.assets)
+            .concat(assets["non-cash"].assets)
+            .concat(assets.crypto.assets);
+        const currencyToType = allAssets.reduce((result, asset) => {
+            result[asset.currency] = asset.type;
+            return result;
+        }, {});
+        const currencies = Object.keys(currencyToType);
+        const activeCurrenciesToNewData = {};
         allAssets.forEach(asset => {
             const identifier = asset.id || asset.name;
             currencies.forEach(currency => {
                 if (!partialPerCurrencies[currency]) {
                     partialPerCurrencies[currency] = {}
                 }
-                const type = rates.isFiat(currency) ? "cash" : "crypto";
+                const type = currencyToType[currency];
                 const afterDecimalPoint = type === "crypto" ? 8 : 2;
                 const value = numberFormat(rates.transformAssetValue(asset, currency, type), afterDecimalPoint);
                 const newItem = [now, value];
-                const data = [].concat(partialPerCurrencies[currency][identifier]?.data || [[prev, 0]]);
+                let data = [].concat(partialPerCurrencies[currency][identifier]?.data || prevData);
                 data.push(newItem);
                 partialPerCurrencies[currency][identifier] = {
-                    id: asset.id,
+                    id: identifier,
                     data: data,
                     name: asset.name,
                 };
             });
-            asset.usdAmount = numberFormat(rates.transformAssetValueToFiat(asset, "USD"), 2);
-            const newItem = [now, asset.usdAmount];
-            const data = [].concat(currentNamed[identifier]?.data || [[prev, 0]]);
-            data.forEach(a => {
-                if (isNaN(+a[1])) {
-                    a[1] = 0
-                }
-            });
-            data.push(newItem);
-            currentNamed[identifier] = {
-                id: asset.id,
-                data: data,
-                name: asset.name,
-            };
+            activeCurrenciesToNewData[asset.currency] = currentTotalNamed[asset.currency]
+                || (currentTotalNamed[asset.currency] = {
+                    id: identifier,
+                    data: prevData,
+                    name: asset.currency,
+                    __type: asset.type,
+                    currency: asset.currency,
+                });
         });
-        let newSeries = Object.values(currentNamed);
-
-        const currentTotalNamed = lastHistory.totalSeriesNamed || {};
-        const activeCurrenciesToNewData = {};
-        allAssets.forEach(asset => activeCurrenciesToNewData[asset.currency] = currentTotalNamed[asset.currency]
-            || (currentTotalNamed[asset.currency] = {
-                id: asset.id,
-                data: [[prev, 0]],
-                name: asset.currency,
-                __type: asset.type,
-                currency: asset.currency,
-            }));
 
         const newTotalDataPerCurrency = Object.values(activeCurrenciesToNewData);
+        if (isNothingNew(newTotalDataPerCurrency)) {
+            optimiseData(newTotalDataPerCurrency)
+        }
         newTotalDataPerCurrency.forEach(info => {
             info.data.push([now, 0])
         });
@@ -91,19 +81,12 @@ const historyService = {
                     info.__type === "crypto" ? 8 : 2);
             });
         });
-
-        if (newSeries && isNothingNew(newSeries)) {
-            newSeries = optimiseData(newSeries);
-            Object.entries(activeCurrenciesToNewData).forEach(entry => {
-                const cur = entry[0];
-                activeCurrenciesToNewData[cur] = optimiseData([currentTotalNamed[cur]])[0]
-            });
-        }
+        newTotalDataPerCurrency.forEach(info => {
+            info.data = optimiseLastData(info.data)
+        });
 
         const history = {
-            series: newSeries,
             totalSeriesNamed: currentTotalNamed,
-            named: currentNamed,
             partialPerCurrencies: partialPerCurrencies,
         };
         historyRepository.save(history);
@@ -117,10 +100,13 @@ cryptoRatesRepository.subscribeOnChange(cryptoRates => historyService.updateHist
 export default historyService
 
 function isNothingNew(series) {
+    const prevOld1 = series.map(s => (s.data[s.data.length - 4] || [])[1]).toString();
     const prevOld = series.map(s => (s.data[s.data.length - 3] || [])[1]).toString();
     const lastOld = series.map(s => (s.data[s.data.length - 2] || [])[1]).toString();
     const newOnes = series.map(s => (s.data[s.data.length - 1] || [])[1]).toString();
-    return prevOld === lastOld && lastOld === newOnes;
+    return prevOld1 === prevOld
+        && prevOld === lastOld
+        && lastOld === newOnes;
 }
 
 function optimiseData(series) {
@@ -129,5 +115,24 @@ function optimiseData(series) {
         datum.data.pop(); // this one is thrown away
         datum.data.push(last);
     });
-    return series
+}
+
+function optimiseLastData(dataArr) {
+    if (dataArr.length <= 4) {
+        return dataArr
+    }
+    const prevOld1 = dataArr[dataArr.length - 4][1];
+    const prevOld = dataArr[dataArr.length - 3][1];
+    const lastOld = dataArr[dataArr.length - 2][1];
+    const newOne = dataArr[dataArr.length - 1][1];
+    const isNothingNew = prevOld1 === prevOld
+        && prevOld === lastOld
+        && lastOld === newOne;
+
+    if (isNothingNew) {
+        const last = dataArr.pop();
+        dataArr.pop(); // this one is thrown away
+        dataArr.push(last);
+    }
+    return dataArr
 }

@@ -3,10 +3,8 @@ import LocalStorageRepository from "./LocalStorageRepository";
 const historyRepository = LocalStorageRepository.builder()
     .name('history')
     .nullObjectSupplier(() => ({
-        series: [],
-        totalSeries: [],
         totalSeriesNamed: {},
-        named: {},
+        partialPerCurrencies: {},
     }))
     .build();
 

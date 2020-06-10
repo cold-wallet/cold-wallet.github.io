@@ -29,6 +29,19 @@ treemap(Highcharts);
 const BTC = "BTC";
 const USD = "USD";
 const EUR = "EUR";
+const pieColors = [
+    "#103b34",
+    "#245741",
+    "#2d6a4f",
+    "#357a5b",
+    "#41926d",
+    "#5bac85",
+    "#6ab791",
+    "#78c19c",
+    "#98d3b2",
+    "#b7e4c7",
+    "#d8f3dc",
+];
 
 let unmount;
 
@@ -52,19 +65,26 @@ export default class ResultsWrapper extends React.Component {
             assets => !unmount && this.setState({assets: assets.assets}));
         fiatRatesRepository.subscribeOnChange(
             fiatRates => !unmount && this.setState({fiatRates: fiatRates}));
-        cryptoRatesRepository.subscribeOnChange(
-            cryptoRates => !unmount && this.setState({cryptoRates: cryptoRates}));
-        historyRepository.subscribeOnChange(
-            history => {
-                if (!unmount) {
-                    return
-                }
-                try {
-                    this.setState({historyData: history});
-                } catch (e) {
-                    console.error(e)
-                }
-            });
+        cryptoRatesRepository.subscribeOnChange(cryptoRates => {
+            if (!unmount) {
+                return
+            }
+            try {
+                this.setState({cryptoRates: cryptoRates});
+            } catch (e) {
+                console.error(e)
+            }
+        });
+        historyRepository.subscribeOnChange(history => {
+            if (!unmount) {
+                return
+            }
+            try {
+                this.setState({historyData: history});
+            } catch (e) {
+                console.error(e)
+            }
+        });
     }
 
     componentWillUnmount() {
@@ -141,23 +161,10 @@ export default class ResultsWrapper extends React.Component {
                 const totalUsdAmount = assets.map(asset => asset.usdAmount)
                     .reduce((a, b) => a + b, 0);
 
-                assets = assets
-                    .map(asset => {
-                        asset.percents = (100 * asset.usdAmount) / totalUsdAmount;
-                        return asset
-                    });
-
-                function buildAnotherTitle({percents, amount, currency}) {
-                    let afterDecimalPoint;
-                    if (percents < 0.01) {
-                        afterDecimalPoint = 8;
-                    } else if (percents < 2) {
-                        afterDecimalPoint = 2
-                    } else {
-                        afterDecimalPoint = 0
-                    }
-                    return ` : ${noExponents(addCommas(numberFormat(amount, afterDecimalPoint)))} ${currency}`
-                }
+                assets = assets.map(asset => {
+                    asset.percents = (100 * asset.usdAmount) / totalUsdAmount;
+                    return asset
+                });
 
                 function buildTitle(asset) {
                     let afterDecimalPoint;
@@ -223,18 +230,10 @@ export default class ResultsWrapper extends React.Component {
                             return a
                         }, {
                             eventKey: type,
-                            x: type,
+                            x: type + ": ",
                             percents: 0,
                             y: 0,
-                        }))
-                        .map((o) => {
-                            o.x += buildAnotherTitle({
-                                percents: o.percents,
-                                amount: o.y,
-                                currency: USD,
-                            });
-                            return o
-                        });
+                        }));
                     preparedAssets = cashAssets.concat(nonCashAssets).concat(cryptoAssets).map(asset => {
                         asset.eventKey = asset.type;
                         return asset
@@ -306,11 +305,12 @@ export default class ResultsWrapper extends React.Component {
                     }))
                 }];
                 if (this.state.chartType === "per-type") {
-                    series.unshift({
+                    series.push({
                         name: 'Total',
-                        size: '44%',
+                        size: '43%',
                         dataLabels: {
-                            distance: -30,
+                            format: '<b>{point.name}</b> {point.percentage:.2f} %',
+                            distance: -20,
                             filter: {
                                 property: 'percentage',
                                 operator: '>',
@@ -318,26 +318,19 @@ export default class ResultsWrapper extends React.Component {
                             }
                         },
                         allowPointSelect: false,
-                        data: amountPerTypeChartData.map(item => ({
-                            name: item.x,
-                            y: item.y,
-                        })),
+                        data: amountPerTypeChartData.map((item, i) => {
+                            let colorIndex = i + 1;
+                            while (colorIndex > (pieColors.length - 1)) {
+                                colorIndex -= pieColors.length
+                            }
+                            return {
+                                name: item.x,
+                                y: item.y,
+                                color: pieColors[colorIndex] || pieColors[1],
+                            }
+                        }),
                     })
                 }
-
-                const pieColors = [
-                    "#103b34",
-                    "#245741",
-                    "#2d6a4f",
-                    "#357a5b",
-                    "#41926d",
-                    "#5bac85",
-                    "#6ab791",
-                    "#78c19c",
-                    "#98d3b2",
-                    "#b7e4c7",
-                    "#d8f3dc",
-                ];
 
                 const options = {
                     chart: {
@@ -532,7 +525,7 @@ export default class ResultsWrapper extends React.Component {
                     || this.state.chartsCurrencySelected
                     || currencies[0];
                 const historySeries = Object.values(
-                    historyChartsData.partialPerCurrencies[currentCurrency] || {}
+                    (historyChartsData.partialPerCurrencies || {})[currentCurrency] || {}
                 );
                 const buildChronologyChart = () => this.state.activeResultsTab === "timelapse"
                     ? <div key={key} className={"results-timelapse--block"}>
@@ -632,8 +625,10 @@ export default class ResultsWrapper extends React.Component {
                 const currentCurrency = this.state.chartsBufferActiveCurrency
                     || this.state.chartsCurrencySelected
                     || currencies[0];
+                const currentType = currencyToType[currentCurrency];
+                const afterDecimalPoint = currentType === "crypto" ? 8 : 2;
                 const historySeries = Object.values(
-                    historyChartsData.partialPerCurrencies[currentCurrency] || {}
+                    (historyChartsData.partialPerCurrencies || {})[currentCurrency] || {}
                 );
                 const buildChronologyPercentageChart = () => this.state.activeResultsTab === "timelapse-percents"
                     ? <div key={key} className={"results-timelapse-percents--block"}>
@@ -674,7 +669,7 @@ export default class ResultsWrapper extends React.Component {
                                         pointFormat: `<tspan style="color:{point.color}" x="8" dy="15">●</tspan>
                                             <span>{series.name}</span>: <b>
                                             {point.percentage:.2f}%</b>
-                                             {point.y:,.2f} ${currentCurrency}<br/>`,
+                                            {point.y:,.${afterDecimalPoint}f} ${currentCurrency}<br/>`,
                                     },
                                     plotOptions: {
                                         series: {
@@ -733,7 +728,9 @@ export default class ResultsWrapper extends React.Component {
                 const currentCurrency = this.state.chartsBufferActiveCurrency
                     || this.state.chartsCurrencySelected
                     || currencies[0];
-                const historyTotalSeries = historyChartsData.totalSeriesNamed[currentCurrency] || [];
+                const historyTotalSeries = historyChartsData.totalSeriesNamed[currentCurrency]
+                    ? [historyChartsData.totalSeriesNamed[currentCurrency]]
+                    : [];
                 const buildChronologyTotalChart = () => (
                     <div key={key} className={"results-timelapse--block"}>
                         <div className="results-timelapse--container">
@@ -873,7 +870,7 @@ export default class ResultsWrapper extends React.Component {
                         .sort((a, b) => b.value - a.value)
                         .map((asset, i) => {
                             asset.percentage = (asset.value * 100) / totalValue;
-                            asset.name += ` ${addCommas(numberFormatByType(asset.amount, asset.assetType))}
+                            asset.name += `: ${addCommas(numberFormatByType(asset.amount, asset.assetType))}
                             ${asset.currency}`;
                             return asset
                         }),
@@ -887,7 +884,7 @@ export default class ResultsWrapper extends React.Component {
                                 highcharts={Highcharts}
                                 options={{
                                     chart: {
-                                        height: '60%',
+                                        height: '55%',
                                         type: 'treemap',
                                     },
                                     title: {
