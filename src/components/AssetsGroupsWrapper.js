@@ -32,7 +32,7 @@ export class AssetsGroupsWrapper extends React.Component {
         if (!this.state.savedState) {
             return null
         }
-        return <div className={"assets-groups-wrapper"}>{[
+        return <div className="assets-groups-wrapper" translate="no">{[
             this.state.showMenu
                 ? <NewAssetMenu
                     key={0}

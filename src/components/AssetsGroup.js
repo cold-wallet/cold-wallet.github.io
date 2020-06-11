@@ -23,7 +23,7 @@ export class AssetsGroup extends React.Component {
 
     render() {
         return <div className={"assets-group"}>
-            <div className={"assets-title"}>{this.props.group.type}</div>
+            <div className="assets-title" translate="no">{this.props.group.type} currency</div>
             <div className={"assets"}>{[
                 this.buildNewAssetIfNeeds(),
                 this.buildCurrentOrDefaultAssets(),
@@ -81,7 +81,7 @@ export class AssetsGroup extends React.Component {
                 />
             </div>
             <div className={"asset-item-currency"}>
-                <span className={"asset-item-currency-name"}>{props.currencyCode}</span>
+                <span translate="no" className={"asset-item-currency-name"}>{props.currencyCode}</span>
             </div>
             <div className={"asset-item-buttons-container"}>{[
                 <button
@@ -178,7 +178,7 @@ export class AssetsGroup extends React.Component {
                 }
             };
             return (
-                <div key={props.key} className={"asset-item"}>
+                <div translate="no" key={props.key} className={"asset-item"}>
                     <div className={"asset-item-value"}>
                         <NumberFormat
                             allowNegative={false}
@@ -209,7 +209,7 @@ export class AssetsGroup extends React.Component {
                         />
                     </div>
                     <div className={"asset-item-currency"}>
-                        <span className={"asset-item-currency-name"}>{props.currencyCode}</span>
+                        <span translate="no" className={"asset-item-currency-name"}>{props.currencyCode}</span>
                     </div>
                     <div className={"asset-item-buttons-container"}>{[
                         (props.editModeEnabled)

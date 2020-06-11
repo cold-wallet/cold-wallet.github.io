@@ -14,10 +14,8 @@ export default function App() {
 
     return <div className="dashboard">
         <div className={"assets-wrapper"}>
-            <div className={"assets-wrapper-title"}>{"So if you have:"}</div>
-            <AssetsGroupsWrapper
-                savedState={savedState}
-            />
+            <div translate="no" className={"assets-wrapper-title"}>{"So if you have:"}</div>
+            <AssetsGroupsWrapper savedState={savedState}/>
         </div>
         <ResultsWrapper
             savedState={savedState}/>
