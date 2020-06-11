@@ -870,8 +870,8 @@ export default class ResultsWrapper extends React.Component {
                         .sort((a, b) => b.value - a.value)
                         .map((asset, i) => {
                             asset.percentage = (asset.value * 100) / totalValue;
-                            asset.name += `: ${addCommas(numberFormatByType(asset.amount, asset.assetType))}
-                            ${asset.currency}`;
+                            asset.name +=
+                                `: ${addCommas(numberFormatByType(asset.amount, asset.assetType))} ${asset.currency}`;
                             return asset
                         }),
                 };
