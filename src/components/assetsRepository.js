@@ -4,12 +4,8 @@ const assetsRepository = LocalStorageRepository.builder()
     .name('data')
     .nullObject({
         assets: {
-            cash: {
-                type: 'cash',
-                assets: [],
-            },
-            "non-cash": {
-                type: 'non-cash',
+            fiat: {
+                type: 'fiat',
                 assets: [],
             },
             crypto: {

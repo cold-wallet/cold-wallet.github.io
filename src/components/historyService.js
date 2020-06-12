@@ -26,8 +26,7 @@ const historyService = {
             ? currentTotalValues[0].data[currentTotalValues[0].data.length - 1][0]
             : now - 1000;
         const prevData = prev ? [[prev, 0]] : [];
-        const allAssets = [].concat(assets.cash.assets)
-            .concat(assets["non-cash"].assets)
+        const allAssets = [].concat(assets.fiat?.assets || assets.cash.assets.concat(assets["non-cash"].assets))
             .concat(assets.crypto.assets);
         const currencyToType = allAssets.reduce((result, asset) => {
             result[asset.currency] = asset.type;

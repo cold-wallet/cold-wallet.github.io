@@ -44,8 +44,7 @@ export class AssetsGroupsWrapper extends React.Component {
                 />
                 : null,
             [
-                this.props.savedState.cash,
-                this.props.savedState["non-cash"],
+                this.props.savedState.fiat || mergeFiatGroup(this.props.savedState.cash, this.props.savedState["non-cash"]),
                 this.props.savedState.crypto,
             ].map((group) =>
                 <AssetsGroup key={group.type}
@@ -55,6 +54,8 @@ export class AssetsGroupsWrapper extends React.Component {
                              })}
                              saveStateFunction={(assets) => {
                                  const buffer = this.props.savedState;
+                                 buffer[group.type] || (buffer[group.type] = {});
+                                 buffer[group.type].type = group.type;
                                  buffer[group.type].assets = assets.map(AssetDTO.copy);
                                  assetsRepository.save({
                                      assets: buffer,
@@ -64,5 +65,17 @@ export class AssetsGroupsWrapper extends React.Component {
                 />
             ),
         ]}</div>
+    }
+}
+
+function mergeFiatGroup(mergeMe0, mergeMe1) {
+    const type = "fiat";
+    console.log("still merging");
+    return {
+        type: type,
+        assets: [].concat(mergeMe0.assets).concat(mergeMe1.assets).map(asset => {
+            asset.type = type;
+            return asset
+        })
     }
 }

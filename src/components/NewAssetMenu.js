@@ -45,8 +45,7 @@ function getListOfTopCurrenciesByType(type) {
                 info.htmlCode = <img className={"asset-pic--image-img"} src={info.icon} alt={info.name}/>;
                 return info;
             });
-        case "cash":
-        case "non-cash":
+        case "fiat":
         default:
             return [
                 {

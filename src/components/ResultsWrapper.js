@@ -123,18 +123,12 @@ export default class ResultsWrapper extends React.Component {
                 if (this.state.activeResultsTab !== "first") {
                     return null
                 }
-                const assetGroups = [
-                    data.cash,
-                    data["non-cash"],
-                    data.crypto,
-                ];
-                const currenciesBuffer = [].concat(data.cash.assets)
-                    .concat(data["non-cash"].assets)
-                    .concat(data.crypto.assets)
-                    .reduce((result, asset) => {
-                        result[asset.currency] = asset.type;
-                        return result;
-                    }, {});
+                const assetGroups = data.fiat ? [data.fiat] : [data.cash, data["non-cash"]];
+                assetGroups.push(data.crypto);
+                const currenciesBuffer = extractAllAssets(data).reduce((result, asset) => {
+                    result[asset.currency] = asset.type;
+                    return result;
+                }, {});
 
                 return <div
                     key={key}
@@ -153,9 +147,7 @@ export default class ResultsWrapper extends React.Component {
                 if (this.state.activeResultsTab !== "first") {
                     return null
                 }
-                let assets = data.cash.assets
-                    .concat(data["non-cash"].assets)
-                    .concat(data.crypto.assets)
+                let assets = extractAllAssets(data)
                     .map(asset => {
                         asset.usdAmount = rates.transformAssetValueToFiat(asset, USD);
                         return asset
@@ -218,13 +210,9 @@ export default class ResultsWrapper extends React.Component {
 
                 if (this.state.chartType === "per-type") {
                     const buffer = [];
-                    const cashAssets = assets.filter(asset => asset.type === "cash");
-                    if (cashAssets.length) {
-                        buffer.push({type: "cash", groupAssets: cashAssets})
-                    }
-                    const nonCashAssets = assets.filter(asset => asset.type === "non-cash");
-                    if (nonCashAssets.length) {
-                        buffer.push({type: "non-cash", groupAssets: nonCashAssets})
+                    const fiatAssets = assets.filter(asset => asset.type === "fiat");
+                    if (fiatAssets.length) {
+                        buffer.push({type: "fiat", groupAssets: fiatAssets})
                     }
                     const cryptoAssets = assets.filter(asset => asset.type === "crypto");
                     if (cryptoAssets.length) {
@@ -242,7 +230,7 @@ export default class ResultsWrapper extends React.Component {
                             percents: 0,
                             y: 0,
                         }));
-                    preparedAssets = cashAssets.concat(nonCashAssets).concat(cryptoAssets).map(asset => {
+                    preparedAssets = fiatAssets.concat(cryptoAssets).map(asset => {
                         asset.eventKey = asset.type;
                         return asset
                     })
@@ -489,11 +477,8 @@ export default class ResultsWrapper extends React.Component {
                                 >
                                     <div className={"circle-chart-type--item-wrapper"}><VictoryPie
                                         data={[{
-                                            x: "cash",
-                                            y: 0.5,
-                                        }, {
-                                            x: "non-cash",
-                                            y: 1,
+                                            x: "fiat",
+                                            y: 0.6,
                                         }, {
                                             x: "crypto",
                                             y: 0.8,
@@ -517,9 +502,7 @@ export default class ResultsWrapper extends React.Component {
         }, {
             name: 'timelapse',
             buildInnerResult: (key, data) => {
-                const allAssets = [].concat(data.cash.assets)
-                    .concat(data["non-cash"].assets)
-                    .concat(data.crypto.assets);
+                const allAssets = extractAllAssets(data);
                 if (!allAssets.length || (this.state.activeResultsTab !== "timelapse")) {
                     return null
                 }
@@ -618,9 +601,7 @@ export default class ResultsWrapper extends React.Component {
         }, {
             name: 'timelapse-percents',
             buildInnerResult: (key, data) => {
-                const allAssets = [].concat(data.cash.assets)
-                    .concat(data["non-cash"].assets)
-                    .concat(data.crypto.assets);
+                const allAssets = extractAllAssets(data);
                 if (!allAssets.length || (this.state.activeResultsTab !== "timelapse-percents")) {
                     return null
                 }
@@ -717,9 +698,7 @@ export default class ResultsWrapper extends React.Component {
             name: 'timelapse-total',
             buildInnerResult: (key, data) => {
                 const historyChartsData = historyService.readHistory();
-                const allAssets = [].concat(data.cash.assets)
-                    .concat(data["non-cash"].assets)
-                    .concat(data.crypto.assets);
+                const allAssets = extractAllAssets(data);
                 const currencyToType = allAssets.reduce((result, asset) => {
                     result[asset.currency] = asset.type;
                     return result;
@@ -818,9 +797,7 @@ export default class ResultsWrapper extends React.Component {
         }, {
             name: 'balance-treemap',
             buildInnerResult: (key, data) => {
-                const allAssets = [].concat(data.cash.assets)
-                    .concat(data["non-cash"].assets)
-                    .concat(data.crypto.assets);
+                const allAssets = extractAllAssets(data);
                 if (!allAssets.length || (this.state.activeResultsTab !== "balance-treemap")) {
                     return null
                 }
@@ -1043,6 +1020,12 @@ export default class ResultsWrapper extends React.Component {
             </div>
         </div>
     }
+}
+
+function extractAllAssets(data) {
+    return []
+        .concat(data.fiat?.assets || data.cash.assets.concat(data["non-cash"].assets))
+        .concat(data.crypto.assets);
 }
 
 function addCommas(toMe) {
