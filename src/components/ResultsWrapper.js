@@ -300,10 +300,24 @@ export default class ResultsWrapper extends React.Component {
                         y: item.y,
                     }))
                 }];
+                const chartOptions = {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie',
+                    options3d: {
+                        enabled: true,
+                        alpha: 35,
+                        beta: 0
+                    },
+                    style: {
+                        width: "100%",
+                    },
+                };
                 if (this.state.chartType === "per-type") {
                     series.push({
                         name: 'Total',
-                        size: '43%',
+                        size: '44%',
                         dataLabels: {
                             format: '<b>{point.name}</b> {point.percentage:.2f} %',
                             distance: -20,
@@ -325,24 +339,12 @@ export default class ResultsWrapper extends React.Component {
                                 color: pieColors[colorIndex] || pieColors[1],
                             }
                         }),
-                    })
+                    });
+                    chartOptions.options3d.enabled = false;
                 }
 
                 const options = {
-                    chart: {
-                        plotBackgroundColor: null,
-                        plotBorderWidth: null,
-                        plotShadow: false,
-                        type: 'pie',
-                        options3d: {
-                            enabled: true,
-                            alpha: 35,
-                            beta: 0
-                        },
-                        style: {
-                            width: "100%",
-                        },
-                    },
+                    chart: chartOptions,
                     title: {
                         text: '',
                     },
