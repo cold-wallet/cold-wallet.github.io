@@ -57,6 +57,8 @@ export class AssetsGroupsWrapper extends React.Component {
                                  buffer[group.type] || (buffer[group.type] = {});
                                  buffer[group.type].type = group.type;
                                  buffer[group.type].assets = assets.map(AssetDTO.copy);
+                                 delete buffer.cash;
+                                 delete buffer["non-cash"];
                                  assetsRepository.save({
                                      assets: buffer,
                                  });
