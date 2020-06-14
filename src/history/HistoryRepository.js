@@ -1,4 +1,4 @@
-import LocalStorageRepository from "./LocalStorageRepository";
+import LocalStorageRepository from "../repo/LocalStorageRepository";
 
 const historyRepository = LocalStorageRepository.builder()
     .name('history')

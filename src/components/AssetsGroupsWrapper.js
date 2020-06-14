@@ -3,7 +3,7 @@ import {NewAssetMenu} from "./NewAssetMenu";
 import {AssetsGroup} from "./AssetsGroup";
 import AssetDTO from "./AssetDTO";
 import './AssetsGroupsWrapper.css';
-import assetsRepository from "./assetsRepository";
+import assetsRepository from "../repo/assetsRepository";
 
 export class AssetsGroupsWrapper extends React.Component {
 

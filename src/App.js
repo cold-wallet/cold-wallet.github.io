@@ -5,7 +5,7 @@ import {AssetsGroupsWrapper} from "./components/AssetsGroupsWrapper";
 import "./fonts.scss";
 import "./mixin.scss";
 import "./reset.scss";
-import assetsRepository from "./components/assetsRepository";
+import assetsRepository from "./repo/assetsRepository";
 
 
 export default function App() {
@@ -17,7 +17,6 @@ export default function App() {
             <div translate="no" className={"assets-wrapper-title"}>{"So if you have:"}</div>
             <AssetsGroupsWrapper savedState={savedState}/>
         </div>
-        <ResultsWrapper
-            savedState={savedState}/>
+        <ResultsWrapper savedState={savedState}/>
     </div>
 }

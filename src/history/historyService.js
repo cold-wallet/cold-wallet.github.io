@@ -1,8 +1,8 @@
-import rates from "./rates";
+import rates from "../extensions/rates";
 import numberFormat from "../extensions/numberFormat";
-import assetsRepository from "./assetsRepository";
-import fiatRatesRepository from "./FiatRatesRepository";
-import cryptoRatesRepository from "./CryptoRatesRepository";
+import assetsRepository from "../repo/assetsRepository";
+import fiatRatesRepository from "../repo/FiatRatesRepository";
+import cryptoRatesRepository from "../repo/CryptoRatesRepository";
 import historyRepository from "./HistoryRepository"
 
 const historyService = {

@@ -7,14 +7,14 @@ import numberFormat, {numberFormatByType} from "../extensions/numberFormat";
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import './../extensions/highChartTheme'
-import rates from "./rates";
+import rates from "../extensions/rates";
 import highCharts3d from 'highcharts/highcharts-3d'
 import treemap from 'highcharts/modules/treemap'
-import assetsRepository from "./assetsRepository";
-import historyService from "./historyService";
-import fiatRatesRepository from "./FiatRatesRepository";
-import cryptoRatesRepository from "./CryptoRatesRepository";
-import historyRepository from "./HistoryRepository";
+import assetsRepository from "../repo/assetsRepository";
+import historyService from "../history/historyService";
+import fiatRatesRepository from "../repo/FiatRatesRepository";
+import cryptoRatesRepository from "../repo/CryptoRatesRepository";
+import historyRepository from "../history/HistoryRepository";
 import btcIcon from "../resources/currencies/btc.png";
 import ethIcon from "../resources/currencies/eth.png";
 import usdtIcon from "../resources/currencies/usdt.png";

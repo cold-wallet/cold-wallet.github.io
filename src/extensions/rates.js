@@ -1,7 +1,7 @@
 import axios from "axios";
 import currencies from "../resources/currencies-iso-4217";
-import fiatRatesRepository from "./FiatRatesRepository";
-import cryptoRatesRepository from "./CryptoRatesRepository";
+import fiatRatesRepository from "../repo/FiatRatesRepository";
+import cryptoRatesRepository from "../repo/CryptoRatesRepository";
 
 const uahNumCode = 980;
 const BTC = "BTC";
