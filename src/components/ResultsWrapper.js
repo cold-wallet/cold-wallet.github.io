@@ -163,25 +163,6 @@ export default class ResultsWrapper extends React.Component {
                     return asset
                 });
 
-                function buildTitle(asset) {
-                    let afterDecimalPoint;
-                    if (asset.percents < 0.01) {
-                        afterDecimalPoint = 8;
-                    } else if (asset.percents < 2) {
-                        afterDecimalPoint = 2
-                    } else {
-                        afterDecimalPoint = 0
-                    }
-                    const amount = noExponents(addCommas(asset.amount));
-                    const percents = numberFormat(asset.percents, afterDecimalPoint);
-                    return `${amount} ${asset.currency} (${percents}%)`
-                }
-
-                function buildHighChartsTitle(asset) {
-                    const amount = noExponents(addCommas(asset.amount));
-                    return `${amount} ${asset.currency}`
-                }
-
                 let preparedAssets;
 
                 if (this.state.chartType === "per-currency") {
@@ -830,34 +811,56 @@ export default class ResultsWrapper extends React.Component {
                     "#b7e4c7",
                     "#d8f3dc",
                 ];
+
+                let preparedAssets = allAssets
+                    .map((asset, i) => {
+                        const value = rates.transformAssetValue(asset, currentCurrency, currentType);
+                        totalValue += value;
+                        let colorIndex = i;
+                        while (colorIndex > (colors.length - 1)) {
+                            colorIndex -= colors.length
+                        }
+                        return {
+                            value: value,
+                            name: asset.name,
+                            currency: asset.currency,
+                            assetName: asset.name,
+                            amount: asset.amount,
+                            assetType: asset.type,
+                            color: colors[colorIndex] || colors[0],
+                        }
+                    })
+                    .sort((a, b) => b.value - a.value)
+                    .map((asset, i) => {
+                        asset.percentage = (asset.value * 100) / totalValue;
+                        asset.name +=
+                            `: ${addCommas(numberFormatByType(asset.amount, asset.assetType))} ${asset.currency}`;
+                        return asset
+                    });
+                const tinyAmounts = preparedAssets.filter(asset => asset.percentage < 1);
+                if (tinyAmounts.length > 1) {
+                    const otherAmounts = preparedAssets.filter(asset => asset.percentage >= 1);
+                    const tinyAssetsComposite = tinyAmounts.reduce((accumulator, asset) => {
+                        accumulator.name += `\n${buildTitle(asset)}`;
+                        accumulator.value += asset.value;
+                        accumulator.percentage += asset.percentage;
+                        return accumulator
+                    }, {
+                        assetName: "Other",
+                        name: "",
+                        value: 0,
+                        percentage: 0,
+                    });
+                    tinyAssetsComposite.name = `Other : ${tinyAssetsComposite.name}`;
+                    console.log("adding", tinyAssetsComposite);
+                    otherAmounts.push(tinyAssetsComposite);
+                    preparedAssets = otherAmounts;
+                }
+
                 let series = {
                     type: "treemap",
                     layoutAlgorithm: 'squarified',
-                    data: allAssets
-                        .map((asset, i) => {
-                            const value = rates.transformAssetValue(asset, currentCurrency, currentType);
-                            totalValue += value;
-                            let colorIndex = i;
-                            while (colorIndex > (colors.length - 1)) {
-                                colorIndex -= colors.length
-                            }
-                            return {
-                                value: value,
-                                name: asset.name,
-                                currency: asset.currency,
-                                assetName: asset.name,
-                                amount: asset.amount,
-                                assetType: asset.type,
-                                color: colors[colorIndex] || colors[0],
-                            }
-                        })
-                        .sort((a, b) => b.value - a.value)
-                        .map((asset, i) => {
-                            asset.percentage = (asset.value * 100) / totalValue;
-                            asset.name +=
-                                `: ${addCommas(numberFormatByType(asset.amount, asset.assetType))} ${asset.currency}`;
-                            return asset
-                        }),
+                    data: preparedAssets,
                 };
 
                 const buildTotalTreemapChart = () => this.state.activeResultsTab === "balance-treemap"
@@ -1120,3 +1123,17 @@ function getListOfTopCurrenciesByType() {
     };
     return result
 }
+
+function buildTitle(asset) {
+    const percentage = asset.percentage || asset.percents;
+    const afterDecimalPoint = percentage < 0.01 ? 8 : 2;
+    const amount = noExponents(addCommas(asset.amount));
+    const percents = numberFormat(percentage, afterDecimalPoint);
+    return `${amount} ${asset.currency} (${percents}%)`
+}
+
+function buildHighChartsTitle(asset) {
+    const amount = noExponents(addCommas(asset.amount));
+    return `${amount} ${asset.currency}`
+}
+
