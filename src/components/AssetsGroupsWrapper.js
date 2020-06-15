@@ -3,13 +3,9 @@ import {NewAssetMenu} from "./NewAssetMenu";
 import {AssetsGroup} from "./AssetsGroup";
 import AssetDTO from "./AssetDTO";
 import './AssetsGroupsWrapper.css';
-import assetsRepository from "../repo/assetsRepository";
+import assetsService from "../assets/AssetService";
 
 export class AssetsGroupsWrapper extends React.Component {
-
-    static defaultProps = {
-        savedState: {},
-    };
 
     state = {
         showMenu: false,
@@ -24,8 +20,8 @@ export class AssetsGroupsWrapper extends React.Component {
     }
 
     componentDidMount() {
-        const storedData = assetsRepository.getLatest();
-        this.setState({savedState: storedData.assets})
+        const assets = assetsService.getCurrentAssets();
+        this.setState({savedState: assets.assets})
     }
 
     render() {
@@ -44,8 +40,8 @@ export class AssetsGroupsWrapper extends React.Component {
                 />
                 : null,
             [
-                this.props.savedState.fiat || mergeFiatGroup(this.props.savedState.cash, this.props.savedState["non-cash"]),
-                this.props.savedState.crypto,
+                this.state.savedState.fiat || mergeFiatGroup(this.state.savedState.cash, this.state.savedState["non-cash"]),
+                this.state.savedState.crypto,
             ].map((group) =>
                 <AssetsGroup key={group.type}
                              spawnMenu={({onSettingsSet}) => this.setState({
@@ -53,13 +49,13 @@ export class AssetsGroupsWrapper extends React.Component {
                                  onSettingsSet: onSettingsSet,
                              })}
                              saveStateFunction={(assets) => {
-                                 const buffer = this.props.savedState;
+                                 const buffer = this.state.savedState;
                                  buffer[group.type] || (buffer[group.type] = {});
                                  buffer[group.type].type = group.type;
                                  buffer[group.type].assets = assets.map(AssetDTO.copy);
                                  delete buffer.cash;
                                  delete buffer["non-cash"];
-                                 assetsRepository.save({
+                                 assetsService.save({
                                      assets: buffer,
                                  });
                              }}
@@ -72,7 +68,6 @@ export class AssetsGroupsWrapper extends React.Component {
 
 function mergeFiatGroup(mergeMe0, mergeMe1) {
     const type = "fiat";
-    console.log("still merging");
     return {
         type: type,
         assets: [].concat(mergeMe0.assets).concat(mergeMe1.assets).map(asset => {

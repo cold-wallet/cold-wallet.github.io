@@ -105,3 +105,8 @@
 .neutral-button:active {
   padding: 0 2px 2px 0;
 }
+
+.document--label,
+input[type=checkbox] {
+  cursor: pointer;
+}

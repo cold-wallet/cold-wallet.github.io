@@ -10,7 +10,6 @@ import './../extensions/highChartTheme'
 import rates from "../extensions/rates";
 import highCharts3d from 'highcharts/highcharts-3d'
 import treemap from 'highcharts/modules/treemap'
-import assetsRepository from "../repo/assetsRepository";
 import historyService from "../history/historyService";
 import fiatRatesRepository from "../repo/FiatRatesRepository";
 import cryptoRatesRepository from "../repo/CryptoRatesRepository";
@@ -21,6 +20,7 @@ import usdtIcon from "../resources/currencies/usdt.png";
 import ltcIcon from "../resources/currencies/ltc.png";
 import eosIcon from "../resources/currencies/eos.png";
 import bchIcon from "../resources/currencies/bch.png";
+import assetsService from "../assets/AssetService";
 
 // -> Load Highcharts modules
 highCharts3d(Highcharts);
@@ -46,14 +46,10 @@ const pieColors = [
 let unmount;
 
 export default class ResultsWrapper extends React.Component {
-    static defaultProps = {
-        savedState: {},
-    };
-
     constructor(props, context) {
         super(props, context);
         this.state = {
-            assets: props.savedState || [],
+            assets: assetsService.getCurrentAssets().assets,
             chartType: props.chartType || "total",
             activeResultsTab: props.activeResultsTab || "first",
         };
@@ -61,8 +57,9 @@ export default class ResultsWrapper extends React.Component {
 
     componentDidMount() {
         unmount = false;
-        assetsRepository.subscribeOnChange(
-            assets => !unmount && this.setState({assets: assets.assets}));
+        assetsService.subscribeOnChange(assets => {
+            this.setState({assets: assets.assets})
+        });
         fiatRatesRepository.subscribeOnChange(fiatRates => {
             if (!unmount) {
                 return

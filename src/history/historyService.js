@@ -1,9 +1,9 @@
 import rates from "../extensions/rates";
 import numberFormat from "../extensions/numberFormat";
-import assetsRepository from "../repo/assetsRepository";
 import fiatRatesRepository from "../repo/FiatRatesRepository";
 import cryptoRatesRepository from "../repo/CryptoRatesRepository";
 import historyRepository from "./HistoryRepository"
+import assetsService from "../assets/AssetService";
 
 const historyService = {
     readHistory() {
@@ -92,9 +92,9 @@ const historyService = {
     },
 };
 
-assetsRepository.subscribeOnChange(assets => historyService.updateHistory(assets));
-fiatRatesRepository.subscribeOnChange(rates => historyService.updateHistory(assetsRepository.getLatest()));
-cryptoRatesRepository.subscribeOnChange(cryptoRates => historyService.updateHistory(assetsRepository.getLatest()));
+assetsService.subscribeOnChange(assets => historyService.updateHistory(assets));
+fiatRatesRepository.subscribeOnChange(rates => historyService.updateHistory(assetsService.getCurrentAssets()));
+cryptoRatesRepository.subscribeOnChange(cryptoRates => historyService.updateHistory(assetsService.getCurrentAssets()));
 
 export default historyService
 

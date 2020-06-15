@@ -1,0 +1,69 @@
+.settings-button {
+  position: absolute;
+  top: 1%;
+  right: 0.5%;
+  background: transparent;
+  border: none;
+}
+
+.settings-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.settings--shadow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #103b34;
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.settings--box {
+  position: absolute;
+  background-color: #6f9f98;
+  width: 50%;
+  height: 50%;
+  top: 3%;
+  left: 43%;
+  border: 2px solid #3e3e3e;
+  box-shadow: 5px 5px 20px 0;
+  border-radius: 5px;
+  padding: 2%;
+}
+
+.integration-container--monobank-token-input {
+  word-break: break-all;
+  display: inline-block;
+  background: #ebebeb;
+  padding: 1%;
+  width: 50%;
+  margin: 1%;
+  border-radius: .4rem;
+}
+
+.settings--list {
+  width: 100%;
+  height: 90%;
+  overflow-y: auto;
+}
+
+.settings--control {
+  padding: 1%;
+  min-width: 10%;
+  border-radius: 1%;
+}
+
+.document--label {
+  padding: 1%;
+}
+
+.integration-container--monobank-token-input-wrapper {
+  padding: 1% 1% 1% 3%;
+}
+
+.integration-container--monobank-info {
+  padding: 1%;
+}

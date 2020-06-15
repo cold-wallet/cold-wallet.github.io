@@ -2,6 +2,7 @@ import axios from "axios";
 import currencies from "../resources/currencies-iso-4217";
 import fiatRatesRepository from "../repo/FiatRatesRepository";
 import cryptoRatesRepository from "../repo/CryptoRatesRepository";
+import monobankApiClient from "./monobankApiClient";
 
 const uahNumCode = 980;
 const BTC = "BTC";
@@ -24,12 +25,9 @@ let terminated = false;
         return
     }
     try {
-        axios.get("https://api.monobank.ua/bank/currency")
-            .then(response => {
-                let fiatRates;
-                if (response
-                    && (response.status === 200)
-                    && (fiatRates = response.data)
+        monobankApiClient.getRates(
+            fiatRates => {
+                if (fiatRates
                     && !fiatRates.errorDescription
                     && fiatRates.length
                 ) {
@@ -39,11 +37,11 @@ let terminated = false;
                     }
                     futures.push(setTimeout(fetchLatestRates, 300_000))
                 } else {
-                    console.warn("Fetching latest rates failed", response);
-                    throw response
+                    console.warn("Fetching latest rates failed", fiatRates);
+                    throw fiatRates
                 }
-            })
-            .catch(e => {
+            },
+            e => {
                 console.warn(e);
                 console.log(`Will re-fetch after timeout: ${currentTimeout / milli}s`);
                 setTimeout(fetchLatestRates, currentTimeout);
@@ -52,7 +50,8 @@ let terminated = false;
                     newTimeoutValue = endTimeout
                 }
                 currentTimeout = newTimeoutValue;
-            })
+            }
+        );
     } catch (e) {
         console.error(e);
     }
@@ -82,7 +81,7 @@ let terminated = false;
             })
             .catch(e => {
                 console.warn(e);
-                console.log(`Will re-fetch cryptoRates after timeout: ${currentCryptoTimeout / milli}s`);
+                console.warn(`Will re-fetch cryptoRates after timeout: ${currentCryptoTimeout / milli}s`);
                 setTimeout(fetchLatestCryptoCurrenciesRates, currentCryptoTimeout);
             })
     } catch (e) {
@@ -193,7 +192,7 @@ function transformFiatToCrypto(fiatAsset, outputCryptoCurrencyCode) {
         return amount;
     }
 
-    console.log("not found adequate transformation", fiatAsset, outputCryptoCurrencyCode);
+    console.warn("not found adequate transformation", fiatAsset, outputCryptoCurrencyCode);
     return 0;
 }
 
