@@ -42,7 +42,6 @@ export default class Settings extends React.Component {
         } : {});
 
         this.setState({
-            waitingForMonobankIntegrationResponse: false,
             saveSettingsRequested: false,
             settingsWindowRequested: false,
             bufferMonobankIntegrationToken: undefined,
@@ -54,8 +53,7 @@ export default class Settings extends React.Component {
     render() {
         const bufferMonobankIntegrationToken = this.state.bufferMonobankIntegrationToken;
 
-        if (!this.state.waitingForMonobankIntegrationResponse
-            && this.state.saveSettingsRequested
+        if (this.state.saveSettingsRequested
             && !this.settingsSaved
             && this.state.monobankIntegrationEnabled
             && bufferMonobankIntegrationToken
@@ -80,14 +78,9 @@ export default class Settings extends React.Component {
                     this.setState({
                         saveSettingsRequested: false,
                         isInvalidBufferMonobankIntegrationToken: true,
-                        waitingForMonobankIntegrationResponse: false,
                     });
                     lockerRepository.save({});
                 });
-            this.setState({
-                bufferMonobankIntegrationToken: undefined,
-                waitingForMonobankIntegrationResponse: true,
-            })
         }
         return [
             <button title="Settings" key="settings-button" className="settings-button"
@@ -140,11 +133,15 @@ export default class Settings extends React.Component {
                     <div className="settings--controls">
                         <button
                             onClick={event => {
-                                this.setState((this.state.monobankIntegrationEnabled
+                                console.log("state", this.state);
+                                const state = (this.state.monobankIntegrationEnabled
                                     && !this.state.bufferMonobankIntegrationToken)
-                                    ? {emptyTokenOnSave: true}
-                                    : {saveSettingsRequested: true}
-                                );
+                                    ? {
+                                        bufferMonobankIntegrationToken: this.state.monobankIntegrationToken,
+                                        saveSettingsRequested: true
+                                    }
+                                    : {saveSettingsRequested: true};
+                                this.setState(state);
                             }}
                             className="settings--control settings--controls-save">Save
                         </button>

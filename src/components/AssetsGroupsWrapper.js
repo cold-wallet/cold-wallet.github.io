@@ -21,13 +21,20 @@ export class AssetsGroupsWrapper extends React.Component {
 
     componentDidMount() {
         const assets = assetsService.getCurrentAssets();
-        this.setState({savedState: assets.assets})
+        this.setState({savedState: assets.assets});
+        assetsService.subscribeOnChange(assets => {
+            this.setState({savedState: assets.assets});
+        });
     }
 
     render() {
         if (!this.state.savedState) {
             return null
         }
+        const assets = [
+            this.state.savedState.fiat || mergeFiatGroup(this.state.savedState.cash, this.state.savedState["non-cash"]),
+            this.state.savedState.crypto,
+        ];
         return <div className="assets-groups-wrapper" translate="no">{[
             this.state.showMenu
                 ? <NewAssetMenu
@@ -39,10 +46,7 @@ export class AssetsGroupsWrapper extends React.Component {
                     assetType={this.state.showMenu}
                 />
                 : null,
-            [
-                this.state.savedState.fiat || mergeFiatGroup(this.state.savedState.cash, this.state.savedState["non-cash"]),
-                this.state.savedState.crypto,
-            ].map((group) =>
+            assets.map((group) =>
                 <AssetsGroup key={group.type}
                              spawnMenu={({onSettingsSet}) => this.setState({
                                  showMenu: group.type,

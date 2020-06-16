@@ -21,6 +21,10 @@ const assetsService = {
     }
 };
 
+monobankUserDataRepository.subscribeOnChange(__ => {
+    assetsService.save(assetsService.getCurrentAssets())
+});
+
 function extractAssets(assets) {
     const settings = settingsRepository.getLatest();
     if (settings.integrations.monobank.monobankIntegrationEnabled) {

@@ -5,6 +5,7 @@ import AssetDTO from "./AssetDTO";
 import NumberFormat from "react-number-format";
 import noExponents from "../extensions/noExponents";
 import uuidGenerator from "../extensions/uuid-generator";
+import assetsService from "../assets/AssetService";
 
 export class AssetsGroup extends React.Component {
 
@@ -36,6 +37,12 @@ export class AssetsGroup extends React.Component {
                 </button>
             </div>
         </div>;
+    }
+
+    componentDidMount() {
+        assetsService.subscribeOnChange(assets => this.setState({
+            assets: assets.assets[this.props.group.type].assets,
+        }))
     }
 
     buildNewAssetIfNeeds() {
@@ -127,8 +134,7 @@ export class AssetsGroup extends React.Component {
     }
 
     addAsset(asset) {
-        const assets = this.props.group.assets;
-        assets.unshift(asset);
+        const assets = [asset].concat(this.props.group.assets);
         this.setState({
             newAsset: null,
             assets,
@@ -242,10 +248,7 @@ export class AssetsGroup extends React.Component {
     }
 
     buildCurrentOrDefaultAssets() {
-        if (this.state.assets.length) {
-            return this.buildAssets();
-        }
-        return null;
+        return this.state.assets.length ? this.buildAssets() : null;
     }
 
     _onAddAssetButtonClick() {
