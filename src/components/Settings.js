@@ -3,7 +3,19 @@ import './Settings.css'
 import settingsRepository from "../repo/SettingsRepository";
 import monobankApiClient from "../extensions/monobankApiClient";
 import monobankUserDataRepository from "../repo/MonobankUserDataRepository";
-import lockerRepository from "../extensions/locker";
+import binanceUserDataRepository from "../repo/BinanceUserDataRepository";
+import LocalStorageRepository from "../repo/LocalStorageRepository";
+import binanceClient from "../extensions/binanceClient";
+
+const binanceLocker = LocalStorageRepository.builder()
+    .name('binance-locker')
+    .nullObject({})
+    .build();
+
+const monobankLocker = LocalStorageRepository.builder()
+    .name('monobank-locker')
+    .nullObject({})
+    .build();
 
 export default class Settings extends React.Component {
 
@@ -14,8 +26,11 @@ export default class Settings extends React.Component {
         const currentSettings = settingsRepository.getLatest();
         this.state = {
             settingsWindowRequested: false,
-            monobankIntegrationEnabled: currentSettings.integrations.monobank.monobankIntegrationEnabled,
-            monobankIntegrationToken: currentSettings.integrations.monobank.monobankIntegrationToken,
+            monobankIntegrationEnabled: currentSettings.integrations.monobank?.monobankIntegrationEnabled,
+            monobankIntegrationToken: currentSettings.integrations.monobank?.monobankIntegrationToken,
+            binanceIntegrationEnabled: currentSettings.integrations.binance?.binanceIntegrationEnabled,
+            binanceKeyIntegrationToken: currentSettings.integrations.binance?.binanceKeyIntegrationToken,
+            binanceSecretIntegrationToken: currentSettings.integrations.binance?.binanceSecretIntegrationToken,
         };
     }
 
@@ -25,15 +40,39 @@ export default class Settings extends React.Component {
         })
     }
 
-    saveSettings(settings) {
-        settingsRepository.save({
-            integrations: {
-                monobank: {
-                    monobankIntegrationEnabled: settings.monobankIntegrationEnabled,
-                    monobankIntegrationToken: settings.monobankIntegrationToken,
-                },
-            }
-        });
+    saveBinanceSettings(settings) {
+        const latest = settingsRepository.getLatest();
+        latest.integrations.binance = {
+            binanceIntegrationEnabled: settings.binanceIntegrationEnabled,
+            binanceKeyIntegrationToken: settings.binanceKeyIntegrationToken,
+            binanceSecretIntegrationToken: settings.binanceSecretIntegrationToken,
+        };
+        settingsRepository.save(latest);
+
+        binanceUserDataRepository.save(settings.binanceIntegrationEnabled ? {
+            clientId: settings.clientId,
+            name: settings.name,
+            accounts: settings.accounts,
+        } : {});
+
+        this.setState({
+            saveSettingsRequested: false,
+            settingsWindowRequested: false,
+            bufferBinanceKeyIntegrationToken: undefined,
+            bufferBinanceSecretIntegrationToken: undefined,
+            binanceIntegrationEnabled: settings.binanceIntegrationEnabled,
+            binanceKeyIntegrationToken: settings.binanceKeyIntegrationToken,
+            binanceSecretIntegrationToken: settings.binanceSecretIntegrationToken,
+        }, () => binanceLocker.save({}));
+    }
+
+    saveMonobankSettings(settings) {
+        const latest = settingsRepository.getLatest();
+        latest.integrations.monobank = {
+            monobankIntegrationEnabled: settings.monobankIntegrationEnabled,
+            monobankIntegrationToken: settings.monobankIntegrationToken,
+        };
+        settingsRepository.save(latest);
 
         monobankUserDataRepository.save(settings.monobankIntegrationEnabled ? {
             clientId: settings.clientId,
@@ -47,25 +86,27 @@ export default class Settings extends React.Component {
             bufferMonobankIntegrationToken: undefined,
             monobankIntegrationEnabled: settings.monobankIntegrationEnabled,
             monobankIntegrationToken: settings.monobankIntegrationToken,
-        }, () => lockerRepository.save({}));
+        }, () => monobankLocker.save({}));
     }
 
     render() {
         const bufferMonobankIntegrationToken = this.state.bufferMonobankIntegrationToken;
+        const bufferBinanceKeyIntegrationToken = this.state.bufferBinanceKeyIntegrationToken;
+        const bufferBinanceSecretIntegrationToken = this.state.bufferBinanceSecretIntegrationToken;
 
         if (this.state.saveSettingsRequested
             && !this.settingsSaved
             && this.state.monobankIntegrationEnabled
             && bufferMonobankIntegrationToken
-            && !lockerRepository.getLatest().monobankIntegrationLock
+            && !monobankLocker.getLatest().monobankIntegrationLock
         ) {
-            lockerRepository.save({
+            monobankLocker.save({
                 monobankIntegrationLock: Date.now(),
             });
             monobankApiClient.getUserInfo(
                 bufferMonobankIntegrationToken,
                 userInfo => {
-                    this.saveSettings({
+                    this.saveMonobankSettings({
                         clientId: userInfo.clientId,
                         name: userInfo.name,
                         accounts: userInfo.accounts,
@@ -77,10 +118,37 @@ export default class Settings extends React.Component {
                     console.error(e);
                     this.setState({
                         saveSettingsRequested: false,
-                        isInvalidBufferMonobankIntegrationToken: true,
                     });
-                    lockerRepository.save({});
+                    monobankLocker.save({});
                 });
+        }
+
+        if (this.state.saveSettingsRequested
+            && !this.settingsSaved
+            && this.state.binanceIntegrationEnabled
+            && bufferBinanceKeyIntegrationToken
+            && bufferBinanceSecretIntegrationToken
+            && !binanceLocker.getLatest().binanceIntegrationLock
+        ) {
+            binanceLocker.save({
+                binanceIntegrationLock: Date.now(),
+            });
+
+            (async () => {
+                const accountData = await binanceClient.getAccountData(
+                    bufferBinanceKeyIntegrationToken, bufferBinanceSecretIntegrationToken
+                );
+                console.log("binance account data", accountData);
+                this.saveBinanceSettings({
+                    // clientId: userInfo.clientId,
+                    // name: userInfo.name,
+                    // accounts: userInfo.balances,
+                    binanceIntegrationEnabled: this.state.binanceIntegrationEnabled,
+                    binanceKeyIntegrationToken: bufferBinanceKeyIntegrationToken,
+                    binanceSecretIntegrationToken: bufferBinanceSecretIntegrationToken,
+                });
+            })();
+            binanceLocker.save({});
         }
         return [
             <button title="Settings" key="settings-button" className="settings-button"
@@ -129,18 +197,72 @@ export default class Settings extends React.Component {
                                 </div>
                             }
                         </div>
+                        <div id="integration-binance" className="integration-container">
+                            <label className="document--label"><input
+                                type="checkbox"
+                                checked={this.state.binanceIntegrationEnabled}
+                                onChange={event => {
+                                    this.setState({
+                                        binanceIntegrationEnabled: !this.state.binanceIntegrationEnabled,
+                                    })
+                                }}
+                            />&nbsp;<span>Enable binance integration</span></label>
+                            {
+                                !(this.state.binanceIntegrationEnabled) ? null : <div>
+                                    <div className="integration-container--binance-token-input-wrapper">
+                                        <div>
+                                            <input type="text"
+                                                   placeholder="binance API key"
+                                                   onChange={event => this.setState({
+                                                       bufferBinanceKeyIntegrationToken: event.target.value,
+                                                   })}
+                                                   value={(bufferBinanceKeyIntegrationToken === undefined)
+                                                       ? (this.state.binanceKeyIntegrationToken || "")
+                                                       : bufferBinanceKeyIntegrationToken}
+                                                   className="integration-container--binance-token-input"/>
+                                        </div>
+                                        <div>
+                                            <input type="text"
+                                                   placeholder="binance API secret"
+                                                   onChange={event => this.setState({
+                                                       bufferBinanceSecretIntegrationToken: event.target.value,
+                                                   })}
+                                                   value={(bufferBinanceSecretIntegrationToken === undefined)
+                                                       ? (this.state.binanceSecretIntegrationToken || "")
+                                                       : bufferBinanceSecretIntegrationToken}
+                                                   className="integration-container--binance-token-input"/>
+                                        </div>
+                                        {
+                                            !this.state.saveSettingsRequested ? null : (
+                                                <span>Checking...</span>
+                                                //    todo: add loading animation
+                                            )
+                                        }
+                                        <p className="integration-container--binance-info">
+                                            <a
+                                                target="new-window"
+                                                href="https://www.binance.com/en/usercenter/settings/api-management/">
+                                                Get binance API token here
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                     <div className="settings--controls">
                         <button
                             onClick={event => {
-                                console.log("state", this.state);
-                                const state = (this.state.monobankIntegrationEnabled
-                                    && !this.state.bufferMonobankIntegrationToken)
-                                    ? {
-                                        bufferMonobankIntegrationToken: this.state.monobankIntegrationToken,
-                                        saveSettingsRequested: true
-                                    }
-                                    : {saveSettingsRequested: true};
+                                const state = {saveSettingsRequested: true};
+
+                                if (this.state.monobankIntegrationEnabled
+                                    && !this.state.bufferMonobankIntegrationToken) {
+                                    state.bufferMonobankIntegrationToken = this.state.monobankIntegrationToken;
+                                }
+                                if (this.state.binanceIntegrationEnabled
+                                    && !this.state.bufferBinanceKeyIntegrationToken) {
+                                    state.bufferBinanceKeyIntegrationToken = this.state.binanceKeyIntegrationToken;
+                                }
                                 this.setState(state);
                             }}
                             className="settings--control settings--controls-save">Save
