@@ -852,7 +852,6 @@ export default class ResultsWrapper extends React.Component {
                         percentage: 0,
                     });
                     tinyAssetsComposite.name = `Other : ${tinyAssetsComposite.name}`;
-                    console.log("adding", tinyAssetsComposite);
                     otherAmounts.push(tinyAssetsComposite);
                     preparedAssets = otherAmounts;
                 }
