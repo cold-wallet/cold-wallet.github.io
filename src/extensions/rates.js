@@ -20,6 +20,9 @@ let savedCryptoRates = null;
 const futures = [];
 let terminated = false;
 
+const fiatRatesTimeout = 300_000;
+const cryptoRatesTimeout = 300_000;
+
 (function fetchLatestRates() {
     if (terminated) {
         return
@@ -35,7 +38,7 @@ let terminated = false;
                         storeFiatRates(fiatRates);
                         savedRates = fiatRates;
                     }
-                    futures.push(setTimeout(fetchLatestRates, 300_000))
+                    futures.push(setTimeout(fetchLatestRates, fiatRatesTimeout))
                 } else {
                     console.warn("Fetching latest rates failed", fiatRates);
                     throw fiatRates
@@ -73,7 +76,7 @@ let terminated = false;
                         storeCryptoRates(cryptoRates);
                         savedCryptoRates = cryptoRates;
                     }
-                    futures.push(setTimeout(fetchLatestCryptoCurrenciesRates, 60_000))
+                    futures.push(setTimeout(fetchLatestCryptoCurrenciesRates, cryptoRatesTimeout))
                 } else {
                     console.warn("Fetching latest cryptoRates failed", response);
                     throw response
