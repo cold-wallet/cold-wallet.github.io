@@ -18,8 +18,6 @@ const monobankLocker = LocalStorageRepository.builder()
 
 export default class Settings extends React.Component {
 
-    settingsSaved = false;
-
     constructor(props, context) {
         super(props, context);
         const currentSettings = settingsRepository.getLatest();
@@ -31,6 +29,29 @@ export default class Settings extends React.Component {
             binanceKeyIntegrationToken: currentSettings.integrations.binance?.binanceKeyIntegrationToken,
             binanceSecretIntegrationToken: currentSettings.integrations.binance?.binanceSecretIntegrationToken,
         };
+    }
+
+    componentDidMount() {
+        if (!this.state.saveSettingsRequested
+            && this.state.monobankIntegrationEnabled
+            && this.state.monobankIntegrationToken
+        ) {
+            try {
+                monobankApiClient.getUserInfo(
+                    this.state.monobankIntegrationToken,
+                    userInfo => {
+                        monobankUserDataRepository.save({
+                            clientId: userInfo.clientId,
+                            name: userInfo.name,
+                            accounts: userInfo.accounts,
+                        });
+                    },
+                    console.error
+                );
+            } catch (e) {
+                console.error(e)
+            }
+        }
     }
 
     switchState() {
@@ -94,7 +115,6 @@ export default class Settings extends React.Component {
         const bufferBinanceSecretIntegrationToken = this.state.bufferBinanceSecretIntegrationToken;
 
         if (this.state.saveSettingsRequested
-            && !this.settingsSaved
             && this.state.monobankIntegrationEnabled
             && bufferMonobankIntegrationToken
             && !monobankLocker.getLatest().monobankIntegrationLock
@@ -127,7 +147,6 @@ export default class Settings extends React.Component {
         }
 
         if (this.state.saveSettingsRequested
-            && !this.settingsSaved
             && this.state.binanceIntegrationEnabled
             && bufferBinanceKeyIntegrationToken
             && bufferBinanceSecretIntegrationToken
