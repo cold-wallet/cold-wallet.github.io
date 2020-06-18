@@ -5,7 +5,6 @@ import monobankApiClient from "../extensions/monobankApiClient";
 import monobankUserDataRepository from "../repo/MonobankUserDataRepository";
 import binanceUserDataRepository from "../repo/BinanceUserDataRepository";
 import LocalStorageRepository from "../repo/LocalStorageRepository";
-import binanceClient from "../extensions/binanceClient";
 
 const binanceLocker = LocalStorageRepository.builder()
     .name('binance-locker')
@@ -103,24 +102,28 @@ export default class Settings extends React.Component {
             monobankLocker.save({
                 monobankIntegrationLock: Date.now(),
             });
-            monobankApiClient.getUserInfo(
-                bufferMonobankIntegrationToken,
-                userInfo => {
-                    this.saveMonobankSettings({
-                        clientId: userInfo.clientId,
-                        name: userInfo.name,
-                        accounts: userInfo.accounts,
-                        monobankIntegrationEnabled: this.state.monobankIntegrationEnabled,
-                        monobankIntegrationToken: bufferMonobankIntegrationToken
+            try {
+                monobankApiClient.getUserInfo(
+                    bufferMonobankIntegrationToken,
+                    userInfo => {
+                        this.saveMonobankSettings({
+                            clientId: userInfo.clientId,
+                            name: userInfo.name,
+                            accounts: userInfo.accounts,
+                            monobankIntegrationEnabled: this.state.monobankIntegrationEnabled,
+                            monobankIntegrationToken: bufferMonobankIntegrationToken
+                        });
+                    },
+                    e => {
+                        console.error(e);
+                        this.setState({
+                            saveSettingsRequested: false,
+                        });
+                        monobankLocker.save({});
                     });
-                },
-                e => {
-                    console.error(e);
-                    this.setState({
-                        saveSettingsRequested: false,
-                    });
-                    monobankLocker.save({});
-                });
+            } catch (e) {
+                monobankLocker.save({});
+            }
         }
 
         if (this.state.saveSettingsRequested
@@ -133,22 +136,15 @@ export default class Settings extends React.Component {
             binanceLocker.save({
                 binanceIntegrationLock: Date.now(),
             });
-
-            (async () => {
-                const accountData = await binanceClient.getAccountData(
-                    bufferBinanceKeyIntegrationToken, bufferBinanceSecretIntegrationToken
-                );
-                console.log("binance account data", accountData);
+            try {
                 this.saveBinanceSettings({
-                    // clientId: userInfo.clientId,
-                    // name: userInfo.name,
-                    // accounts: userInfo.balances,
                     binanceIntegrationEnabled: this.state.binanceIntegrationEnabled,
                     binanceKeyIntegrationToken: bufferBinanceKeyIntegrationToken,
                     binanceSecretIntegrationToken: bufferBinanceSecretIntegrationToken,
                 });
-            })();
-            binanceLocker.save({});
+            } catch (e) {
+                binanceLocker.save({})
+            }
         }
         return [
             <button title="Settings" key="settings-button" className="settings-button"
