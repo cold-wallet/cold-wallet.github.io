@@ -1,6 +1,6 @@
 {
-  "short_name": "Personal Assets",
-  "name": "Personal Assets",
+  "short_name": "Cold Wallet",
+  "name": "Cold Wallet",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,7 +18,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "https://personal-assets.github.io/",
+  "start_url": "https://cold-wallet.github.io/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"

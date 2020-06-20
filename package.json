@@ -1,8 +1,8 @@
 {
-  "name": "personal-assets.github.io",
+  "name": "cold-wallet",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://personal-assets.github.io/",
+  "homepage": "https://cold-wallet.github.io/",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
