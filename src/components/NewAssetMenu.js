@@ -57,13 +57,16 @@ export class NewAssetMenu extends React.Component {
                                             })}>
                                         <option disabled selected value> -- select currency --</option>
                                         {
-                                            getFiatCurrencies().map(currency => {
-                                                return (
-                                                    <option key={currency.code}
-                                                            title={currency.name}
-                                                            value={currency.code}>{currency.code}{"\t"}- {currency.name}</option>
-                                                )
-                                            })
+                                            (this.props.assetType === "crypto"
+                                                ? []
+                                                : getFiatCurrencies())
+                                                .map(currency => {
+                                                    return (
+                                                        <option key={currency.code}
+                                                                title={currency.name}
+                                                                value={currency.code}>{currency.code}{"\t"}- {currency.name}</option>
+                                                    )
+                                                })
                                         }</select>
                                 </div>
                             </div>
