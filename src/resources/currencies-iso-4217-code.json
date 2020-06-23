@@ -1,4 +1,22 @@
 {
+  "894": {
+    "code": "ZMK",
+    "numCode": "894",
+    "afterDecimalPoint": 2,
+    "name": "Zambian Kwacha"
+  },
+  "795": {
+    "code": "TMM",
+    "numCode": "795",
+    "afterDecimalPoint": 2,
+    "name": "Turkmenistan manat"
+  },
+  "478": {
+    "code": "MRO",
+    "numCode": "478",
+    "afterDecimalPoint": 2,
+    "name": "Mauritanian ouguiya"
+  },
   "784": {
     "code": "AED",
     "numCode": "784",

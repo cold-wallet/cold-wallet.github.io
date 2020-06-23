@@ -6,6 +6,7 @@ import ethIcon from '../resources/currencies/eth.png'
 import ltcIcon from '../resources/currencies/ltc.png'
 import eosIcon from '../resources/currencies/eos.png'
 import bchIcon from '../resources/currencies/bch.png'
+import rates from "../extensions/rates";
 
 export class NewAssetMenu extends React.Component {
     static defaultProps = {
@@ -50,6 +51,20 @@ export class NewAssetMenu extends React.Component {
                                     )
                                 }</div>
                                 <div className={"find-asset--container"}>
+                                    <select className="find-asset--select"
+                                            onChange={e => this.onCurrencySelected({
+                                                currencyCode: e.target.value,
+                                            })}>
+                                        <option disabled selected value> -- select currency --</option>
+                                        {
+                                            getFiatCurrencies().map(currency => {
+                                                return (
+                                                    <option key={currency.code}
+                                                            title={currency.name}
+                                                            value={currency.code}>{currency.code}{"\t"}- {currency.name}</option>
+                                                )
+                                            })
+                                        }</select>
                                 </div>
                             </div>
                     }</div>
@@ -68,6 +83,10 @@ export class NewAssetMenu extends React.Component {
         });
         this.props.hideMenu();
     }
+}
+
+function getFiatCurrencies() {
+    return rates.getFiatCurrencies()
 }
 
 function getListOfTopCurrenciesByType(type) {

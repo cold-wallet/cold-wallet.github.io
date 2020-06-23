@@ -19,6 +19,10 @@
     "universal-cookie": "latest",
     "victory": "^34.3.5"
   },
+  "devDependencies": {
+    "gh-pages": "^2.2.0",
+    "react-devtools": "^4.6.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -41,9 +45,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "gh-pages": "^2.2.0",
-    "react-devtools": "^4.6.0"
   }
 }

@@ -1,5 +1,5 @@
 import axios from "axios";
-import currencies from "../resources/currencies-iso-4217";
+import currencies from "./currencies";
 import fiatRatesRepository from "../repo/FiatRatesRepository";
 import cryptoRatesRepository from "../repo/CryptoRatesRepository";
 import monobankApiClient from "./monobankApiClient";
@@ -142,8 +142,8 @@ function transformCurrencyToUAH(amount, currencyNumCode) {
 }
 
 function transformFiatToFiat({amount, currency}, outputCurrency) {
-    let outputCurrencyNumCode = +(currencies[outputCurrency].numCode);
-    let currencyNumCode = +(currencies[currency].numCode);
+    const outputCurrencyNumCode = +(currencies.getByStringCode(outputCurrency).numCode);
+    const currencyNumCode = +(currencies.getByStringCode(currency).numCode);
 
     if (currencyNumCode === outputCurrencyNumCode) {
         return amount
@@ -221,7 +221,7 @@ function getCryptoRates() {
 
 export default {
     isFiat(currencyStrCode) {
-        return !!currencies[currencyStrCode];
+        return !!currencies.getByStringCode(currencyStrCode);
     },
     isReady() {
         return getFiatRates().length && getCryptoRates().length
@@ -231,6 +231,25 @@ export default {
     },
     extractCryptoRates() {
         return getCryptoRates()
+    },
+    getFiatCurrencies() {
+        return Object
+            .values(getFiatRates().reduce((result, rate) => {
+                try {
+                    const currency = currencies.getByNumCode(rate.currencyCodeA);
+                    result[currency.code] = currency;
+                } catch (e) {
+                    console.error(e)
+                }
+                try {
+                    const currency = currencies.getByNumCode(rate.currencyCodeB);
+                    result[currency.code] = currency;
+                } catch (e) {
+                    console.error(e)
+                }
+                return result
+            }, {}))
+            .sort((a, b) => (a.code < b.code ? -1 : (a.code > b.code ? 1 : 0)))
     },
     transformAssetValue(asset, resultCurrencyCode, resultType) {
         return resultType === "crypto"

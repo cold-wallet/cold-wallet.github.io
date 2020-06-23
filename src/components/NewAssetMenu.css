@@ -145,3 +145,11 @@
   justify-content: space-evenly;
 }
 
+.find-asset--container {
+  padding: 3%;
+}
+
+.find-asset--select {
+  padding: 1%;
+}
+
