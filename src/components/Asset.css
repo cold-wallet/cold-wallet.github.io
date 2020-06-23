@@ -70,6 +70,15 @@
   background-color: rgba(208, 0, 0, 0.2);
 }
 
+.asset-item-buttons-container--integration-name {
+  width: 30%;
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+  cursor: default;
+  font-family: 'Lucida Console', monospace
+}
+
 .asset-item-buttons-container {
   width: 30%;
   display: flex;

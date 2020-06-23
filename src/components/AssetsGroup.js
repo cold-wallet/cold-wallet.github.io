@@ -6,6 +6,7 @@ import NumberFormat from "react-number-format";
 import noExponents from "../extensions/noExponents";
 import uuidGenerator from "../extensions/uuid-generator";
 import assetsService from "../assets/AssetService";
+import settingsRepository from "../repo/SettingsRepository";
 
 export class AssetsGroup extends React.Component {
 
@@ -237,43 +238,46 @@ export class AssetsGroup extends React.Component {
                         <div className={"asset-item-currency"}>
                             <span translate="no" className={"asset-item-currency-name"}>{props.currencyCode}</span>
                         </div>
-                        <div className={"asset-item-buttons-container"}>{[
-                            (props.editModeEnabled)
-                                ? <button
-                                    key={"accept-new-asset-button"}
-                                    onClick={() => {
-                                        if (this.checkIsInvalid(amount)) {
-                                            props.enableInvalidMode();
-                                            return;
+                        {props.asset.isMonobankAsset && settingsRepository.getLatest().integrations.monobank.monobankIntegrationEnabled
+                            ? <div title={"Monobank integration"}
+                                   className={"asset-item-buttons-container--integration-name"}>monobank</div>
+                            : <div className={"asset-item-buttons-container"}>{[
+                                (props.editModeEnabled)
+                                    ? <button
+                                        key={"accept-new-asset-button"}
+                                        onClick={() => {
+                                            if (this.checkIsInvalid(amount)) {
+                                                props.enableInvalidMode();
+                                                return;
 
-                                        } else if (props.isInvalid) {
-                                            props.disableInvalidMode();
-                                        }
+                                            } else if (props.isInvalid) {
+                                                props.disableInvalidMode();
+                                            }
 
-                                        props.onAccepted({
-                                            amount: amount,
-                                            name: nameInput.value,
-                                        });
-                                    }}
-                                    className={"accept-new-asset-button positive-button button"}>✔</button>
-                                : <button
-                                    key={"edit-asset-button"}
-                                    onClick={() => props.onEditRequested()}
-                                    className={"edit-asset-button neutral-button pencil-icon button"}>🖉</button>,
-                            (props.editModeEnabled)
-                                ? <button
-                                    key={"cancel-editing-asset-button"}
-                                    onClick={() => props.onEditCancelRequested()}
-                                    className={"cancel-editing-asset-button neutral-button button"}>
-                                    <img alt="discard changes"
-                                         className="cancel-editing-asset-button--image"
-                                         src="https://img.icons8.com/android/24/000000/cancel.png"/>
-                                </button>
-                                : <button
-                                    key={"delete-asset-button"}
-                                    onClick={() => props.onDelete()}
-                                    className={"delete-asset-button negative-button button"}>✖</button>
-                        ]}</div>
+                                            props.onAccepted({
+                                                amount: amount,
+                                                name: nameInput.value,
+                                            });
+                                        }}
+                                        className={"accept-new-asset-button positive-button button"}>✔</button>
+                                    : <button
+                                        key={"edit-asset-button"}
+                                        onClick={() => props.onEditRequested()}
+                                        className={"edit-asset-button neutral-button pencil-icon button"}>🖉</button>,
+                                (props.editModeEnabled)
+                                    ? <button
+                                        key={"cancel-editing-asset-button"}
+                                        onClick={() => props.onEditCancelRequested()}
+                                        className={"cancel-editing-asset-button neutral-button button"}>
+                                        <img alt="discard changes"
+                                             className="cancel-editing-asset-button--image"
+                                             src="https://img.icons8.com/android/24/000000/cancel.png"/>
+                                    </button>
+                                    : <button
+                                        key={"delete-asset-button"}
+                                        onClick={() => props.onDelete()}
+                                        className={"delete-asset-button negative-button button"}>✖</button>
+                            ]}</div>}
                     </div>
                     {
                         !props.editModeEnabled ? null :
@@ -281,6 +285,7 @@ export class AssetsGroup extends React.Component {
                                 <div><label>
                                     <div className="new-asset-menu--data-name-input-label">Short name:</div>
                                     <input
+                                        disabled={props.asset.isMonobankAsset ? "disabled" : ""}
                                         ref={instance => {
                                             nameInput = instance;
                                             if (nameInput) {
@@ -288,7 +293,12 @@ export class AssetsGroup extends React.Component {
                                             }
                                         }}
                                         type="text"
-                                        className={"new-asset-menu--data-name-input"}/>
+                                        title={props.asset.isMonobankAsset
+                                            ? "No custom name for external integration asset"
+                                            : ""}
+                                        className={"new-asset-menu--data-name-input" + (props.asset.isMonobankAsset
+                                            ? " new-asset-menu--data-name-input__disabled"
+                                            : "")}/>
                                 </label></div>
                             </div>
                     }

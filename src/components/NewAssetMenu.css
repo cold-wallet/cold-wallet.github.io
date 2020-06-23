@@ -112,6 +112,10 @@
   min-height: 100px;
 }
 
+.new-asset-menu--data-name-input__disabled {
+  cursor: text;
+}
+
 .new-asset-menu--data-description-input,
 .new-asset-menu--data-name-input {
   width: 95%;
