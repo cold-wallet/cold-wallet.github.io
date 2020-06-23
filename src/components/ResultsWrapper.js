@@ -56,40 +56,44 @@ export default class ResultsWrapper extends React.Component {
     }
 
     componentDidMount() {
-        unmount = false;
-        assetsService.subscribeOnChange(assets => {
-            this.setState({assets: assets.assets})
-        });
-        fiatRatesRepository.subscribeOnChange(fiatRates => {
-            if (!unmount) {
-                return
-            }
-            try {
-                this.setState({fiatRates: fiatRates});
-            } catch (e) {
-                console.error(e)
-            }
-        });
-        cryptoRatesRepository.subscribeOnChange(cryptoRates => {
-            if (!unmount) {
-                return
-            }
-            try {
-                this.setState({cryptoRates: cryptoRates});
-            } catch (e) {
-                console.error(e)
-            }
-        });
-        historyRepository.subscribeOnChange(history => {
-            if (!unmount) {
-                return
-            }
-            try {
-                this.setState({historyData: history});
-            } catch (e) {
-                console.error(e)
-            }
-        });
+        try {
+            unmount = false;
+            assetsService.subscribeOnChange(assets => {
+                this.setState({assets: assets.assets})
+            });
+            fiatRatesRepository.subscribeOnChange(fiatRates => {
+                if (!unmount) {
+                    return
+                }
+                try {
+                    this.setState({fiatRates: fiatRates});
+                } catch (e) {
+                    console.error(e)
+                }
+            });
+            cryptoRatesRepository.subscribeOnChange(cryptoRates => {
+                if (!unmount) {
+                    return
+                }
+                try {
+                    this.setState({cryptoRates: cryptoRates});
+                } catch (e) {
+                    console.error(e)
+                }
+            });
+            historyRepository.subscribeOnChange(history => {
+                if (!unmount) {
+                    return
+                }
+                try {
+                    this.setState({historyData: history});
+                } catch (e) {
+                    console.error(e)
+                }
+            });
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     componentWillUnmount() {
