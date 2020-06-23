@@ -18,7 +18,13 @@ export default class LocalStorageRepository {
 
     save(data) {
         localStorage.setItem(this.name, JSON.stringify(data));
-        this.subscribers.forEach(subscriber => subscriber(data))
+        this.subscribers.forEach(subscriber => {
+            try {
+                subscriber(data)
+            } catch (e) {
+                console.error(e)
+            }
+        })
     }
 
     subscribeOnChange(consumer) {
