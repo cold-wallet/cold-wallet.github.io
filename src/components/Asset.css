@@ -1,5 +1,12 @@
+.asset-item--main-controls-row {
+  display: flex;
+  padding: 1%;
+  justify-content: space-between;
+}
+
 .asset-item--active,
 .asset-item {
+  flex-flow: column;
   display: flex;
   padding: 1%;
   justify-content: space-between;

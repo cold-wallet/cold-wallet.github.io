@@ -50,6 +50,7 @@ export class AssetsGroup extends React.Component {
     }
 
     buildNewAssetItem() {
+        let nameInput;
         const props = {
             key: "new-" + this.props.group.type,
             name: this.state.newAsset?.name || "",
@@ -58,72 +59,85 @@ export class AssetsGroup extends React.Component {
                 || buildTemplateAssetDTO(this.props.group.type).currency,
         };
         return <div key={props.key} className={"asset-item--active"}>
-            <div className={"asset-item-value"}>
-                <NumberFormat
-                    allowNegative={false}
-                    getInputRef={(input) => {
-                        props.valueInput = input;
-                        input && this.state.newAsset && input.focus();
-                    }}
-                    isNumericString={true}
-                    displayType={"input"}
-                    decimalScale={(this.props.group.type === "crypto") ? 8 : 2}
-                    thousandSeparator={true}
-                    defaultValue={(props.amount || props.value || "")}
-                    onValueChange={(values) => {
-                        const {floatValue} = values;
-                        // {
-                        //     formattedValue: '$23,234,235.56', //value after applying formatting
-                        //     value: '23234235.56', //non formatted value as numeric string 23234235.56,
-                        //     // if you are setting this value to state make sure to pass isNumericString prop to true
-                        //     floatValue: 23234235.56 //floating point representation. For big numbers it
-                        //     // can have exponential syntax
-                        // }
-                        props.valueAsNumber = floatValue
-                    }}
-                    renderText={value => <div className={
-                        "asset-item-value-input" +
-                        (this.state.newAsset?.isInvalid ? " asset-item-value-input--invalid" : "")
-                    }>{value}</div>}
-                />
-            </div>
-            <div className={"asset-item-currency"}>
-                <span translate="no" className={"asset-item-currency-name"}>{props.currencyCode}</span>
-            </div>
-            <div className={"asset-item-buttons-container"}>{[
-                <button
-                    key={"accept-new-asset-button"}
-                    onClick={() => {
-                        if (this.checkIsInvalid(props.valueAsNumber)) {
-                            const newAsset = this.state.newAsset
-                                || (() => buildTemplateAssetDTO(this.props.group.type))();
-                            newAsset.isInvalid = true;
-                            this.setState({newAsset: newAsset});
+            <div className="asset-item--main-controls-row">
+                <div className={"asset-item-value"}>
+                    <NumberFormat
+                        allowNegative={false}
+                        getInputRef={(input) => {
+                            props.valueInput = input;
+                            input && this.state.newAsset && input.focus();
+                        }}
+                        isNumericString={true}
+                        displayType={"input"}
+                        decimalScale={(this.props.group.type === "crypto") ? 8 : 2}
+                        thousandSeparator={true}
+                        defaultValue={(props.amount || props.value || "")}
+                        onValueChange={(values) => {
+                            const {floatValue} = values;
+                            // {
+                            //     formattedValue: '$23,234,235.56', //value after applying formatting
+                            //     value: '23234235.56', //non formatted value as numeric string 23234235.56,
+                            //     // if you are setting this value to state make sure to pass isNumericString prop to true
+                            //     floatValue: 23234235.56 //floating point representation. For big numbers it
+                            //     // can have exponential syntax
+                            // }
+                            props.valueAsNumber = floatValue
+                        }}
+                        renderText={value => <div className={
+                            "asset-item-value-input" +
+                            (this.state.newAsset?.isInvalid ? " asset-item-value-input--invalid" : "")
+                        }>{value}</div>}
+                    />
+                </div>
+                <div className={"asset-item-currency"}>
+                    <span translate="no" className={"asset-item-currency-name"}>{props.currencyCode}</span>
+                </div>
+                <div className={"asset-item-buttons-container"}>{[
+                    <button
+                        key={"accept-new-asset-button"}
+                        onClick={() => {
+                            if (this.checkIsInvalid(props.valueAsNumber)) {
+                                const newAsset = this.state.newAsset
+                                    || (() => buildTemplateAssetDTO(this.props.group.type))();
+                                newAsset.isInvalid = true;
+                                this.setState({newAsset: newAsset});
+                                props.valueInput.focus();
+                                return;
+                            }
+                            this.addAsset(new AssetDTO(
+                                this.props.group.type,
+                                props.valueAsNumber,
+                                props.currencyCode,
+                                props.name || nameInput.value,
+                                props.description,
+                                this.state.newAsset.id,
+                            ));
+                        }}
+                        className={"accept-new-asset-button positive-button button"}>✔</button>,
+                    <button
+                        key={"delete-asset-button"}
+                        onClick={() => {
+                            props.valueInput.value = "";
+                            props.valueAsNumber = 0;
                             props.valueInput.focus();
-                            return;
-                        }
-                        this.addAsset(new AssetDTO(
-                            this.props.group.type,
-                            props.valueAsNumber,
-                            props.currencyCode,
-                            props.name,
-                            props.description,
-                            this.state.newAsset.id,
-                        ));
-                    }}
-                    className={"accept-new-asset-button positive-button button"}>✔</button>,
-                <button
-                    key={"delete-asset-button"}
-                    onClick={() => {
-                        props.valueInput.value = "";
-                        props.valueAsNumber = 0;
-                        props.valueInput.focus();
-                        this.setState({
-                            newAsset: null
-                        });
-                    }}
-                    className={"delete-asset-button negative-button button"}>✖</button>
-            ]}</div>
+                            this.setState({
+                                newAsset: null
+                            });
+                        }}
+                        className={"delete-asset-button negative-button button"}>✖</button>
+                ]}</div>
+            </div>
+            <div className={"new-asset-menu--data-edit"} key={"inputs"}>
+                <div><label>
+                    <div className="new-asset-menu--data-name-input-label">Short name:</div>
+                    <input
+                        ref={instance => {
+                            (nameInput = instance) && (nameInput.value = props.name);
+                        }}
+                        type="text"
+                        className={"new-asset-menu--data-name-input"}/>
+                </label></div>
+            </div>
         </div>
     }
 
@@ -148,8 +162,10 @@ export class AssetsGroup extends React.Component {
             asset,
             value: asset.amount,
             currencyCode: asset.currency,
-            onAccepted: (amount) => {
+            onAccepted: ({amount, name, description}) => {
                 asset.amount = amount;
+                asset.name = name;
+                asset.description = description;
                 delete asset.editModeEnabled;
                 const assets = this.state.assets;
                 assets[i] = asset;
@@ -177,71 +193,105 @@ export class AssetsGroup extends React.Component {
                     assets: this.state.assets,
                 })
             },
+            onEditCancelRequested: () => {
+                delete asset.editModeEnabled;
+                this.setState({
+                    assets: this.state.assets,
+                })
+            },
         })).map(props => {
-            const _state = {
-                valueInput: {
-                    valueAsNumber: props.asset.amount,
-                }
-            };
+            let amount = props.asset.amount;
+            let nameInput;
             return (
                 <div translate="no" key={props.key} className={"asset-item"}>
-                    <div className={"asset-item-value"}>
-                        <NumberFormat
-                            allowNegative={false}
-                            getInputRef={(input) => {
-                                input && input.focus();
-                            }}
-                            isNumericString={true}
-                            displayType={props.editModeEnabled ? "input" : "text"}
-                            decimalScale={(props.asset.type === "crypto") ? 8 : 2}
-                            thousandSeparator={true}
-                            disabled={!props.editModeEnabled}
-                            value={noExponents(props.asset.amount)}
-                            onValueChange={(values) => {
-                                const {floatValue} = values;
-                                // {
-                                //     formattedValue: '$23,234,235.56', //value after applying formatting
-                                //     value: '23234235.56', //non formatted value as numeric string 23234235.56,
-                                //     // if you are setting this value to state make sure to pass isNumericString prop to true
-                                //     floatValue: 23234235.56 //floating point representation. For big numbers it
-                                //     // can have exponential syntax
-                                // }
-                                _state.valueInput.valueAsNumber = floatValue
-                            }}
-                            renderText={value => <div className={
-                                "asset-item-value-input" +
-                                (props.isInvalid ? " asset-item-value-input--invalid" : "")
-                            }>{value}</div>}
-                        />
-                    </div>
-                    <div className={"asset-item-currency"}>
-                        <span translate="no" className={"asset-item-currency-name"}>{props.currencyCode}</span>
-                    </div>
-                    <div className={"asset-item-buttons-container"}>{[
-                        (props.editModeEnabled)
-                            ? <button
-                                key={"accept-new-asset-button"}
-                                onClick={() => {
-                                    if (this.checkIsInvalid(_state.valueInput.valueAsNumber)) {
-                                        props.enableInvalidMode();
-                                        return;
-
-                                    } else if (props.isInvalid) {
-                                        props.disableInvalidMode();
-                                    }
-
-                                    props.onAccepted(_state.valueInput.valueAsNumber);
+                    <div className="asset-item--main-controls-row">
+                        <div className={"asset-item-value"}>
+                            <NumberFormat
+                                allowNegative={false}
+                                getInputRef={(input) => {
+                                    input && input.focus();
                                 }}
-                                className={"accept-new-asset-button positive-button button"}>✔</button>
-                            : <button
-                                key={"edit-asset-button"}
-                                onClick={() => props.onEditRequested()}
-                                className={"edit-asset-button neutral-button pencil-icon button"}>🖉</button>,
-                        <button
-                            key={"delete-asset-button"}
-                            onClick={() => props.onDelete()}
-                            className={"delete-asset-button negative-button button"}>✖</button>
-                    ]}</div>
+                                isNumericString={true}
+                                displayType={props.editModeEnabled ? "input" : "text"}
+                                decimalScale={(props.asset.type === "crypto") ? 8 : 2}
+                                thousandSeparator={true}
+                                disabled={!props.editModeEnabled}
+                                value={noExponents(props.asset.amount)}
+                                onValueChange={(values) => {
+                                    const {floatValue} = values;
+                                    // {
+                                    //     formattedValue: '$23,234,235.56', //value after applying formatting
+                                    //     value: '23234235.56', //non formatted value as numeric string 23234235.56,
+                                    //     // if you are setting this value to state make sure to pass isNumericString prop to true
+                                    //     floatValue: 23234235.56 //floating point representation. For big numbers it
+                                    //     // can have exponential syntax
+                                    // }
+                                    amount = floatValue
+                                }}
+                                renderText={value => <div className={
+                                    "asset-item-value-input" +
+                                    (props.isInvalid ? " asset-item-value-input--invalid" : "")
+                                }>{value}</div>}
+                            />
+                        </div>
+                        <div className={"asset-item-currency"}>
+                            <span translate="no" className={"asset-item-currency-name"}>{props.currencyCode}</span>
+                        </div>
+                        <div className={"asset-item-buttons-container"}>{[
+                            (props.editModeEnabled)
+                                ? <button
+                                    key={"accept-new-asset-button"}
+                                    onClick={() => {
+                                        if (this.checkIsInvalid(amount)) {
+                                            props.enableInvalidMode();
+                                            return;
+
+                                        } else if (props.isInvalid) {
+                                            props.disableInvalidMode();
+                                        }
+
+                                        props.onAccepted({
+                                            amount: amount,
+                                            name: nameInput.value,
+                                        });
+                                    }}
+                                    className={"accept-new-asset-button positive-button button"}>✔</button>
+                                : <button
+                                    key={"edit-asset-button"}
+                                    onClick={() => props.onEditRequested()}
+                                    className={"edit-asset-button neutral-button pencil-icon button"}>🖉</button>,
+                            (props.editModeEnabled)
+                                ? <button
+                                    key={"cancel-editing-asset-button"}
+                                    onClick={() => props.onEditCancelRequested()}
+                                    className={"cancel-editing-asset-button neutral-button button"}>
+                                    <img alt="discard changes"
+                                         className="cancel-editing-asset-button--image"
+                                         src="https://img.icons8.com/android/24/000000/cancel.png"/>
+                                </button>
+                                : <button
+                                    key={"delete-asset-button"}
+                                    onClick={() => props.onDelete()}
+                                    className={"delete-asset-button negative-button button"}>✖</button>
+                        ]}</div>
+                    </div>
+                    {
+                        !props.editModeEnabled ? null :
+                            <div className={"new-asset-menu--data-edit"} key={"inputs"}>
+                                <div><label>
+                                    <div className="new-asset-menu--data-name-input-label">Short name:</div>
+                                    <input
+                                        ref={instance => {
+                                            nameInput = instance;
+                                            if (nameInput) {
+                                                nameInput.value = props.asset.name;
+                                            }
+                                        }}
+                                        type="text"
+                                        className={"new-asset-menu--data-name-input"}/>
+                                </label></div>
+                            </div>
+                    }
                 </div>
             )
         })
