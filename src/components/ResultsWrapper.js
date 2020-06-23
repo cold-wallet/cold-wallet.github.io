@@ -1039,11 +1039,18 @@ function addCommas(toMe) {
         .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
 }
 
+function getCurrencyInfo(currency) {
+    return getListOfTopCurrenciesByType()[currency] || {
+        name: currency,
+        code: "",
+        htmlCode: <span className={"chart-currencies-switch-controls--currency-name"}>{currency}</span>,
+    }
+}
+
 function buildCurrenciesSwitchControls(currencyToType, onCurrencySelected, currentCurrency) {
-    const currencyToInfo = getListOfTopCurrenciesByType();
     return <div className="chart-currencies-switch-controls-wrapper">{
         Object.keys(currencyToType).map((currency, i) => {
-            const info = currencyToInfo[currency];
+            const info = getCurrencyInfo(currency);
             return <div key={i}
                         title={info.name}
                         onClick={() => onCurrencySelected(currency)}

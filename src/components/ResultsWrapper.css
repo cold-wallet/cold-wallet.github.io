@@ -187,6 +187,10 @@
   height: 85%;
 }
 
+.chart-currencies-switch-controls--currency-icon-wrapper .chart-currencies-switch-controls--currency-name {
+  font-size: 180%;
+}
+
 .chart-currencies-switch-controls--currency-icon-wrapper .chart-currencies-switch-controls--currency-icon {
   font-size: 330%;
 }
