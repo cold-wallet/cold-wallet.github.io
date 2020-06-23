@@ -29,7 +29,7 @@ export default {
             .catch(onError)
     },
     getRates(ratesConsumer, onError) {
-        axios.get("https://api.monobank.ua/bank/currency")
+        axios.get(baseUrl + "/bank/currency")
             .then(response => {
                 if (response
                     && (response.status === 200)
