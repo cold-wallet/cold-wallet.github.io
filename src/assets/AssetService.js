@@ -3,6 +3,7 @@ import settingsRepository from "../repo/SettingsRepository";
 import monobankUserDataRepository from "../repo/MonobankUserDataRepository";
 import currencies from "../extensions/currencies";
 import AssetDTO from "../components/AssetDTO";
+import compareStrings from "../extensions/compareStrings";
 
 const assetsService = {
     getCurrentAssets() {
@@ -35,7 +36,7 @@ function extractAssets(assets) {
         const monobankUserInfo = monobankUserDataRepository.getLatest();
         if (monobankUserInfo && monobankUserInfo.accounts) {
             let monobankAssets = monobankUserInfo.accounts
-                .sort((a, b) => (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)))
+                .sort((a, b) => compareStrings(a.id, b.id))
                 .map(account => {
                     const currency = currencies.getByNumCode(account.currencyCode).code;
                     const name = `monobank ${currency} ${account.maskedPan ? account.maskedPan[0] : ""} ${account.type}`;

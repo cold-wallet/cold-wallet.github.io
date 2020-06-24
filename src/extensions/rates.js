@@ -3,6 +3,7 @@ import currencies from "./currencies";
 import fiatRatesRepository from "../repo/FiatRatesRepository";
 import cryptoRatesRepository from "../repo/CryptoRatesRepository";
 import monobankApiClient from "./monobankApiClient";
+import compareStrings from "./compareStrings";
 
 const uahNumCode = 980;
 const BTC = "BTC";
@@ -249,7 +250,7 @@ export default {
                 }
                 return result
             }, {}))
-            .sort((a, b) => (a.code < b.code ? -1 : (a.code > b.code ? 1 : 0)))
+            .sort((a, b) => compareStrings(a.code, b.code))
     },
     transformAssetValue(asset, resultCurrencyCode, resultType) {
         return resultType === "crypto"
