@@ -1042,8 +1042,8 @@ function addCommas(toMe) {
 function getCurrencyInfo(currency) {
     return getListOfTopCurrenciesByType()[currency] || {
         name: currency,
-        code: "",
-        htmlCode: <span className={"chart-currencies-switch-controls--currency-name"}>{currency}</span>,
+        code: currency,
+        htmlCode: <span className={"chart-currencies-switch-controls--currency-icon asset-currency-icon"}>+</span>,
     }
 }
 
