@@ -33,6 +33,7 @@ export class AssetsGroup extends React.Component {
             </div>
             <div className={"add-asset-button-wrapper"}>
                 <button className={"add-asset-button positive-button"}
+                        title={"Add new asset"}
                         onClick={() => this._onAddAssetButtonClick()}
                 ><strong>+</strong>
                 </button>
@@ -96,6 +97,7 @@ export class AssetsGroup extends React.Component {
                 <div className={"asset-item-buttons-container"}>{[
                     <button
                         key={"accept-new-asset-button"}
+                        title={"accept"}
                         onClick={() => {
                             if (this.checkIsInvalid(props.valueAsNumber)) {
                                 const newAsset = this.state.newAsset
@@ -117,6 +119,7 @@ export class AssetsGroup extends React.Component {
                         className={"accept-new-asset-button positive-button button"}>✔</button>,
                     <button
                         key={"delete-asset-button"}
+                        title={"delete"}
                         onClick={() => {
                             props.valueInput.value = "";
                             props.valueAsNumber = 0;
@@ -245,6 +248,7 @@ export class AssetsGroup extends React.Component {
                                 (props.editModeEnabled)
                                     ? <button
                                         key={"accept-new-asset-button"}
+                                        title={"accept"}
                                         onClick={() => {
                                             if (this.checkIsInvalid(amount)) {
                                                 props.enableInvalidMode();
@@ -262,11 +266,13 @@ export class AssetsGroup extends React.Component {
                                         className={"accept-new-asset-button positive-button button"}>✔</button>
                                     : <button
                                         key={"edit-asset-button"}
+                                        title={"edit"}
                                         onClick={() => props.onEditRequested()}
                                         className={"edit-asset-button neutral-button pencil-icon button"}>🖉</button>,
                                 (props.editModeEnabled)
                                     ? <button
                                         key={"cancel-editing-asset-button"}
+                                        title={"cancel"}
                                         onClick={() => props.onEditCancelRequested()}
                                         className={"cancel-editing-asset-button neutral-button button"}>
                                         <img alt="discard changes"
@@ -275,6 +281,7 @@ export class AssetsGroup extends React.Component {
                                     </button>
                                     : <button
                                         key={"delete-asset-button"}
+                                        title={"delete"}
                                         onClick={() => props.onDelete()}
                                         className={"delete-asset-button negative-button button"}>✖</button>
                             ]}</div>}

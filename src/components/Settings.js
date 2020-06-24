@@ -280,6 +280,7 @@ export default class Settings extends React.Component {
                                 }
                                 this.setState(state);
                             }}
+                            title={"save"}
                             className="settings--control settings--controls-save">Save
                         </button>
                     </div>
