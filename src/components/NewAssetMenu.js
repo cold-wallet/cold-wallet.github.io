@@ -57,16 +57,18 @@ export class NewAssetMenu extends React.Component {
                                             })}>
                                         <option disabled selected value> -- select currency --</option>
                                         {
-                                            (this.props.assetType === "crypto"
-                                                ? []
-                                                : getFiatCurrencies())
-                                                .map(currency => {
-                                                    return (
-                                                        <option key={currency.code}
-                                                                title={currency.name}
-                                                                value={currency.code}>{currency.code}{"\t"}- {currency.name}</option>
-                                                    )
-                                                })
+                                            rates.getCurrenciesByType(this.props.assetType).map(currency => {
+                                                return (
+                                                    <option key={currency.code}
+                                                            title={currency.name}
+                                                            value={currency.code}>{
+                                                        currency.code + (currency.crypto
+                                                                ? ""
+                                                                : `\t - ${currency.name}`
+                                                        )
+                                                    }</option>
+                                                )
+                                            })
                                         }</select>
                                 </div>
                             </div>
@@ -86,10 +88,6 @@ export class NewAssetMenu extends React.Component {
         });
         this.props.hideMenu();
     }
-}
-
-function getFiatCurrencies() {
-    return rates.getFiatCurrencies()
 }
 
 function getListOfTopCurrenciesByType(type) {

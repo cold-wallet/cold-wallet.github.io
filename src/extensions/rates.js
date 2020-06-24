@@ -4,6 +4,7 @@ import fiatRatesRepository from "../repo/FiatRatesRepository";
 import cryptoRatesRepository from "../repo/CryptoRatesRepository";
 import monobankApiClient from "./monobankApiClient";
 import compareStrings from "./compareStrings";
+import cryptoCurrenciesRepository from "../repo/CryptoCurrenciesRepository";
 
 const uahNumCode = 980;
 const BTC = "BTC";
@@ -23,6 +24,8 @@ let terminated = false;
 
 const fiatRatesTimeout = 300_000;
 const cryptoRatesTimeout = 300_000;
+
+const binanceApiUrl = "https://api.binance.com";
 
 (function fetchLatestRates() {
     if (terminated) {
@@ -61,12 +64,49 @@ const cryptoRatesTimeout = 300_000;
     }
 })();
 
+(function fetchCryptoCurrencies() {
+    if (terminated) {
+        return
+    }
+    try {
+        axios.get(binanceApiUrl + "/api/v3/exchangeInfo")
+            .then(response => {
+                let symbols;
+                if (response
+                    && (response.status === 200)
+                    && (symbols = response.data.symbols)
+                ) {
+                    if (symbols) {
+                        storeCryptoCurrencies(Object.keys(symbols
+                            .sort((a, b) => compareStrings(a.symbol, b.symbol))
+                            .reduce((result, symbol) => {
+                                result[symbol.baseAsset] = true;
+                                result[symbol.quoteAsset] = true;
+                                return result
+                            }, {})));
+                    }
+                } else {
+                    console.warn("Fetching latest binance symbols failed", response);
+                    throw response
+                }
+            })
+            .catch(e => {
+                console.warn(e);
+                const timeout = 10_000;
+                console.warn(`Will re-fetch cryptoRates after timeout: ${timeout / milli}s`);
+                setTimeout(fetchCryptoCurrencies, timeout);
+            })
+    } catch (e) {
+        console.error(e)
+    }
+})();
+
 (function fetchLatestCryptoCurrenciesRates() {
     if (terminated) {
         return
     }
     try {
-        axios.get("https://api.binance.com/api/v1/ticker/price")
+        axios.get(binanceApiUrl + "/api/v1/ticker/price")
             .then(response => {
                 let cryptoRates;
                 if (response
@@ -94,8 +134,25 @@ const cryptoRatesTimeout = 300_000;
 })();
 
 function getCryptoPrice(left, right) {
-    const ticker = getCryptoRates().filter(r => r.symbol === `${left}${right}`)[0] || {};
-    const price = +(ticker.price);
+    const cryptoRates = getCryptoRates();
+    let ticker = cryptoRates.filter(r => r.symbol === `${left}${right}`)[0] || {};
+    let price = +(ticker.price);
+
+    if (price && !isNaN(price)) {
+        return price;
+    }
+    ticker = cryptoRates.filter(r => r.symbol === `${right}${left}`)[0] || {};
+    price = +(ticker.price);
+
+    if (price && !isNaN(price)) {
+        return 1 / price;
+    }
+
+    const ticker1 = cryptoRates.filter(r => r.symbol === `${left}USDT`)[0] || {};
+    const price1 = +(ticker1.price);
+    const ticker2 = cryptoRates.filter(r => r.symbol === `${right}USDT`)[0] || {};
+    const price2 = +(ticker2.price);
+    price = price1 / price2;
 
     if (price && !isNaN(price)) {
         return price;
@@ -212,6 +269,14 @@ function getFiatRates() {
     return fiatRatesRepository.getLatest()
 }
 
+function storeCryptoCurrencies(data) {
+    cryptoCurrenciesRepository.save(data)
+}
+
+function getCryptoCurrencies() {
+    return cryptoCurrenciesRepository.getLatest()
+}
+
 function storeCryptoRates(cryptoRates) {
     cryptoRatesRepository.save(cryptoRates)
 }
@@ -227,11 +292,22 @@ export default {
     isReady() {
         return getFiatRates().length && getCryptoRates().length
     },
-    extractFiatRates() {
-        return getFiatRates()
+    getCurrenciesByType(type) {
+        return type === "crypto"
+            ? this.getCryptoCurrencies()
+            : this.getFiatCurrencies()
     },
-    extractCryptoRates() {
-        return getCryptoRates()
+    getCryptoCurrencies() {
+        return getCryptoCurrencies()
+            .sort(compareStrings)
+            .map(currencyStrCode => {
+                return {
+                    crypto: true,
+                    code: currencyStrCode,
+                    afterDecimalPoint: 8,
+                    name: currencyStrCode,
+                }
+            })
     },
     getFiatCurrencies() {
         return Object
