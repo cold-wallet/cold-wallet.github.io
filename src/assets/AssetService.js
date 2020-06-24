@@ -35,12 +35,13 @@ function extractAssets(assets) {
         const monobankUserInfo = monobankUserDataRepository.getLatest();
         if (monobankUserInfo && monobankUserInfo.accounts) {
             let monobankAssets = monobankUserInfo.accounts
+                .sort((a, b) => (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)))
                 .map(account => {
                     const currency = currencies.getByNumCode(account.currencyCode).code;
-                    const name = `monobank ${currency} ${account.maskedPan[0]} ${account.type}`;
+                    const name = `monobank ${currency} ${account.maskedPan ? account.maskedPan[0] : ""} ${account.type}`;
                     return new AssetDTO(
                         'fiat',
-                        account.balance / 100,
+                        (account.balance || 0) / 100,
                         currency,
                         name,
                         name,
