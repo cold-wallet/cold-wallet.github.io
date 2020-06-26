@@ -1135,7 +1135,7 @@ function getListOfTopCurrenciesByType() {
 }
 
 function buildTitle(asset) {
-    const percentage = asset.percentage || asset.percents;
+    const percentage = asset.percentage || asset.percents || 0;
     const afterDecimalPoint = percentage < 0.01 ? 8 : 2;
     const amount = noExponents(addCommas(asset.amount));
     const percents = numberFormat(percentage, afterDecimalPoint);
