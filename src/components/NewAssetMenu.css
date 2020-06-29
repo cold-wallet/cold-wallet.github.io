@@ -96,6 +96,9 @@
 
 .new-asset-menu--data-edit {
   padding: 1% 5% 5% 5%;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-evenly;
 }
 
 .new-asset-menu--data {

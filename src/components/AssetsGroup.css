@@ -1,3 +1,7 @@
+label {
+  cursor: pointer;
+}
+
 .assets-group {
   background: linear-gradient(#F0F8FF, #BFD0DF);
   overflow-y: auto;
