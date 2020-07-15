@@ -111,7 +111,7 @@ export class AssetsGroup extends React.Component {
                                 this.props.group.type,
                                 props.valueAsNumber,
                                 props.currencyCode,
-                                props.name || nameInput.value,
+                                nameInput.value || props.name,
                                 props.description,
                                 this.state.newAsset.id,
                             ));
