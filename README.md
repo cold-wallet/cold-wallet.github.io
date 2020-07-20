@@ -2,6 +2,7 @@ Cold Wallet
 ===========
 
 ![](https://github.com/cold-wallet/cold-wallet.github.io/workflows/CI/CD%20Pipeline/badge.svg)
+![](https://img.shields.io/github/v/tag/cold-wallet/cold-wallet.github.io)
 
 [Cold Wallet - anonymous financial assets dashboard](https://cold-wallet.github.io/)
 
@@ -23,8 +24,8 @@ Features:
 [Green gamma](https://coolors.co/a9ddd6-8cbeb7-6f9f98-35605a-2e3532),
 [Charts green](https://coolors.co/d8f3dc-b7e4c7-a6ddbd-95d5b2-74c69d-52b788-40916c-2d6a4f-1b4332-081c15)
 
-![t](https://github.com/cold-wallet/cold-wallet.github.io/raw/dev/resources/screen3.png)
+![](https://github.com/cold-wallet/cold-wallet.github.io/raw/dev/resources/screen3.png)
 
-![t](https://github.com/cold-wallet/cold-wallet.github.io/raw/dev/resources/screen4.png)
+![](https://github.com/cold-wallet/cold-wallet.github.io/raw/dev/resources/screen4.png)
 
-![t](https://github.com/cold-wallet/cold-wallet.github.io/raw/dev/resources/screen5.png)
+![](https://github.com/cold-wallet/cold-wallet.github.io/raw/dev/resources/screen5.png)
