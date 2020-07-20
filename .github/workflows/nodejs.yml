@@ -20,16 +20,13 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials
         # to false in most cases for the deployment to work correctly.
-
-      - name: Install and Build 🔧 # This example project is built using npm and outputs the
-        # result to the 'build' folder. Replace with the commands required to build your project,
-        # or remove this step entirely if your site is pre-built.
-      - run: npm install
-      - run: npm run build
+      - name: Install 🔧
+        run: npm install
+      - name: Build 🔧
+        run: npm run build
       - run: git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
       - run: npm version patch --force
       - run: git push --tags && git push
-
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
