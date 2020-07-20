@@ -7,12 +7,10 @@ import numberFormat, {numberFormatByType} from "../extensions/numberFormat";
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import './../extensions/highChartTheme'
-import rates from "../extensions/rates";
+import rates from "../integration/ratesClient";
 import highCharts3d from 'highcharts/highcharts-3d'
 import treemap from 'highcharts/modules/treemap'
 import historyService from "../history/historyService";
-import fiatRatesRepository from "../repo/FiatRatesRepository";
-import cryptoRatesRepository from "../repo/CryptoRatesRepository";
 import historyRepository from "../history/HistoryRepository";
 import btcIcon from "../resources/currencies/btc.png";
 import ethIcon from "../resources/currencies/eth.png";
@@ -61,26 +59,6 @@ export default class ResultsWrapper extends React.Component {
             assetsService.subscribeOnChange(assets => {
                 this.setState({assets: assets.assets})
             });
-            fiatRatesRepository.subscribeOnChange(fiatRates => {
-                if (!unmount) {
-                    return
-                }
-                try {
-                    this.setState({fiatRates: fiatRates});
-                } catch (e) {
-                    console.error(e)
-                }
-            });
-            cryptoRatesRepository.subscribeOnChange(cryptoRates => {
-                if (!unmount) {
-                    return
-                }
-                try {
-                    this.setState({cryptoRates: cryptoRates});
-                } catch (e) {
-                    console.error(e)
-                }
-            });
             historyRepository.subscribeOnChange(history => {
                 if (!unmount) {
                     return
@@ -104,6 +82,9 @@ export default class ResultsWrapper extends React.Component {
     render() {
         if (!this.state.assets || !rates.isReady()) {
             return null;
+        }
+        if (this.state.historyData) {
+            console.log("historyData", this.state.historyData)
         }
         return <div className={"results-wrapper"}>
             <div className="results-one-more-wrap-layer">
@@ -150,7 +131,7 @@ export default class ResultsWrapper extends React.Component {
                 }
                 let assets = extractAllAssets(data)
                     .map(asset => {
-                        asset.usdAmount = rates.transformAssetValueToFiat(asset, USD);
+                        asset.usdAmount = rates.transformAssetValue(asset, USD);
                         return asset
                     })
                     .sort((a, b) => b.usdAmount - a.usdAmount)
@@ -818,7 +799,7 @@ export default class ResultsWrapper extends React.Component {
 
                 let preparedAssets = allAssets
                     .map((asset, i) => {
-                        const value = rates.transformAssetValue(asset, currentCurrency, currentType);
+                        const value = rates.transformAssetValue(asset, currentCurrency);
                         totalValue += value;
                         let colorIndex = i;
                         while (colorIndex > (colors.length - 1)) {
@@ -983,11 +964,8 @@ export default class ResultsWrapper extends React.Component {
 
                                 if (asset.currency === resultCurrencyCode) {
                                     amount = asset.amount
-
-                                } else if (resultCurrencyType === "crypto") {
-                                    amount = rates.transformAssetValueToCrypto(asset, resultCurrencyCode);
                                 } else {
-                                    amount = rates.transformAssetValueToFiat(asset, resultCurrencyCode);
+                                    amount = rates.transformAssetValue(asset, resultCurrencyCode);
                                 }
                                 totalAmount += +amount;
 

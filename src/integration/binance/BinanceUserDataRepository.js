@@ -1,4 +1,4 @@
-import LocalStorageRepository from "./LocalStorageRepository";
+import LocalStorageRepository from "../../extensions/LocalStorageRepository";
 
 const binanceUserDataRepository = LocalStorageRepository.builder()
     .name('binance-user-data')

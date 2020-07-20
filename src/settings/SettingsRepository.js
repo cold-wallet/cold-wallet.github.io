@@ -1,4 +1,4 @@
-import LocalStorageRepository from "./LocalStorageRepository";
+import LocalStorageRepository from "../extensions/LocalStorageRepository";
 
 const settingsRepository = LocalStorageRepository.builder()
     .name('settings')

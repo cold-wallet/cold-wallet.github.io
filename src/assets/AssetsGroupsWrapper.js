@@ -1,11 +1,11 @@
 import React from "react";
-import {NewAssetMenu} from "./NewAssetMenu";
-import {AssetsGroup} from "./AssetsGroup";
+import NewAssetMenu from "./NewAssetMenu";
+import AssetsGroup from "./AssetsGroup";
 import AssetDTO from "./AssetDTO";
 import './AssetsGroupsWrapper.css';
 import assetsService from "../assets/AssetService";
 
-export class AssetsGroupsWrapper extends React.Component {
+export default class AssetsGroupsWrapper extends React.Component {
 
     state = {
         showMenu: false,

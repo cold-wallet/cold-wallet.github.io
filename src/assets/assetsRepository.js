@@ -1,4 +1,4 @@
-import LocalStorageRepository from "../repo/LocalStorageRepository";
+import LocalStorageRepository from "../extensions/LocalStorageRepository";
 
 const assetsRepository = LocalStorageRepository.builder()
     .name('data')

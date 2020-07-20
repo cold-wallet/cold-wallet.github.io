@@ -6,9 +6,9 @@ import NumberFormat from "react-number-format";
 import noExponents from "../extensions/noExponents";
 import uuidGenerator from "../extensions/uuid-generator";
 import assetsService from "../assets/AssetService";
-import settingsRepository from "../repo/SettingsRepository";
+import settingsRepository from "../settings/SettingsRepository";
 
-export class AssetsGroup extends React.Component {
+export default class AssetsGroup extends React.Component {
 
     static defaultProps = {
         spawnMenu: ({onSettingsSet}) => false,

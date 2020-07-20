@@ -1,7 +1,5 @@
-import rates from "../extensions/rates";
+import rates from "../integration/ratesClient";
 import numberFormat from "../extensions/numberFormat";
-import fiatRatesRepository from "../repo/FiatRatesRepository";
-import cryptoRatesRepository from "../repo/CryptoRatesRepository";
 import historyRepository from "./HistoryRepository"
 import assetsService from "../assets/AssetService";
 
@@ -16,14 +14,14 @@ const historyService = {
         }
         const now = Date.now();
         const lastHistory = this.readHistory();
+        const partialPerCurrencies = lastHistory.partialPerCurrencies || {};
         const currentTotalNamed = lastHistory.totalSeriesNamed || {};
         const currentTotalValues = Object.values(currentTotalNamed);
-        const partialPerCurrencies = lastHistory.partialPerCurrencies || {};
-        const prev = (currentTotalValues.length
-            && currentTotalValues[0]
-            && currentTotalValues[0].data
-            && currentTotalValues[0].data.length)
-            ? currentTotalValues[0].data[currentTotalValues[0].data.length - 1][0]
+        const currentTotalValue = currentTotalValues[0];
+        const prev = (currentTotalValue
+            && currentTotalValue.data
+            && currentTotalValue.data.length)
+            ? currentTotalValue.data[currentTotalValue.data.length - 1][0]
             : now - 1000;
         const prevData = prev ? [[prev, 0]] : [];
         const allAssets = [].concat(assets.fiat?.assets || assets.cash.assets.concat(assets["non-cash"].assets))
@@ -42,7 +40,7 @@ const historyService = {
                 }
                 const type = currencyToType[currency];
                 const afterDecimalPoint = type === "crypto" ? 8 : 2;
-                const value = numberFormat(rates.transformAssetValue(asset, currency, type), afterDecimalPoint);
+                const value = numberFormat(rates.transformAssetValue(asset, currency), afterDecimalPoint);
                 const newItem = [now, value];
                 let data = [].concat(partialPerCurrencies[currency][identifier]?.data || prevData);
                 data.push(newItem);
@@ -71,9 +69,7 @@ const historyService = {
         });
         allAssets.forEach(asset => {
             newTotalDataPerCurrency.forEach(info => {
-                const amount = rates.transformAssetValue(
-                    asset, info.currency, info.__type
-                );
+                const amount = rates.transformAssetValue(asset, info.currency);
                 const last = info.data.length - 1;
                 info.name = info.currency;
                 info.data[last][1] = numberFormat(info.data[last][1] + amount,
@@ -93,8 +89,7 @@ const historyService = {
 };
 
 assetsService.subscribeOnChange(assets => historyService.updateHistory(assets));
-fiatRatesRepository.subscribeOnChange(rates => historyService.updateHistory(assetsService.getCurrentAssets()));
-cryptoRatesRepository.subscribeOnChange(cryptoRates => historyService.updateHistory(assetsService.getCurrentAssets()));
+rates.triggerOnChange(() => historyService.updateHistory(assetsService.getCurrentAssets()));
 
 export default historyService
 

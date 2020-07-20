@@ -1,8 +1,8 @@
 import assetsRepository from "./assetsRepository";
-import settingsRepository from "../repo/SettingsRepository";
-import monobankUserDataRepository from "../repo/MonobankUserDataRepository";
+import settingsRepository from "../settings/SettingsRepository";
+import monobankUserDataRepository from "../integration/monobank/MonobankUserDataRepository";
 import currencies from "../extensions/currencies";
-import AssetDTO from "../components/AssetDTO";
+import AssetDTO from "./AssetDTO";
 import compareStrings from "../extensions/compareStrings";
 
 const assetsService = {

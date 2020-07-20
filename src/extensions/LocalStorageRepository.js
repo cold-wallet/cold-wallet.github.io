@@ -50,8 +50,8 @@ class Builder {
         return this
     }
 
-    subscribers(dataConsumers) {
-        this._dataConsumers = dataConsumers;
+    subscribers(subscribers) {
+        this._subscribers = subscribers;
         return this
     }
 
@@ -60,7 +60,7 @@ class Builder {
         repo.name = this._name;
         repo.nullObject = this._nullObject;
         repo.nullObjectSupplier = this._nullObjectSupplier;
-        repo.subscribers.concat(this._dataConsumers);
+        repo.subscribers = this._subscribers || [];
         return repo
     }
 }

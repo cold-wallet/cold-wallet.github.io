@@ -1,11 +1,11 @@
 import React from 'react';
 import './App.css';
 import ResultsWrapper from "./components/ResultsWrapper";
-import {AssetsGroupsWrapper} from "./components/AssetsGroupsWrapper";
+import AssetsGroupsWrapper from "./assets/AssetsGroupsWrapper";
 import "./fonts.scss";
 import "./mixin.scss";
 import "./reset.scss";
-import Settings from "./components/Settings";
+import Settings from "./settings/Settings";
 
 
 export default function App() {

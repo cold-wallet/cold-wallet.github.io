@@ -6,9 +6,9 @@ import ethIcon from '../resources/currencies/eth.png'
 import ltcIcon from '../resources/currencies/ltc.png'
 import eosIcon from '../resources/currencies/eos.png'
 import bchIcon from '../resources/currencies/bch.png'
-import rates from "../extensions/rates";
+import rates from "../integration/ratesClient";
 
-export class NewAssetMenu extends React.Component {
+export default class NewAssetMenu extends React.Component {
     static defaultProps = {
         hideMenu: () => false,
         assetType: '',

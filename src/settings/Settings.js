@@ -1,10 +1,10 @@
 import * as React from "react";
 import './Settings.css'
-import settingsRepository from "../repo/SettingsRepository";
-import monobankApiClient from "../extensions/monobankApiClient";
-import monobankUserDataRepository from "../repo/MonobankUserDataRepository";
-import binanceUserDataRepository from "../repo/BinanceUserDataRepository";
-import LocalStorageRepository from "../repo/LocalStorageRepository";
+import settingsRepository from "../settings/SettingsRepository";
+import monobankApiClient from "../integration/monobank/monobankApiClient";
+import monobankUserDataRepository from "../integration/monobank/MonobankUserDataRepository";
+import binanceUserDataRepository from "../integration/binance/BinanceUserDataRepository";
+import LocalStorageRepository from "../extensions/LocalStorageRepository";
 
 const binanceLocker = LocalStorageRepository.builder()
     .name('binance-locker')
