@@ -24,9 +24,11 @@ jobs:
       - name: Install and Build 🔧 # This example project is built using npm and outputs the
         # result to the 'build' folder. Replace with the commands required to build your project,
         # or remove this step entirely if your site is pre-built.
-        run: |
-          npm install
-          npm run build
+      - run: npm install
+      - run: npm run build
+      - run: git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
+      - run: npm version patch --force
+      - run: git push --tags && git push
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
@@ -36,7 +38,7 @@ jobs:
           FOLDER: build # The folder the action should deploy.
           SINGLE_COMMIT: true # This option can be toggled to true if you'd prefer to have a single commit on the
             # deployment branch instead of maintaining the full history. Using this option will also cause any existing
-            # history to be wiped from the deployment branch.
+          # history to be wiped from the deployment branch.
           CLEAN: true # clean build folder up
 
       - name: npm logs
