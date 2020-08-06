@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "gh-pages": "^2.2.0",
-    "react-devtools": "^4.6.0"
+    "react-devtools": "^4.8.2"
   },
   "scripts": {
     "start": "react-scripts start",
