@@ -42,7 +42,7 @@ const historyService = {
                 const afterDecimalPoint = type === "crypto" ? 8 : 2;
                 const value = numberFormat(rates.transformAssetValue(asset, currency), afterDecimalPoint);
                 const newItem = [now, value];
-                let data = [].concat(partialPerCurrencies[currency][identifier]?.data || prevData);
+                let data = [].concat(partialPerCurrencies[currency][identifier]?.data || [...prevData]);
                 data.push(newItem);
                 partialPerCurrencies[currency][identifier] = {
                     id: identifier,
@@ -53,7 +53,7 @@ const historyService = {
             activeCurrenciesToNewData[asset.currency] = currentTotalNamed[asset.currency]
                 || (currentTotalNamed[asset.currency] = {
                     id: identifier,
-                    data: prevData,
+                    data: [...prevData],
                     name: asset.currency,
                     __type: asset.type,
                     currency: asset.currency,
