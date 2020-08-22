@@ -57,10 +57,17 @@ export default class ResultsWrapper extends React.Component {
         try {
             unmount = false;
             assetsService.subscribeOnChange(assets => {
-                this.setState({assets: assets.assets})
+                if (document.hidden || unmount) {
+                    return
+                }
+                try {
+                    this.setState({assets: assets.assets})
+                } catch (e) {
+                    console.error(e)
+                }
             });
             historyRepository.subscribeOnChange(history => {
-                if (!unmount) {
+                if (document.hidden || unmount) {
                     return
                 }
                 try {
