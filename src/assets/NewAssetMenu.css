@@ -120,7 +120,8 @@
 }
 
 .new-asset-menu--data-description-input,
-.new-asset-menu--data-name-input {
+.new-asset-menu--data-name-input,
+.new-asset-menu--data-address-input {
   width: 95%;
   padding: 1%;
 }
@@ -138,6 +139,7 @@
 }
 
 .new-asset-menu--data-description-input-label,
+.new-asset-menu--data-address-input-label,
 .new-asset-menu--data-name-input-label {
   padding: 1%;
 }

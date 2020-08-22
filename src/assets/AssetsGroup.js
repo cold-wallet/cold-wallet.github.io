@@ -7,6 +7,7 @@ import noExponents from "../extensions/noExponents";
 import uuidGenerator from "../extensions/uuid-generator";
 import assetsService from "../assets/AssetService";
 import settingsRepository from "../settings/SettingsRepository";
+import cryptoApi from "../components/cryptoApi";
 
 export default class AssetsGroup extends React.Component {
 
@@ -53,6 +54,7 @@ export default class AssetsGroup extends React.Component {
 
     buildNewAssetItem() {
         let nameInput;
+        let addressInput;
         const props = {
             key: "new-" + this.props.group.type,
             name: this.state.newAsset?.name || "",
@@ -99,13 +101,18 @@ export default class AssetsGroup extends React.Component {
                         key={"accept-new-asset-button"}
                         title={"accept"}
                         onClick={() => {
-                            if (this.checkIsInvalid(props.valueAsNumber)) {
-                                const newAsset = this.state.newAsset
-                                    || (() => buildTemplateAssetDTO(this.props.group.type))();
-                                newAsset.isInvalid = true;
-                                this.setState({newAsset: newAsset});
-                                props.valueInput.focus();
-                                return;
+                            if (!(addressInput?.value
+                                && cryptoApi.isAddressSupportedFor(props.currencyCode)
+                                && cryptoApi.checkAddress(props.currencyCode, addressInput.value))
+                            ) {
+                                if (this.checkIsInvalid(props.valueAsNumber)) {
+                                    const newAsset = this.state.newAsset
+                                        || (() => buildTemplateAssetDTO(this.props.group.type))();
+                                    newAsset.isInvalid = true;
+                                    this.setState({newAsset: newAsset});
+                                    props.valueInput.focus();
+                                    return;
+                                }
                             }
                             this.addAsset(new AssetDTO(
                                 this.props.group.type,
@@ -114,6 +121,7 @@ export default class AssetsGroup extends React.Component {
                                 nameInput.value || props.name,
                                 props.description,
                                 this.state.newAsset.id,
+                                addressInput?.value,
                             ));
                         }}
                         className={"accept-new-asset-button positive-button button"}>✔</button>,
@@ -141,6 +149,17 @@ export default class AssetsGroup extends React.Component {
                         type="text"
                         className={"new-asset-menu--data-name-input"}/>
                 </label></div>
+                {
+                    cryptoApi.isAddressSupportedFor(props.currencyCode)
+                        ? (<div><label>
+                            <div className="new-asset-menu--data-address-input-label">Or enter address:</div>
+                            <input
+                                ref={instance => addressInput = instance}
+                                type="text"
+                                className={"new-asset-menu--data-address-input"}/>
+                        </label></div>)
+                        : null
+                }
             </div>
         </div>
     }
@@ -307,6 +326,17 @@ export default class AssetsGroup extends React.Component {
                                             ? " new-asset-menu--data-name-input__disabled"
                                             : "")}/>
                                 </label></div>
+                                {
+                                    (props.asset.address && cryptoApi.isAddressSupportedFor(props.currencyCode))
+                                        ? (<div><label>
+                                            <div className="new-asset-menu--data-address-input-label">Address:</div>
+                                            <input
+                                                ref={instance => instance && (instance.value = props.asset.address)}
+                                                type="text"
+                                                className={"new-asset-menu--data-address-input"}/>
+                                        </label></div>)
+                                        : null
+                                }
                             </div>
                     }
                 </div>

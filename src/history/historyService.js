@@ -84,9 +84,29 @@ const historyService = {
             totalSeriesNamed: currentTotalNamed,
             partialPerCurrencies: partialPerCurrencies,
         };
-        historyRepository.save(history);
+        try {
+            historyRepository.save(history);
+        } catch (e) {
+            if (
+                (e instanceof DOMException)
+                && (e.message === `Failed to execute 'setItem' on 'Storage': Setting the value of '${historyRepository.name}' exceeded the quota.`)
+                && (e.name === "QuotaExceededError")
+            ) {
+                historyRepository.save(minimizeHistoryData(history))
+            } else {
+                console.error(e);
+            }
+        }
     },
 };
+
+function minimizeHistoryData(history) {
+    const newTotalSeriesNamed = Object.entries(history.totalSeriesNamed)
+        .reduce((previousValue, currentValue) => ({}), {})
+    console.log("history.totalSeriesNamed", history.totalSeriesNamed);
+    console.log("newTotalSeriesNamed", newTotalSeriesNamed);
+    return history
+}
 
 assetsService.subscribeOnChange(assets => historyService.updateHistory(assets));
 rates.triggerOnChange(() => historyService.updateHistory(assetsService.getCurrentAssets()));

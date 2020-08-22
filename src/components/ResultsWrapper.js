@@ -19,6 +19,7 @@ import ltcIcon from "../resources/currencies/ltc.png";
 import eosIcon from "../resources/currencies/eos.png";
 import bchIcon from "../resources/currencies/bch.png";
 import assetsService from "../assets/AssetService";
+import cryptoApi from "./cryptoApi";
 
 // -> Load Highcharts modules
 highCharts3d(Highcharts);
@@ -1122,13 +1123,15 @@ function getListOfTopCurrenciesByType() {
 function buildTitle(asset) {
     const percentage = asset.percentage || asset.percents || 0;
     const afterDecimalPoint = percentage < 0.01 ? 8 : 2;
-    const amount = noExponents(addCommas(asset.amount));
+    const _amount = asset.address ? cryptoApi.getBalance(asset.currency, asset.address) : asset.amount;
+    const amount = noExponents(addCommas(_amount));
     const percents = numberFormat(percentage, afterDecimalPoint);
     return `${amount} ${asset.currency} (${percents}%)`
 }
 
 function buildHighChartsTitle(asset) {
-    const amount = noExponents(addCommas(asset.amount));
+    const _amount = asset.address ? cryptoApi.getBalance(asset.currency, asset.address) : asset.amount;
+    const amount = noExponents(addCommas(_amount));
     return `${amount} ${asset.currency}`
 }
 
