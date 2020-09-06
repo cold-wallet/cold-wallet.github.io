@@ -90,9 +90,9 @@ export default class ResultsWrapper extends React.Component {
         if (!this.state.assets || !rates.isReady()) {
             return null;
         }
-        if (this.state.historyData) {
-            console.log("historyData", this.state.historyData)
-        }
+        // if (this.state.historyData) {
+        //     console.log("historyData", this.state.historyData)
+        // }
         return <div className={"results-wrapper"}>
             <div className="results-one-more-wrap-layer">
                 <div className={"results-title"}>Then short statistics would be:</div>
