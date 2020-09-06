@@ -84,9 +84,59 @@ const historyService = {
             totalSeriesNamed: currentTotalNamed,
             partialPerCurrencies: partialPerCurrencies,
         };
-        historyRepository.save(history);
+        try {
+            historyRepository.save(history);
+        } catch (e) {
+            if (
+                (e instanceof DOMException)
+                && (e.message === `Failed to execute 'setItem' on 'Storage': Setting the value of '${historyRepository.name}' exceeded the quota.`)
+                && (e.name === "QuotaExceededError")
+            ) {
+                historyRepository.save(minimizeHistoryData(history))
+            } else {
+                console.error(e);
+            }
+        }
     },
 };
+
+function minimizeHistoryData(history) {
+    Object.values(history.totalSeriesNamed).forEach(dataContainer => {
+        const length = dataContainer.data.length;
+        if (length >= 50) {
+            dataContainer.data = dataContainer.data.filter((v, i) => {
+                return (i === 0) || (i === length - 1) || (i % 2 !== 0)
+            })
+        }
+    })
+    Object.values(history.partialPerCurrencies)
+        .map(v => Object.entries(v))
+        .forEach(currentEntries => {
+            const timesToRemove = {};
+            let index = 3;
+            while (true) {
+                let earliestTime;
+                for (let i = 0; i < currentEntries.length; i++) {
+                    const data = currentEntries[i][1].data;
+                    const entry = data[index];
+                    if (!entry) {
+                        continue
+                    }
+                    const entryTime = entry[0];
+                    if (!earliestTime || (earliestTime > entryTime)) {
+                        earliestTime = entryTime
+                    }
+                }
+                if (!earliestTime) {
+                    break;
+                }
+                timesToRemove[earliestTime] = true;
+                index += 2;
+            }
+            currentEntries.forEach(e => e[1].data = e[1].data.filter(ee => !timesToRemove[ee[0]]));
+        });
+    return history
+}
 
 assetsService.subscribeOnChange(assets => historyService.updateHistory(assets));
 rates.triggerOnChange(() => historyService.updateHistory(assetsService.getCurrentAssets()));
@@ -112,17 +162,13 @@ function optimiseData(series) {
 }
 
 function optimiseLastData(dataArr) {
-    if (dataArr.length <= 4) {
+    if (dataArr.length <= 3) {
         return dataArr
     }
-    const prevOld1 = dataArr[dataArr.length - 4][1];
     const prevOld = dataArr[dataArr.length - 3][1];
     const lastOld = dataArr[dataArr.length - 2][1];
     const newOne = dataArr[dataArr.length - 1][1];
-    const isNothingNew = prevOld1 === prevOld
-        && prevOld === lastOld
-        && lastOld === newOne;
-
+    const isNothingNew = prevOld === lastOld && lastOld === newOne;
     if (isNothingNew) {
         const last = dataArr.pop();
         dataArr.pop(); // this one is thrown away
