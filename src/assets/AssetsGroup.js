@@ -92,7 +92,9 @@ export default class AssetsGroup extends React.Component {
                     />
                 </div>
                 <div className={"asset-item-currency"}>
-                    <span translate="no" className={"asset-item-currency-name"}>{props.currencyCode}</span>
+                    <span translate="no"
+                          title={props.name}
+                          className={"asset-item-currency-name"}>{props.currencyCode}</span>
                 </div>
                 <div className={"asset-item-buttons-container"}>{[
                     <button
@@ -239,7 +241,9 @@ export default class AssetsGroup extends React.Component {
                             />
                         </div>
                         <div className={"asset-item-currency"}>
-                            <span translate="no" className={"asset-item-currency-name"}>{props.currencyCode}</span>
+                            <span translate="no"
+                                  title={props.asset.name}
+                                  className={"asset-item-currency-name"}>{props.currencyCode}</span>
                         </div>
                         {props.asset.isMonobankAsset && settingsRepository.getLatest().integrations.monobank.monobankIntegrationEnabled
                             ? <div title={"Monobank integration"}
