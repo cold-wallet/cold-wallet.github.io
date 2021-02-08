@@ -39,7 +39,9 @@ function extractAssets(assets) {
                 .sort((a, b) => compareStrings(a.id, b.id))
                 .map(account => {
                     const currency = currencies.getByNumCode(account.currencyCode).code;
-                    const name = `monobank ${currency} ${account.maskedPan ? account.maskedPan[0] : ""} ${account.type}`;
+                    const name = `monobank ${currency} ${account.maskedPan
+                        ? (account.maskedPan[0] ? (account.maskedPan[0] + " ") : "")
+                        : ""}${account.type}`;
                     return new AssetDTO(
                         'fiat',
                         (account.balance || 0) / 100,
