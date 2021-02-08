@@ -25,7 +25,7 @@ const binanceApiClient = {
             .catch(onError)
     },
     getUserInfo(key, secret, resultConsumer, onError) {
-        const client = new Binance().options({
+        const client = new Binance({
             APIKEY: key,
             APISECRET: secret
         });
