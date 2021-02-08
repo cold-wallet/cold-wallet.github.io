@@ -17,7 +17,12 @@ export default class LocalStorageRepository {
     }
 
     save(data) {
-        localStorage.setItem(this.name, JSON.stringify(data));
+        const newData = JSON.stringify(data);
+        const oldData = localStorage.getItem(this.name) || "{}";
+        if (newData === oldData) {
+            return
+        }
+        localStorage.setItem(this.name, newData);
         this.subscribers.forEach(subscriber => {
             try {
                 subscriber(data)

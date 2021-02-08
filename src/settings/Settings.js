@@ -5,6 +5,7 @@ import monobankApiClient from "../integration/monobank/monobankApiClient";
 import monobankUserDataRepository from "../integration/monobank/MonobankUserDataRepository";
 import binanceUserDataRepository from "../integration/binance/BinanceUserDataRepository";
 import LocalStorageRepository from "../extensions/LocalStorageRepository";
+import binanceApiClient from "../integration/binance/binanceApiClient";
 
 const binanceLocker = LocalStorageRepository.builder()
     .name('binance-locker')
@@ -45,6 +46,29 @@ export default class Settings extends React.Component {
                             name: userInfo.name,
                             accounts: userInfo.accounts,
                         });
+                    },
+                    console.error
+                );
+            } catch (e) {
+                console.error(e)
+            }
+        }
+        if (!this.state.saveSettingsRequested
+            && this.state.binanceIntegrationEnabled
+            && this.state.binanceKeyIntegrationToken
+            && this.state.binanceSecretIntegrationToken
+        ) {
+            try {
+                binanceApiClient.getUserInfo(
+                    this.state.binanceKeyIntegrationToken,
+                    this.state.binanceSecretIntegrationToken,
+                    userInfo => {
+                        console.log("userInfo", userInfo);
+                        // binanceUserDataRepository.save({
+                        // clientId: userInfo.clientId,
+                        // name: userInfo.name,
+                        // accounts: userInfo.accounts,
+                        // });
                     },
                     console.error
                 );
