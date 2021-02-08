@@ -1,8 +1,13 @@
-name: Install + build
+# This workflow will do a clean install of node dependencies, build the source code and run tests
+# across different versions of node
+# For more information see:
+# https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: dev
+    branches: stage
 
 jobs:
   build:
@@ -11,14 +16,29 @@ jobs:
 
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials
+        # to false in most cases for the deployment to work correctly.
       - name: Install 🔧
         run: npm install
       - name: Build 🔧
         run: npm run build
+      - run: cp ./README.md ./build/
+      - run: git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
+      - run: npm version patch --force
+      - run: git push --tags && git push
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: master # The branch the action should deploy to.
+          FOLDER: build # The folder the action should deploy.
+          SINGLE_COMMIT: true # This option can be toggled to true if you'd prefer to have a single commit on the
+          # deployment branch instead of maintaining the full history. Using this option will also cause any existing
+          # history to be wiped from the deployment branch.
+          CLEAN: true # clean build folder up
 
       - name: npm logs
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2.2.2
         if: failure()
         with:
           name: logs
