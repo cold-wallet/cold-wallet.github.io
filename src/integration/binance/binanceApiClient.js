@@ -2,7 +2,6 @@ import axios from "axios";
 import Binance from 'node-binance-api';
 
 const binanceApiUrl = "https://api.binance.com";
-const client = new Binance();
 
 function extractResponse(onSuccess) {
     return response => {
@@ -26,7 +25,7 @@ const binanceApiClient = {
             .catch(onError)
     },
     getUserInfo(key, secret, resultConsumer, onError) {
-        client
+        new Binance()
             .options({
                 APIKEY: key,
                 APISECRET: secret,
