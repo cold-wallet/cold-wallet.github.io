@@ -1,4 +1,5 @@
 import axios from "axios";
+import Binance from 'node-binance-api';
 
 const binanceApiUrl = "https://api.binance.com";
 
@@ -22,6 +23,15 @@ const binanceApiClient = {
         axios.get(binanceApiUrl + "/api/v1/ticker/price")
             .then(extractResponse(onSuccess))
             .catch(onError)
+    },
+    getUserInfo(key, secret, resultConsumer, onError) {
+        const client = new Binance().options({
+            APIKEY: key,
+            APISECRET: secret
+        });
+        client.balance()
+            .then(resultConsumer)
+            .catch(onError);
     }
 };
 
