@@ -9,7 +9,7 @@
     "@testing-library/user-event": "^7.2.1",
     "axios": "^0.21.1",
     "highcharts": "^8.1.2",
-    "cross-rates-browser": "^0.1.21",
+    "cross-rates-browser": "^0.1.24",
     "highcharts-react-official": "^3.0.0",
     "node-binance-api": "^0.12.4",
     "node-fetch": "^2.6.1",
