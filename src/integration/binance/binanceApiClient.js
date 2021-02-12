@@ -1,7 +1,8 @@
 import axios from "axios";
-import Binance from 'node-binance-api';
+import Binance from 'binance-api-node'
 
 const binanceApiUrl = "https://api.binance.com";
+const proxyUrl = "https://ntrocp887e.execute-api.eu-central-1.amazonaws.com/prod/binance";
 
 function extractResponse(onSuccess) {
     return response => {
@@ -25,20 +26,14 @@ const binanceApiClient = {
             .catch(onError)
     },
     getUserInfo(key, secret, resultConsumer, onError) {
-        new Binance()
-            .options({
-                APIKEY: key,
-                APISECRET: secret,
-                useServerTime: true,
-                reconnect: false,
-                verbose: true,
-                urls: {
-                    base: "https://ntrocp887e.execute-api.eu-central-1.amazonaws.com/prod/binance/"
-                }
-            })
-            .balance()
+        const client = Binance({
+            apiKey: key,
+            apiSecret: secret,
+            httpBase: proxyUrl,
+        })
+        client.accountInfo({recvWindow: 5000, useServerTime: true})
             .then(resultConsumer)
-            .catch(onError);
+            .catch(onError)
     }
 };
 
