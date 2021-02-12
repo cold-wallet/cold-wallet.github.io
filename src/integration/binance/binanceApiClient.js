@@ -32,6 +32,9 @@ const binanceApiClient = {
                 useServerTime: true,
                 reconnect: false,
                 verbose: true,
+                urls: {
+                    base: "https://ntrocp887e.execute-api.eu-central-1.amazonaws.com/prod/binance/"
+                }
             })
             .balance()
             .then(resultConsumer)
