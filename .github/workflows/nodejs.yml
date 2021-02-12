@@ -7,7 +7,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: stage
+    branches: dev
 
 jobs:
   build:

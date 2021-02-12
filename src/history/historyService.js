@@ -21,7 +21,7 @@ const historyService = {
         const prev = (currentTotalValue
             && currentTotalValue.data
             && currentTotalValue.data.length)
-            ? currentTotalValue.data[currentTotalValue.data.length - 1][0]
+            ? currentTotalValue.data[0][0]
             : now - 1000;
         const prevData = prev ? [[prev, 0]] : [];
         const allAssets = [].concat(assets.fiat?.assets || assets.cash.assets.concat(assets["non-cash"].assets))

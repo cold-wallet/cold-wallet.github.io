@@ -188,9 +188,13 @@ export default class AssetsGroup extends React.Component {
                 this.setState({assets: this.state.assets});
             },
             onDelete: () => {
-                const assets = this.state.assets.filter(_asset => _asset !== asset);
-                this.props.saveStateFunction(assets);
-                this.setState({assets: assets});
+                asset.amount = 0;
+                this.props.saveStateFunction(this.state.assets);
+                this.setState({assets: this.state.assets});
+
+                const assetsClear = this.state.assets.filter(_asset => _asset !== asset);
+                this.props.saveStateFunction(assetsClear);
+                this.setState({assets: assetsClear});
             },
             editModeEnabled: asset.editModeEnabled,
             onEditRequested: () => {
