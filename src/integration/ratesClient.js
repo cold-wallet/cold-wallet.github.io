@@ -23,6 +23,9 @@ const ratesClient = {
     transformAssetValue({amount, currency}, resultCurrency) {
         return rates.transform(amount, currency, resultCurrency)
     },
+    getCurrencyType(currency) {
+        return rates.getCurrencyType(currency)
+    },
     shutDown() {
     },
 };
