@@ -59,16 +59,27 @@ export default class Settings extends React.Component {
             && this.state.binanceSecretIntegrationToken
         ) {
             try {
+                const filterEmptyBalances = (balances) => {
+                    return balances.filter(balance => (+balance.free) + (+balance.locked))
+                }
+
                 binanceApiClient.getUserInfo(
                     this.state.binanceKeyIntegrationToken,
                     this.state.binanceSecretIntegrationToken,
                     userInfo => {
-                        console.log("userInfo", userInfo);
-                        // binanceUserDataRepository.save({
-                        // clientId: userInfo.clientId,
-                        // name: userInfo.name,
-                        // accounts: userInfo.accounts,
-                        // });
+                        binanceUserDataRepository.save({
+                            accountType: userInfo.accountType, // "SPOT",
+                            balances: filterEmptyBalances(userInfo.balances), // [{asset,free,locked}],
+                            buyerCommission: userInfo.buyerCommission, // 0,
+                            canDeposit: userInfo.canDeposit, // true,
+                            canTrade: userInfo.canTrade, // true,
+                            canWithdraw: userInfo.canWithdraw, // true,
+                            makerCommission: userInfo.makerCommission, // 10,
+                            permissions: userInfo.permissions, // ["SPOT", "LEVERAGED"],
+                            sellerCommission: userInfo.sellerCommission, // 0,
+                            takerCommission: userInfo.takerCommission, // 10,
+                            updateTime: userInfo.updateTime, // 1613192140017
+                        });
                     },
                     console.error
                 );
@@ -94,9 +105,17 @@ export default class Settings extends React.Component {
         settingsRepository.save(latest);
 
         binanceUserDataRepository.save(settings.binanceIntegrationEnabled ? {
-            clientId: settings.clientId,
-            name: settings.name,
-            accounts: settings.accounts,
+            accountType: settings.accountType,
+            balances: settings.balances,
+            buyerCommission: settings.buyerCommission,
+            canDeposit: settings.canDeposit,
+            canTrade: settings.canTrade,
+            canWithdraw: settings.canWithdraw,
+            makerCommission: settings.makerCommission,
+            permissions: settings.permissions,
+            sellerCommission: settings.sellerCommission,
+            takerCommission: settings.takerCommission,
+            updateTime: settings.updateTime,
         } : {});
 
         this.setState({
@@ -180,11 +199,24 @@ export default class Settings extends React.Component {
                 binanceIntegrationLock: Date.now(),
             });
             try {
-                this.saveBinanceSettings({
-                    binanceIntegrationEnabled: this.state.binanceIntegrationEnabled,
-                    binanceKeyIntegrationToken: bufferBinanceKeyIntegrationToken,
-                    binanceSecretIntegrationToken: bufferBinanceSecretIntegrationToken,
-                });
+                binanceApiClient.getUserInfo(
+                    bufferBinanceKeyIntegrationToken,
+                    bufferBinanceSecretIntegrationToken,
+                    userInfo => {
+                        this.saveBinanceSettings({
+                            binanceIntegrationEnabled: this.state.binanceIntegrationEnabled,
+                            binanceKeyIntegrationToken: bufferBinanceKeyIntegrationToken,
+                            binanceSecretIntegrationToken: bufferBinanceSecretIntegrationToken,
+                            binanceUserInfo: userInfo,
+                        });
+                    },
+                    e => {
+                        console.error(e);
+                        this.setState({
+                            saveSettingsRequested: false,
+                        });
+                        binanceLocker.save({});
+                    });
             } catch (e) {
                 binanceLocker.save({})
             }

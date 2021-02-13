@@ -31,7 +31,7 @@ const binanceApiClient = {
             apiSecret: secret,
             httpBase: proxyUrl,
         })
-        client.accountInfo({recvWindow: 5000, useServerTime: true})
+        client.accountInfo({recvWindow: 30000, useServerTime: true})
             .then(resultConsumer)
             .catch(onError)
     }

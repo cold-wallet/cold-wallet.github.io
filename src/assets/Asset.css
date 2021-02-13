@@ -76,7 +76,24 @@
   flex-flow: row;
   justify-content: center;
   cursor: default;
-  font-family: 'Lucida Console', monospace
+  font-family: 'Lucida Console', monospace;
+  fill: #2D3142;
+}
+
+.asset-item-buttons-container--integration-name:hover {
+  fill: #f6f6f6;
+}
+
+.asset-item-buttons-container--integration-binance {
+  width: 30%;
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+  cursor: default;
+}
+
+.asset-item-buttons-container--integration-binance:hover {
+  fill: #F0B90B;
 }
 
 .asset-item-buttons-container {
