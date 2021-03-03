@@ -294,7 +294,7 @@ export default class AssetsGroup extends React.Component {
                                             key={"edit-asset-button"}
                                             title={"edit"}
                                             onClick={() => props.onEditRequested()}
-                                            className={"edit-asset-button neutral-button pencil-icon button"}>🖉</button>,
+                                            className={"edit-asset-button neutral-button pencil-icon button"}>✎</button>,
                                     (props.editModeEnabled)
                                         ? <button
                                             key={"cancel-editing-asset-button"}
