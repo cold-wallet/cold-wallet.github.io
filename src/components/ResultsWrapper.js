@@ -487,9 +487,11 @@ export default class ResultsWrapper extends React.Component {
                 const currentCurrency = this.state.chartsBufferActiveCurrency
                     || this.state.chartsCurrencySelected
                     || currencies[0];
-                const historySeries = Object.values(
-                    (historyChartsData.partialPerCurrencies || {})[currentCurrency] || {}
-                );
+                const historySeries = Object
+                    .values(
+                        (historyChartsData.partialPerCurrencies || {})[currentCurrency] || {}
+                    )
+                    .sort((x1, x2) => x1.data?.length - x2.data?.length);
                 const buildChronologyChart = () => this.state.activeResultsTab === "timelapse"
                     ? <div key={key} className={"results-timelapse--block"}>
                         <div className="results-timelapse--container">
