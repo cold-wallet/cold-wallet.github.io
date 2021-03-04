@@ -154,12 +154,21 @@ export default class AssetsGroup extends React.Component {
     }
 
     addAsset(asset) {
+        const amount = asset.amount;
+        asset.amount = 0;
         const assets = [asset].concat(this.props.group.assets);
         this.setState({
             newAsset: null,
             assets,
+        }, () => {
+            this.props.saveStateFunction(assets);
+            asset.amount = amount;
+            this.setState({
+                newAsset: null,
+                assets,
+            });
+            this.props.saveStateFunction(assets);
         });
-        this.props.saveStateFunction(assets);
     }
 
     buildAssets() {
