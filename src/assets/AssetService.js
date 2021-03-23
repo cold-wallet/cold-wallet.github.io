@@ -97,9 +97,12 @@ function extractAssets(assets) {
                     a[b.id] = true;
                     return a
                 }, {});
-            const otherFiatAssets = assets.fiat.assets.filter(asset => !binanceFiatAssetIds[asset.id]);
-            const otherCryptoAssets = assets.crypto.assets
-                .filter(asset => !binanceCryptoAssetIds[asset.id] && !asset.isBinanceAsset);
+            const otherFiatAssets = assets.fiat.assets.filter(
+                asset => !binanceFiatAssetIds[asset.id] && !asset.isBinanceAsset
+            );
+            const otherCryptoAssets = assets.crypto.assets.filter(
+                asset => !binanceCryptoAssetIds[asset.id] && !asset.isBinanceAsset
+            );
             binanceFiatAsset = binanceFiatAsset.filter(asset => asset.amount);
             binanceCryptoAssets = binanceCryptoAssets.filter(asset => asset.amount);
             assets.fiat.assets = [].concat(otherFiatAssets).concat(binanceFiatAsset);
