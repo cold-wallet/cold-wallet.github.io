@@ -38,7 +38,7 @@ jobs:
           CLEAN: true # clean build folder up
 
       - name: npm logs
-        uses: actions/upload-artifact@v2.2.2
+        uses: actions/upload-artifact@v2.2.3
         if: failure()
         with:
           name: logs
