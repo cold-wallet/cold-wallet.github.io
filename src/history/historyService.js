@@ -105,7 +105,7 @@ function minimizeHistoryData(history) {
         const length = dataContainer.data.length;
         if (length >= 50) {
             dataContainer.data = dataContainer.data.filter((v, i) => {
-                return (i === 0) || (i === length - 1) || (i % 2 !== 0)
+                return (i === length - 1) || (i % 2 !== 0)
             })
         }
     })
