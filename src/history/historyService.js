@@ -113,7 +113,7 @@ function minimizeHistoryData(history) {
         .map(v => Object.entries(v))
         .forEach(currentEntries => {
             const timesToRemove = {};
-            let index = 3;
+            let index = 0;
             while (true) {
                 let earliestTime;
                 for (let i = 0; i < currentEntries.length; i++) {
