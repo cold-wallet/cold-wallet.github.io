@@ -2,7 +2,7 @@ name: Install + build
 
 on:
   push:
-    branches: dev
+    branches: [dev]
 
 jobs:
   build:
