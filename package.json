@@ -21,7 +21,7 @@
     "react-scripts": "^4.0.2",
     "typescript": "^2.8.0",
     "universal-cookie": "latest",
-    "victory": "^34.3.5"
+    "victory": "^36.1.0"
   },
   "devDependencies": {
     "gh-pages": "^2.2.0",
