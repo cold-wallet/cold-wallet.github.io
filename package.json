@@ -12,7 +12,7 @@
     "cross-rates-browser": "^0.2.2",
     "highcharts-react-official": "^3.0.0",
     "binance-api-node": "^0.10.28",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-cookie": "^4.0.3",
