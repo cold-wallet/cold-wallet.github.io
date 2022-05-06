@@ -23,6 +23,10 @@ export default class NewAssetMenu extends React.Component {
         })
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        this.state.bufferCurrency && this.finish();
+    }
+
     render() {
         return (
             <div className={"new-asset-menu-wrapper"}>
@@ -33,7 +37,7 @@ export default class NewAssetMenu extends React.Component {
                     </div>
                     <div className={"new-asset-menu--body"}>{
                         this.state.bufferCurrency
-                            ? this.finish()
+                            ? []
                             : <div key={"currency-select"}>
                                 <div className={"asset-pics--container"}>{
                                     getListOfTopCurrenciesByType(this.props.assetType).map((currency, i) =>
@@ -55,7 +59,7 @@ export default class NewAssetMenu extends React.Component {
                                             onChange={e => this.onCurrencySelected({
                                                 currencyCode: e.target.value,
                                             })}>
-                                        <option disabled selected value> -- select currency --</option>
+                                        <option defaultValue value> -- select currency --</option>
                                         {
                                             rates.getCurrenciesByType(this.props.assetType).map(currency => {
                                                 return (
