@@ -233,7 +233,7 @@ export default class Settings extends React.Component {
                         <div id="integration-monobank" className="integration-container">
                             <label className="document--label"><input
                                 type="checkbox"
-                                checked={this.state.monobankIntegrationEnabled}
+                                checked={!!this.state.monobankIntegrationEnabled}
                                 onChange={event => {
                                     this.setState({
                                         monobankIntegrationEnabled: !this.state.monobankIntegrationEnabled,
@@ -271,7 +271,7 @@ export default class Settings extends React.Component {
                         <div id="integration-binance" className="integration-container">
                             <label className="document--label"><input
                                 type="checkbox"
-                                checked={this.state.binanceIntegrationEnabled}
+                                checked={!!this.state.binanceIntegrationEnabled}
                                 onChange={event => {
                                     this.setState({
                                         binanceIntegrationEnabled: !this.state.binanceIntegrationEnabled,
@@ -312,7 +312,7 @@ export default class Settings extends React.Component {
                                         <p className="integration-container--binance-info">
                                             <a
                                                 target="new-window"
-                                                href="https://www.binance.com/en/usercenter/settings/api-management/">
+                                                href="https://www.binance.com/en/support/faq/360002502072/">
                                                 Get binance API token here
                                             </a>
                                         </p>
@@ -343,5 +343,29 @@ export default class Settings extends React.Component {
                 </div>
             </div>
         ]
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.state.saveSettingsRequested
+            && !this.state.monobankIntegrationEnabled
+        ) {
+            monobankLocker.save({
+                monobankIntegrationLock: Date.now(),
+            });
+            this.saveMonobankSettings({
+                monobankIntegrationEnabled: this.state.monobankIntegrationEnabled,
+            })
+        }
+        if (this.state.saveSettingsRequested
+            && !this.state.binanceIntegrationEnabled
+        ) {
+            binanceLocker.save({
+                binanceIntegrationLock: Date.now(),
+            });
+            this.saveBinanceSettings({
+                binanceIntegrationEnabled: this.state.binanceIntegrationEnabled,
+            })
+        }
+
     }
 }

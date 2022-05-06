@@ -1,9 +1,9 @@
-import currencies from "../resources/currencies-iso-4217";
+import currenciesJson from "../resources/currencies-iso-4217";
 import currencyCodes from "../resources/currencies-iso-4217-code";
 
-export default {
+const currencies = {
     getByStringCode(code) {
-        return currencies[code]
+        return currenciesJson[code]
     },
     getByNumCode(code) {
         const currencyCodeLength = 3;
@@ -21,3 +21,5 @@ export default {
         return res
     },
 }
+
+export default currencies;

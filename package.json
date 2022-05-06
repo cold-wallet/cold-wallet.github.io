@@ -18,8 +18,8 @@
     "react-cookie": "^4.0.3",
     "react-dom": "^16.13.1",
     "react-number-format": "^4.4.1",
-    "react-scripts": "^4.0.2",
-    "typescript": "^2.8.0",
+    "react-scripts": "^4.0.3",
+    "typescript": "^3.2.1",
     "universal-cookie": "latest",
     "victory": "^34.3.5"
   },

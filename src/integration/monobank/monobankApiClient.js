@@ -2,7 +2,7 @@ import axios from "axios";
 
 const baseUrl = "https://api.monobank.ua";
 
-export default {
+const monobankApiClient = {
 
     getUserInfo(token, onUserInfo, onError) {
         axios
@@ -29,3 +29,5 @@ export default {
             .catch(onError)
     },
 }
+
+export default monobankApiClient;
