@@ -312,7 +312,7 @@ export default class Settings extends React.Component {
                                         <p className="integration-container--binance-info">
                                             <a
                                                 target="new-window"
-                                                href="https://www.binance.com/en/usercenter/settings/api-management/">
+                                                href="https://www.binance.com/en/support/faq/360002502072/">
                                                 Get binance API token here
                                             </a>
                                         </p>
