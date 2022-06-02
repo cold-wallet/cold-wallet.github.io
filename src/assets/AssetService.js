@@ -73,8 +73,14 @@ function extractAssets(assets) {
             let binanceAssets = binanceUserInfo.balances
                 .sort((a, b) => compareStrings(a.asset, b.asset))
                 .map(balance => {
-                    const currency = balance.asset;
-                    const name = `binance ${currency} ${binanceUserInfo.accountType}`;
+                    let currency = balance.asset;
+                    let type = binanceUserInfo.accountType;
+                    if (currency.startsWith("LD") && currency.length >= 5) {
+                        // in case of earning asset, 'LD' prefix should be removed
+                        currency = currency.substr(2);
+                        type = `earn ${type}`;
+                    }
+                    const name = `binance ${currency} ${type}`;
                     const asset = new AssetDTO(
                         ratesClient.getCurrencyType(balance.asset),
                         (+balance.free) + (+balance.locked),
