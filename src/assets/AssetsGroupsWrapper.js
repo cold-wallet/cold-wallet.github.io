@@ -54,11 +54,14 @@ export default class AssetsGroupsWrapper extends React.Component {
                              })}
                              saveStateFunction={(assets) => {
                                  const buffer = this.state.savedState;
-                                 buffer[group.type] || (buffer[group.type] = {});
-                                 buffer[group.type].type = group.type;
-                                 buffer[group.type].assets = assets.map(AssetDTO.copy);
+                                 const asset = buffer[group.type] || (buffer[group.type] = {});
+                                 asset.type = group.type;
+                                 asset.assets = assets.map(AssetDTO.copy);
+
+                                 // deleting leftovers of prev implementation
                                  delete buffer.cash;
                                  delete buffer["non-cash"];
+
                                  assetsService.save({
                                      assets: buffer,
                                  });

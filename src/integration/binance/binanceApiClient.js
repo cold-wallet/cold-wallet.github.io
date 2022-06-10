@@ -33,7 +33,12 @@ const binanceApiClient = {
             apiSecret: secret,
             httpBase: proxyUrl,
         })
-
+        spotClient.accountInfo({recvWindow: 30000, useServerTime: true})
+            .then(resp => {
+                console.log("accountInfo", resp)
+                resultConsumer(resp)
+            })
+            .catch(onError)
         spotClient.futuresAccountInfo({recvWindow: 30000, useServerTime: true}).then(e => {
             console.log("futuresAccountInfo", e)
         })
@@ -124,9 +129,6 @@ const binanceApiClient = {
                         })
                 })
         })
-        // client.savingsFlexibleProductPosition('USDT').then(response => console.log("savingsFlexibleProductPosition USDT", response.data))
-        // client.savingsFlexibleProductPosition('BUSD').then(response => console.log("savingsFlexibleProductPosition BUSD", response.data))
-        // client.isolatedMarginAccountInfo().then(response => console.log("isolatedMarginAccountInfo", response.data))
     }
 };
 
