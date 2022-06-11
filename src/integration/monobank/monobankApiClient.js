@@ -4,6 +4,15 @@ const baseUrl = "https://api.monobank.ua";
 
 const monobankApiClient = {
 
+    async getUserInfoAsync(token) {
+        let url = baseUrl + "/personal/client-info";
+        let config = {
+            headers: {
+                "X-Token": token,
+            }
+        };
+        return await axios.get(url, config)
+    },
     getUserInfo(token, onUserInfo, onError) {
         axios
             .get(baseUrl + "/personal/client-info", {

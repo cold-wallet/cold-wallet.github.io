@@ -13,4 +13,4 @@ class Spot extends flowRight(...Object.values(modules))(APIBase) {
   }
 }
 
-module.exports = Spot
+export default Spot

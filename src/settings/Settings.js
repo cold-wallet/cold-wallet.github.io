@@ -32,60 +32,63 @@ export default class Settings extends React.Component {
         };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (!this.state.saveSettingsRequested
             && this.state.monobankIntegrationEnabled
             && this.state.monobankIntegrationToken
         ) {
+            let response;
             try {
-                monobankApiClient.getUserInfo(
-                    this.state.monobankIntegrationToken,
-                    userInfo => {
-                        monobankUserDataRepository.save({
-                            clientId: userInfo.clientId,
-                            name: userInfo.name,
-                            accounts: userInfo.accounts,
-                        });
-                    },
-                    console.error
-                );
+                response = await monobankApiClient.getUserInfoAsync(this.state.monobankIntegrationToken);
             } catch (e) {
                 console.error(e)
             }
+            let userInfo;
+            if (response
+                && (response.status === 200)
+                && (userInfo = response.data)
+                && !userInfo.errorDescription
+                && userInfo.name
+                && userInfo.accounts
+            ) {
+                monobankUserDataRepository.save({
+                    clientId: userInfo.clientId,
+                    name: userInfo.name,
+                    accounts: userInfo.accounts,
+                });
+            } else {
+                console.warn("Fetching latest rates failed", response);
+            }
+
         }
         if (!this.state.saveSettingsRequested
             && this.state.binanceIntegrationEnabled
             && this.state.binanceKeyIntegrationToken
             && this.state.binanceSecretIntegrationToken
         ) {
-            try {
-                const filterEmptyBalances = (balances) => {
-                    return balances.filter(balance => (+balance.free) + (+balance.locked))
-                }
-
-                binanceApiClient.getUserInfo(
-                    this.state.binanceKeyIntegrationToken,
-                    this.state.binanceSecretIntegrationToken,
-                    userInfo => {
-                        binanceUserDataRepository.save({
-                            accountType: userInfo.accountType, // "SPOT",
-                            balances: filterEmptyBalances(userInfo.balances), // [{asset,free,locked}],
-                            buyerCommission: userInfo.buyerCommission, // 0,
-                            canDeposit: userInfo.canDeposit, // true,
-                            canTrade: userInfo.canTrade, // true,
-                            canWithdraw: userInfo.canWithdraw, // true,
-                            makerCommission: userInfo.makerCommission, // 10,
-                            permissions: userInfo.permissions, // ["SPOT", "LEVERAGED"],
-                            sellerCommission: userInfo.sellerCommission, // 0,
-                            takerCommission: userInfo.takerCommission, // 10,
-                            updateTime: userInfo.updateTime, // 1613192140017
-                        });
-                    },
-                    console.error
-                );
-            } catch (e) {
-                console.error(e)
+            const filterEmptyBalances = (balances) => {
+                return balances.filter(balance => (+balance.free) + (+balance.locked))
             }
+            binanceApiClient
+                .getUserInfoAsync(
+                    this.state.binanceKeyIntegrationToken, this.state.binanceSecretIntegrationToken
+                )
+                .then(userInfo => {
+                    binanceUserDataRepository.save({
+                        accountType: userInfo.accountType, // "SPOT",
+                        balances: filterEmptyBalances(userInfo.balances), // [{asset,free,locked}],
+                        buyerCommission: userInfo.buyerCommission, // 0,
+                        canDeposit: userInfo.canDeposit, // true,
+                        canTrade: userInfo.canTrade, // true,
+                        canWithdraw: userInfo.canWithdraw, // true,
+                        makerCommission: userInfo.makerCommission, // 10,
+                        permissions: userInfo.permissions, // ["SPOT", "LEVERAGED"],
+                        sellerCommission: userInfo.sellerCommission, // 0,
+                        takerCommission: userInfo.takerCommission, // 10,
+                        updateTime: userInfo.updateTime, // 1613192140017
+                    });
+                })
+                .catch(console.error)
         }
     }
 

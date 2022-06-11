@@ -1,6 +1,7 @@
 import axios from "axios";
 import Binance from 'binance-api-node'
 import Spot from './connector/spot'
+import BinanceApiService from "./BinanceApiService";
 
 const binanceApiUrl = "https://api.binance.com";
 const binanceFuturesApiUrl = "https://dapi.binance.com";
@@ -27,7 +28,87 @@ const binanceApiClient = {
             .then(extractResponse(onSuccess))
             .catch(onError)
     },
+    async getUserInfoAsync(key, secret) {
+        let binanceApiService = new BinanceApiService(key, secret);
+        // spot account info
+        let account = binanceApiService.accountInfo();
+        if (!account.accounts) {
+            account.accounts = {};
+        }
+        [
+            async () => {
+                account.accounts.marginIsolated = await binanceApiService.isolatedMarginAssets();
+            },
+            async () => {
+                account.accounts.marginCross = await binanceApiService.crossMarginAssets();
+            },
+            async () => {
+                account.accounts.futuresUsdM = await binanceApiService.futuresBalancesUsdM();
+            },
+            async () => {
+                account.accounts.futuresCoinM = await binanceApiService.futuresBalancesCoinM();
+            },
+            async () => {
+                account.accounts.funding = await binanceApiService.fundingAssets();
+            },
+        ].forEach(tryCatchRequest)
+        // /*`STAKING`,`F_DEFI`,`L_DEFI`*/
+        // client.stakingProductPosition('STAKING').then(response => {
+        //     console.log("stakingProductPosition STAKING", response.data)
+        // })
+        // client.stakingProductPosition('F_DEFI').then(response => {
+        //     console.log("stakingProductPosition F_DEFI", response.data)
+        // })
+        // client.stakingProductPosition('L_DEFI').then(response => {
+        //     console.log("stakingProductPosition L_DEFI", response.data)
+        // })
+        // client.bswapUnclaimedRewards(0).then(response => {
+        //     console.log("bswapUnclaimedRewards Swap rewards", response.data)
+        // })
+        // client.bswapUnclaimedRewards(1).then(response => {
+        //     console.log("bswapUnclaimedRewards Liquidity rewards", response.data)
+        // })
+        // client.bswapLiquidity().then(response => {
+        //     console.log("bswapLiquidity", response.data)
+        //     response.data.filter(data => +data.share.shareAmount)
+        //         .reduce((arr, o) => {
+        //             let keys = Object.keys(o.share.asset);
+        //             let first = {...o};
+        //             first.symbol = keys[0]
+        //             first.description = `${first.symbol} (${o.poolName})`
+        //             first.amount = o.share.asset[first.symbol]
+        //             let second = {...o};
+        //             second.symbol = keys[1]
+        //             second.description = `${second.symbol} (${o.poolName})`
+        //             second.amount = o.share.asset[second.symbol]
+        //             arr.push(first)
+        //             arr.push(second)
+        //             return arr;
+        //         }, [])
+        //         .forEach(data => console.log("bswapLiquidity " + data.description, data))
+        // })
+        // client.savingsAccount().then(response => {
+        //     console.log("savingsAccount", response.data)
+        //     response.data.positionAmountVos?.filter(p => +p.amount)
+        //         .forEach(position => {
+        //             client.savingsFlexibleProductPosition(position.asset)
+        //                 .then(response => {
+        //                     console.log("saving flexible " + position.asset, response.data)
+        //                     return client.savingsCustomizedPosition(position.asset)
+        //                 })
+        //                 .then(response => {
+        //                     if (!response.data || (response.data.__proto__ === [].__proto__ && !response.data.length)) {
+        //                         return
+        //                     }
+        //                     console.log("saving fixed " + position.asset, response.data)
+        //                 })
+        //         })
+        // })
+        console.log("accountInfo", account)
+        return account
+    },
     getUserInfo(key, secret, resultConsumer, onError) {
+        console.trace("here")
         const spotClient = Binance({
             apiKey: key,
             apiSecret: secret,
@@ -131,5 +212,13 @@ const binanceApiClient = {
         })
     }
 };
+
+function tryCatchRequest(action, name) {
+    try {
+        return action()
+    } catch (e) {
+        console.warn(e)
+    }
+}
 
 export default binanceApiClient
