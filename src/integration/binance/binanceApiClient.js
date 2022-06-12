@@ -31,7 +31,7 @@ const binanceApiClient = {
     async getUserInfoAsync(key, secret) {
         let binanceApiService = new BinanceApiService(key, secret);
         // spot account info
-        let account = binanceApiService.accountInfo();
+        let account = await binanceApiService.accountInfo();
         if (!account.accounts) {
             account.accounts = {};
         }
