@@ -31,21 +31,6 @@ class BinanceApiService {
         return this.spotClient.accountInfo()
     }
 
-    futuresBalancesUsdM(): Promise<FuturesBalanceResult[]> {
-        return this.spotClient.futuresAccountBalance()
-            .then((balances: FuturesBalanceResult[]) => {
-                return balances.filter(f => +f.balance)
-            })
-    }
-
-    futuresBalancesCoinM(): Promise<FuturesAssetCoinM[]> {
-        return this.futuresClient.futuresCoinMBalance()
-            .then((response: Response<FuturesAssetCoinM[]>) => response.data)
-            .then((futures: FuturesAssetCoinM[]) => {
-                return futures.filter((f: FuturesAssetCoinM) => +f.balance)
-            })
-    }
-
     isolatedMarginAssets(): Promise<IsolatedAssetSingle[]> {
         return this.spotClient.marginIsolatedAccount()
             .then((account: IsolatedMarginAccount) => account.assets
@@ -61,6 +46,21 @@ class BinanceApiService {
         return this.client.marginAccount().then((response: Response<CrossMarginAccount>) => {
             return response.data.userAssets.filter((p) => +p.netAsset)
         })
+    }
+
+    futuresBalancesUsdM(): Promise<FuturesBalanceResult[]> {
+        return this.spotClient.futuresAccountBalance()
+            .then((balances: FuturesBalanceResult[]) => {
+                return balances.filter(f => +f.balance)
+            })
+    }
+
+    futuresBalancesCoinM(): Promise<FuturesAssetCoinM[]> {
+        return this.futuresClient.futuresCoinMBalance()
+            .then((response: Response<FuturesAssetCoinM[]>) => response.data)
+            .then((futures: FuturesAssetCoinM[]) => {
+                return futures.filter((f: FuturesAssetCoinM) => +f.balance)
+            })
     }
 
     fundingAssets(): Promise<FundingAsset[]> {
