@@ -6,15 +6,18 @@ export default class AssetDTO {
     name;
     description;
     id;
+    isBinanceAsset;
+    isMonobankAsset;
 
-
-    constructor(type, amount, currency, name, description, id) {
+    constructor(type, amount, currency, name, description, id, isBinanceAsset, isMonobankAsset) {
         this.type = type;
         this.amount = amount;
         this.currency = currency;
         this.name = name;
-        this.description = description;
-        this.id = id;
+        this.description = description || name;
+        this.id = id || name;
+        this.isBinanceAsset = isBinanceAsset;
+        this.isMonobankAsset = isMonobankAsset;
     }
 
     static copy(origin) {
@@ -25,6 +28,8 @@ export default class AssetDTO {
             origin.name,
             origin.description,
             origin.id,
+            origin.isBinanceAsset,
+            origin.isMonobankAsset,
         )
     }
 }

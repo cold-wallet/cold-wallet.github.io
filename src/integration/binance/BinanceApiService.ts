@@ -1,12 +1,7 @@
 import Spot from "./connector/spot";
-import BinanceApi, {
-    Account,
-    Binance,
-    FuturesBalanceResult,
-    IsolatedAsset,
-    IsolatedAssetSingle,
-    IsolatedMarginAccount
-} from "binance-api-node";
+import BinanceApi, {Account, Binance, IsolatedAsset, IsolatedAssetSingle} from "binance-api-node";
+import AssetDTO from "../../assets/AssetDTO";
+import ratesClient from "../ratesClient";
 
 const binanceFuturesApiUrl = "https://dapi.binance.com";
 const proxyUrl = "https://ntrocp887e.execute-api.eu-central-1.amazonaws.com/prod/binance";
@@ -31,80 +26,190 @@ class BinanceApiService {
         return this.spotClient.accountInfo()
     }
 
-    isolatedMarginAssets(): Promise<IsolatedAssetSingle[]> {
-        return this.spotClient.marginIsolatedAccount()
-            .then((account: IsolatedMarginAccount) => account.assets
-                .reduce((arr: IsolatedAssetSingle[], account: IsolatedAsset) => {
-                    arr.push(account.baseAsset)
-                    arr.push(account.quoteAsset)
-                    return arr;
-                }, [])
-                .filter(p => +p.netAsset))
-    }
-
-    crossMarginAssets(): Promise<CrossMarginAsset[]> {
-        return this.client.marginAccount().then((response: Response<CrossMarginAccount>) => {
-            return response.data.userAssets.filter((p) => +p.netAsset)
-        })
-    }
-
-    futuresBalancesUsdM(): Promise<FuturesBalanceResult[]> {
-        return this.spotClient.futuresAccountBalance()
-            .then((balances: FuturesBalanceResult[]) => {
-                return balances.filter(f => +f.balance)
+    async isolatedMarginAssets(): Promise<AssetDTO[]> {
+        let account = await this.spotClient.marginIsolatedAccount()
+        return account.assets
+            .reduce((arr: IsolatedAssetSingle[], account: IsolatedAsset) => {
+                arr.push(account.baseAsset)
+                arr.push(account.quoteAsset)
+                return arr;
+            }, [])
+            .filter((p) => +p.netAsset)
+            .map((balance) => {
+                let name = `binance ${balance.asset} Margin Isolated`
+                return new AssetDTO(
+                    ratesClient.getCurrencyType(balance.asset),
+                    +balance.netAsset,
+                    balance.asset,
+                    name,
+                    name,
+                    name,
+                    true,
+                    false
+                )
             })
     }
 
-    futuresBalancesCoinM(): Promise<FuturesAssetCoinM[]> {
-        return this.futuresClient.futuresCoinMBalance()
-            .then((response: Response<FuturesAssetCoinM[]>) => response.data)
-            .then((futures: FuturesAssetCoinM[]) => {
-                return futures.filter((f: FuturesAssetCoinM) => +f.balance)
+    async crossMarginAssets(): Promise<AssetDTO[]> {
+        let marginAccount: Response<CrossMarginAccount> = await this.client.marginAccount();
+        return marginAccount.data.userAssets
+            .filter((p) => +p.netAsset)
+            .map((balance) => {
+                let name = `binance ${balance.asset} Margin Cross`
+                return new AssetDTO(
+                    ratesClient.getCurrencyType(balance.asset),
+                    +balance.netAsset,
+                    balance.asset,
+                    name,
+                    name,
+                    name,
+                    true,
+                    false
+                )
             })
     }
 
-    fundingAssets(): Promise<FundingAsset[]> {
-        return this.client.fundingWallet().then((response: Response<FundingAsset[]>) => {
-            return response.data.filter((asset) => +asset.free)
-        })
+    async futuresBalancesUsdM(): Promise<AssetDTO[]> {
+        let balances = await this.spotClient.futuresAccountBalance();
+        return balances.filter(f => +f.balance)
+            .map((balance) => {
+                let name = `binance ${balance.asset} Futures USD-M`
+                return new AssetDTO(
+                    ratesClient.getCurrencyType(balance.asset),
+                    +balance.balance,
+                    balance.asset,
+                    name,
+                    name,
+                    name,
+                    true,
+                    false
+                )
+            })
     }
 
-    lockedStaking(): Promise<StakingPosition[]> {
+    async futuresBalancesCoinM(): Promise<AssetDTO[]> {
+        let response: Response<FuturesAssetCoinM[]> = await this.futuresClient.futuresCoinMBalance();
+        return response.data.filter((f: FuturesAssetCoinM) => +f.balance)
+            .map((balance) => {
+                let name = `binance ${balance.asset} Futures COIN-M`
+                return new AssetDTO(
+                    ratesClient.getCurrencyType(balance.asset),
+                    +balance.balance,
+                    balance.asset,
+                    name,
+                    name,
+                    name,
+                    true,
+                    false
+                )
+            })
+    }
+
+    async fundingAssets(): Promise<AssetDTO[]> {
+        let response: Response<FundingAsset[]> = await this.client.fundingWallet();
+        return response.data.filter((asset) => +asset.free)
+            .map((balance) => {
+                let name = `binance ${balance.asset} Funding`
+                return new AssetDTO(
+                    ratesClient.getCurrencyType(balance.asset),
+                    +balance.free,
+                    balance.asset,
+                    name,
+                    name,
+                    name,
+                    true,
+                    false
+                )
+            })
+    }
+
+    async lockedStaking(): Promise<AssetDTO[]> {
         //`STAKING` - for Locked Staking
-        return this.client.stakingProductPosition('STAKING').then((r: Response<StakingPosition[]>) => r.data)
-    }
-
-    lockedDeFiStaking(): Promise<StakingPosition[]> {
-        //`L_DEFI` - for locked DeFi Staking
-        return this.client.stakingProductPosition('L_DEFI').then((r: Response<StakingPosition[]>) => r.data)
-    }
-
-    flexibleDefiStaking(): Promise<StakingPosition[]> {
-        //`F_DEFI` - for flexible DeFi Staking
-        return this.client.stakingProductPosition('F_DEFI').then((r: Response<StakingPosition[]>) => r.data)
-    }
-
-    liquidityFarming(): Promise<LiquidityFarmingPool[]> {
-        return this.client.bswapLiquidity().then((response: Response<LiquidityFarmingPool[]>) => {
-            return response.data.filter((data) => +data.share.shareAmount)
-                .reduce((arr: LiquidityFarmingPool[], o) => {
-                    let keys = Object.keys(o.share.asset);
-                    let first = {...o};
-                    first.symbol = keys[0]
-                    first.description = `${first.symbol} (${o.poolName})`
-                    first.amount = o.share.asset[first.symbol]
-                    let second = {...o};
-                    second.symbol = keys[1]
-                    second.description = `${second.symbol} (${o.poolName})`
-                    second.amount = o.share.asset[second.symbol]
-                    arr.push(first)
-                    arr.push(second)
-                    return arr;
-                }, [])
+        let response: Response<StakingPosition[]> = await this.client.stakingProductPosition('STAKING');
+        return response.data.map((balance) => {
+            let name = `binance ${balance.asset} Staking Locked`
+            return new AssetDTO(
+                ratesClient.getCurrencyType(balance.asset),
+                +balance.amount,
+                balance.asset,
+                name,
+                name,
+                name,
+                true,
+                false
+            )
         })
     }
 
-    async savingsFixed(): Promise<SavingFixedPosition[]> {
+    async lockedDeFiStaking(): Promise<AssetDTO[]> {
+        //`L_DEFI` - for locked DeFi Staking
+        let response: Response<StakingPosition[]> = await this.client.stakingProductPosition('L_DEFI');
+        return response.data.map((balance) => {
+            let name = `binance ${balance.asset} Staking Locked DeFi`
+            return new AssetDTO(
+                ratesClient.getCurrencyType(balance.asset),
+                +balance.amount,
+                balance.asset,
+                name,
+                name,
+                name,
+                true,
+                false
+            )
+        })
+    }
+
+    async flexibleDefiStaking(): Promise<AssetDTO[]> {
+        //`F_DEFI` - for flexible DeFi Staking
+        let response: Response<StakingPosition[]> = await this.client.stakingProductPosition('F_DEFI');
+        return response.data.map((balance) => {
+            let name = `binance ${balance.asset} Staking Flexible DeFi`
+            return new AssetDTO(
+                ratesClient.getCurrencyType(balance.asset),
+                +balance.amount,
+                balance.asset,
+                name,
+                name,
+                name,
+                true,
+                false
+            )
+        })
+    }
+
+    async liquidityFarming(): Promise<AssetDTO[]> {
+        let response: Response<LiquidityFarmingPool[]> = await this.client.bswapLiquidity();
+        return response.data.filter((data) => +data.share.shareAmount)
+            .reduce((arr: LiquidityFarmingPool[], o) => {
+                let keys = Object.keys(o.share.asset);
+                let first = {...o};
+                first.symbol = keys[0]
+                first.description = `${first.symbol} (${o.poolName})`
+                first.amount = o.share.asset[first.symbol]
+                let second = {...o};
+                second.symbol = keys[1]
+                second.description = `${second.symbol} (${o.poolName})`
+                second.amount = o.share.asset[second.symbol]
+                arr.push(first)
+                arr.push(second)
+                return arr;
+            }, [])
+            .map((balance) => {
+                let name = `binance ${balance.description} Liquidity Farming`
+                return new AssetDTO(
+                    ratesClient.getCurrencyType(balance.symbol),
+                    +balance.amount,
+                    balance.symbol,
+                    name,
+                    balance.description,
+                    balance.description,
+                    true,
+                    false
+                )
+            })
+    }
+
+    async savingsFixed(): Promise<AssetDTO[]> {
         let client = this.client;
         let savingsAccount: Response<SavingAccount> = await client.savingsAccount();
         let values = savingsAccount.data.positionAmountVos
@@ -122,10 +227,23 @@ class BinanceApiService {
             .reduce((arr, value) => {
                 arr.push(value[0])
                 return arr
-            }, []);
+            }, [])
+            .map((balance: SavingFixedPosition) => {
+                let name = `binance ${balance.asset} Earning Fixed ${+balance.interestRate * 100}%`;
+                return new AssetDTO(
+                    ratesClient.getCurrencyType(balance.asset),
+                    +balance.principal,
+                    balance.asset,
+                    name,
+                    name,
+                    name,
+                    true,
+                    false
+                )
+            })
     }
 
-    async savingsFlexible(): Promise<SavingFlexiblePosition[]> {
+    async savingsFlexible(): Promise<AssetDTO[]> {
         let client = this.client;
         let response = await client.savingsAccount();
         let values: Promise<SavingFlexiblePosition[]>[] = response.data.positionAmountVos
@@ -136,13 +254,6 @@ class BinanceApiService {
                     return []
                 }
                 return response.data
-                // return await client.savingsFlexibleProductPosition(position.asset)
-                //     .then((response: Response<SavingFlexiblePosition[]>) => {
-                //         if (!response.data || (!response.data.length)) {
-                //             return []
-                //         }
-                //         return response.data
-                //     })
             });
         let promise = await Promise.all(values);
 
@@ -151,27 +262,19 @@ class BinanceApiService {
                 arr.push(value[0])
                 return arr
             }, [])
-        // return await client.savingsAccount()
-        //     .then(async (response: Response<SavingAccount>) => {
-        //         let values: Promise<SavingFlexiblePosition[]>[] = response.data.positionAmountVos
-        //             ?.filter((p) => +p.amount)
-        //             .map(async (position) => {
-        //                 return await client.savingsFlexibleProductPosition(position.asset)
-        //                     .then((response: Response<SavingFlexiblePosition[]>) => {
-        //                         if (!response.data || (!response.data.length)) {
-        //                             return []
-        //                         }
-        //                         return response.data
-        //                     })
-        //             });
-        //         let promise = await Promise.all(values);
-        //
-        //         return promise.filter((value) => value.length)
-        //             .reduce((arr: SavingFlexiblePosition[], value: SavingFlexiblePosition[]) => {
-        //                 arr.push(value[0])
-        //                 return arr
-        //             }, [])
-        //     })
+            .map((balance: SavingFlexiblePosition) => {
+                let name = `binance ${balance.asset} Earning Flexible ${+balance.annualInterestRate * 100}%`;
+                return new AssetDTO(
+                    ratesClient.getCurrencyType(balance.asset),
+                    +balance.totalAmount,
+                    balance.asset,
+                    name,
+                    name,
+                    name,
+                    true,
+                    false
+                )
+            })
     }
 }
 
@@ -242,7 +345,7 @@ export interface SavingAsset {
 export interface LiquidityFarmingPool extends LiquidityFarmingPosition {
     symbol: string // "USDT"
     description: string // "USDT (USDC/USDT)"
-    amount?: string //
+    amount: string //
 }
 
 export interface LiquidityFarmingPosition {

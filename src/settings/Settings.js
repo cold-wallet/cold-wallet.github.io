@@ -123,7 +123,6 @@ export default class Settings extends React.Component {
                         data.accounts.savingsFlexible = userInfo.accounts.savingsFlexible
                     }
                     binanceUserDataRepository.save(data);
-                    console.log("binance data", data)
                     return data
                 })
                 .catch(console.error)
