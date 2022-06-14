@@ -70,7 +70,7 @@ function extractAssets(assets) {
     if (settings?.integrations?.binance?.binanceIntegrationEnabled) {
         const binanceUserInfo = binanceUserDataRepository.getLatest();
         if (binanceUserInfo && binanceUserInfo.balances) {
-            let accountAssets = Object.values(binanceUserInfo.accounts)
+            let accountAssets = Object.values(binanceUserInfo.accounts || {})
                 .filter(arr => arr.length)
                 .reduce((arr, account) => {
                     if (!account) {
