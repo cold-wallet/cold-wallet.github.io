@@ -43,4 +43,4 @@ class APIBase {
   }
 }
 
-module.exports = APIBase
+export default APIBase
