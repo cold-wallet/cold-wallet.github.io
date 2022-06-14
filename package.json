@@ -1,6 +1,6 @@
 {
   "name": "cold-wallet",
-  "version": "0.0.40",
+  "version": "0.0.41",
   "private": true,
   "homepage": "https://cold-wallet.github.io/",
   "dependencies": {
