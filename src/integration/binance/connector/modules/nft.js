@@ -4,7 +4,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module NFT
  * @param {*} superclass
  */
-export const NFT = superclass => class extends superclass {
+const NFT = superclass => class extends superclass {
   /**
      * Get NFT Transaction History (USER_DATA)<br>
      *
@@ -98,3 +98,4 @@ export const NFT = superclass => class extends superclass {
     )
   }
 }
+export default NFT

@@ -1,22 +1,49 @@
-export const Blvt = require('./blvt')
-export const Bswap = require('./bswap')
-export const SubAccount = require('./subAccount')
-export const Market = require('./market')
-export const Trade = require('./trade')
-export const Wallet = require('./wallet')
-export const Margin = require('./margin')
-export const Mining = require('./mining')
-export const Savings = require('./savings')
-export const Staking = require('./staking')
-export const Stream = require('./stream')
-export const Websocket = require('./websocket')
-export const Futures = require('./futures')
-export const Fiat = require('./fiat')
-export const C2C = require('./c2c')
-export const Loan = require('./loan')
-export const Pay = require('./pay')
-export const Convert = require('./convert')
-export const Rebate = require('./rebate')
-export const NFT = require('./nft')
-export const GiftCard = require('./giftCard')
-export const PortfolioMargin = require('./portfolioMargin')
+import blvt from "./blvt";
+import bswap from "./bswap";
+import subAccount from "./subAccount";
+import market from "./market";
+import trade from "./trade";
+import wallet from "./wallet";
+import margin from "./margin";
+import mining from "./mining";
+import savings from "./savings";
+import staking from "./staking";
+import stream from "./stream";
+import websocket from "./websocket";
+import futures from "./futures";
+import fiat from "./fiat";
+import c2c from "./c2c";
+import loan from "./loan";
+import pay from "./pay";
+import rebate from "./rebate";
+import nft from "./nft";
+import convert from "./convert";
+import giftCard from "./giftCard";
+import portfolioMargin from "./portfolioMargin";
+
+const modules = {
+    Blvt: blvt,
+    Bswap: bswap,
+    SubAccount: subAccount,
+    Market: market,
+    Trade: trade,
+    Wallet: wallet,
+    Margin: margin,
+    Mining: mining,
+    Savings: savings,
+    Staking: staking,
+    Stream: stream,
+    Websocket: websocket,
+    Futures: futures,
+    Fiat: fiat,
+    C2C: c2c,
+    Loan: loan,
+    Pay: pay,
+    Convert: convert,
+    Rebate: rebate,
+    NFT: nft,
+    GiftCard: giftCard,
+    PortfolioMargin: portfolioMargin,
+}
+
+export default modules

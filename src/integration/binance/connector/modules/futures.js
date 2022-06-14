@@ -5,7 +5,7 @@ const {validateRequiredParameters, hasOneOfParameters} = require('../helpers/val
  * @module Futures
  * @param {*} superclass
  */
-export const Futures = superclass => class extends superclass {
+const Futures = superclass => class extends superclass {
     /**
      * New Futures Account Transfer (USER_DATA)
      *
@@ -428,3 +428,5 @@ export const Futures = superclass => class extends superclass {
         )
     }
 }
+
+export default Futures

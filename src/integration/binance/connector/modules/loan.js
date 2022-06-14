@@ -4,7 +4,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Loan
  * @param {*} superclass
  */
-export const Loan = superclass => class extends superclass {
+const Loan = superclass => class extends superclass {
   /**
    * Get Crypto Loans Income History (USER_DATA)<br>
    *
@@ -32,3 +32,4 @@ export const Loan = superclass => class extends superclass {
     )
   }
 }
+export default Loan

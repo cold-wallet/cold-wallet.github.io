@@ -4,7 +4,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Convert
  * @param {*} superclass
  */
-export const Convert = superclass => class extends superclass {
+const Convert = superclass => class extends superclass {
   /**
    * Get Convert Trade History (USER_DATA)<br>
    *
@@ -29,3 +29,4 @@ export const Convert = superclass => class extends superclass {
     )
   }
 }
+export default Convert

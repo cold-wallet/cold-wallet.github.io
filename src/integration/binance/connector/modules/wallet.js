@@ -5,7 +5,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Wallet
  * @param {*} superclass
  */
-export const Wallet = superclass => class extends superclass {
+const Wallet = superclass => class extends superclass {
   /**
    * System Status (System)<br>
    *
@@ -469,3 +469,5 @@ export const Wallet = superclass => class extends superclass {
     )
   }
 }
+
+export default Wallet

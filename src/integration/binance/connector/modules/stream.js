@@ -5,7 +5,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Stream
  * @param {*} superclass
  */
-export const Stream = superclass => class extends superclass {
+const Stream = superclass => class extends superclass {
   /**
    * Create a ListenKey (USER_STREAM)<br>
    *
@@ -163,3 +163,5 @@ export const Stream = superclass => class extends superclass {
     )
   }
 }
+
+export default Stream

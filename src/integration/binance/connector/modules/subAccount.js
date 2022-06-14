@@ -5,7 +5,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module SubAccount
  * @param {*} superclass
  */
-export const SubAccount = superclass => class extends superclass {
+const SubAccount = superclass => class extends superclass {
   /**
     * Query Sub-account List(For Master Account)<br>
     *
@@ -852,3 +852,5 @@ export const SubAccount = superclass => class extends superclass {
     )
   }
 }
+
+export default SubAccount

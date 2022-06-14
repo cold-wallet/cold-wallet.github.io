@@ -5,7 +5,7 @@ const { validateRequiredParameters, hasOneOfParameters } = require('../helpers/v
  * @module Margin
  * @param {*} superclass
  */
-export const Margin = superclass => class extends superclass {
+const Margin = superclass => class extends superclass {
   /**
    * Cross Margin Account Transfer (MARGIN)<br>
    *
@@ -1001,3 +1001,5 @@ export const Margin = superclass => class extends superclass {
     )
   }
 }
+
+export default Margin

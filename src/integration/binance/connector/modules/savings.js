@@ -5,7 +5,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Savings
  * @param {*} superclass
  */
-export const Savings = superclass => class extends superclass {
+const Savings = superclass => class extends superclass {
   /**
    * Get Flexible Product List (USER_DATA)<br>
    *
@@ -334,3 +334,5 @@ export const Savings = superclass => class extends superclass {
     )
   }
 }
+
+export default Savings

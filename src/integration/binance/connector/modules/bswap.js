@@ -5,7 +5,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Bswap
  * @param {*} superclass
  */
-export const Bswap = superclass => class extends superclass {
+const Bswap = superclass => class extends superclass {
   /**
    * List All Swap Pools (MARKET_DATA)<br>
    *
@@ -334,3 +334,5 @@ export const Bswap = superclass => class extends superclass {
     )
   }
 }
+
+export default Bswap

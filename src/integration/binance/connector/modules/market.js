@@ -6,7 +6,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Market
  * @param {*} superclass
  */
-export const Market = superclass => class extends superclass {
+const Market = superclass => class extends superclass {
   /**
    * Test Connectivity<br>
    *
@@ -261,3 +261,5 @@ export const Market = superclass => class extends superclass {
     )
   }
 }
+
+export default Market

@@ -5,7 +5,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Staking
  * @param {*} superclass
  */
-export const Staking = superclass => class extends superclass {
+const Staking = superclass => class extends superclass {
   /**
    * Get Staking Product List (USER_DATA)<br>
    *
@@ -189,3 +189,5 @@ export const Staking = superclass => class extends superclass {
     )
   }
 }
+
+export default Staking
