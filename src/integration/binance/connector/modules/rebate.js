@@ -3,7 +3,7 @@
  * @module Rebate
  * @param {*} superclass
  */
-const Rebate = superclass => class extends superclass {
+export const Rebate = superclass => class extends superclass {
   /**
    * Get Spot Rebate History Records (USER_DATA)<br>
    *
@@ -26,4 +26,3 @@ const Rebate = superclass => class extends superclass {
     )
   }
 }
-module.exports = Rebate

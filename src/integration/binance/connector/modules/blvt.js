@@ -5,7 +5,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Blvt
  * @param {*} superclass
  */
-const Blvt = superclass => class extends superclass {
+export const Blvt = superclass => class extends superclass {
   /**
    * Get BLVT Info (MARKET_DATA)<br>
    *
@@ -121,5 +121,3 @@ const Blvt = superclass => class extends superclass {
     )
   }
 }
-
-module.exports = Blvt

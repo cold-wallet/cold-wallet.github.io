@@ -5,7 +5,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Mining
  * @param {*} superclass
  */
-const Mining = superclass => class extends superclass {
+export const Mining = superclass => class extends superclass {
   /**
    * Acquiring Algorithm (MARKET_DATA)<br>
    *
@@ -343,5 +343,3 @@ const Mining = superclass => class extends superclass {
     )
   }
 }
-
-module.exports = Mining

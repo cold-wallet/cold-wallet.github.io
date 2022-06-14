@@ -5,7 +5,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module GiftCard
  * @param {*} superclass
  */
-const GiftCard = superclass => class extends superclass {
+export const GiftCard = superclass => class extends superclass {
   /**
     * Create a Binance Code (USER_DATA)<br>
     *
@@ -89,5 +89,3 @@ const GiftCard = superclass => class extends superclass {
     )
   }
 }
-
-module.exports = GiftCard

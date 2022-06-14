@@ -4,7 +4,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module C2C
  * @param {*} superclass
  */
-const C2C = superclass => class extends superclass {
+export const C2C = superclass => class extends superclass {
   /**
    * Get C2C Trade History (USER_DATA)<br>
    *
@@ -32,4 +32,3 @@ const C2C = superclass => class extends superclass {
     )
   }
 }
-module.exports = C2C

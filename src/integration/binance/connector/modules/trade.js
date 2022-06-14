@@ -5,7 +5,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Trade
  * @param {*} superclass
  */
-const Trade = superclass => class extends superclass {
+export const Trade = superclass => class extends superclass {
   /**
    * Test New Order (TRADE)<br>
    *
@@ -386,5 +386,3 @@ const Trade = superclass => class extends superclass {
     )
   }
 }
-
-module.exports = Trade

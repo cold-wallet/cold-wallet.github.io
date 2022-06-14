@@ -3,7 +3,7 @@
  * @module PortfolioMargin
  * @param {*} superclass
  */
-const PortfolioMargin = superclass => class extends superclass {
+export const PortfolioMargin = superclass => class extends superclass {
   /**
    * Get Portfolio Margin Account Info (USER_DATA)<br>
    *
@@ -23,4 +23,3 @@ const PortfolioMargin = superclass => class extends superclass {
     )
   }
 }
-module.exports = PortfolioMargin

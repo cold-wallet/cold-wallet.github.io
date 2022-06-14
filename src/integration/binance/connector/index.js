@@ -1,1 +1,1 @@
-module.exports.Spot = require('./spot')
+export const Spot = require('./spot')

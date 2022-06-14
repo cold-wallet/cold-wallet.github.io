@@ -3,7 +3,7 @@
  * @module Pay
  * @param {*} superclass
  */
-const Pay = superclass => class extends superclass {
+export const Pay = superclass => class extends superclass {
   /**
    * Get Pay Trade History (USER_DATA)<br>
    *
@@ -26,4 +26,3 @@ const Pay = superclass => class extends superclass {
     )
   }
 }
-module.exports = Pay

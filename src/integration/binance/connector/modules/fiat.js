@@ -4,7 +4,7 @@ const { validateRequiredParameters } = require('../helpers/validation')
  * @module Fiat
  * @param {*} superclass
  */
-const Fiat = superclass => class extends superclass {
+export const Fiat = superclass => class extends superclass {
   /**
    * Get Fiat Deposit/Withdraw History (USER_DATA)<br>
    *
@@ -55,4 +55,3 @@ const Fiat = superclass => class extends superclass {
     )
   }
 }
-module.exports = Fiat

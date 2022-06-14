@@ -7,7 +7,7 @@ const WebSocketClient = require('ws')
  * @module Websocket
  * @param {*} superclass
  */
-const Websocket = superclass => class extends superclass {
+export const Websocket = superclass => class extends superclass {
   constructor (options) {
     super(options)
     this.wsURL = options.wsURL || 'wss://stream.binance.com:9443'
@@ -272,5 +272,3 @@ const Websocket = superclass => class extends superclass {
     }
   }
 }
-
-module.exports = Websocket
