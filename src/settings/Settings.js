@@ -32,60 +32,100 @@ export default class Settings extends React.Component {
         };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (!this.state.saveSettingsRequested
             && this.state.monobankIntegrationEnabled
             && this.state.monobankIntegrationToken
         ) {
+            let response;
             try {
-                monobankApiClient.getUserInfo(
-                    this.state.monobankIntegrationToken,
-                    userInfo => {
-                        monobankUserDataRepository.save({
-                            clientId: userInfo.clientId,
-                            name: userInfo.name,
-                            accounts: userInfo.accounts,
-                        });
-                    },
-                    console.error
-                );
+                response = await monobankApiClient.getUserInfoAsync(this.state.monobankIntegrationToken);
             } catch (e) {
                 console.error(e)
             }
+            let userInfo;
+            if (response
+                && (response.status === 200)
+                && (userInfo = response.data)
+                && !userInfo.errorDescription
+                && userInfo.name
+                && userInfo.accounts
+            ) {
+                monobankUserDataRepository.save({
+                    clientId: userInfo.clientId,
+                    name: userInfo.name,
+                    accounts: userInfo.accounts,
+                });
+            } else {
+                console.warn("Fetching latest rates failed", response);
+            }
+
         }
         if (!this.state.saveSettingsRequested
             && this.state.binanceIntegrationEnabled
             && this.state.binanceKeyIntegrationToken
             && this.state.binanceSecretIntegrationToken
         ) {
-            try {
-                const filterEmptyBalances = (balances) => {
-                    return balances.filter(balance => (+balance.free) + (+balance.locked))
-                }
-
-                binanceApiClient.getUserInfo(
-                    this.state.binanceKeyIntegrationToken,
-                    this.state.binanceSecretIntegrationToken,
-                    userInfo => {
-                        binanceUserDataRepository.save({
-                            accountType: userInfo.accountType, // "SPOT",
-                            balances: filterEmptyBalances(userInfo.balances), // [{asset,free,locked}],
-                            buyerCommission: userInfo.buyerCommission, // 0,
-                            canDeposit: userInfo.canDeposit, // true,
-                            canTrade: userInfo.canTrade, // true,
-                            canWithdraw: userInfo.canWithdraw, // true,
-                            makerCommission: userInfo.makerCommission, // 10,
-                            permissions: userInfo.permissions, // ["SPOT", "LEVERAGED"],
-                            sellerCommission: userInfo.sellerCommission, // 0,
-                            takerCommission: userInfo.takerCommission, // 10,
-                            updateTime: userInfo.updateTime, // 1613192140017
-                        });
-                    },
-                    console.error
-                );
-            } catch (e) {
-                console.error(e)
+            const filterEmptyBalances = (balances) => {
+                return balances.filter(balance => (+balance.free) + (+balance.locked))
             }
+            binanceApiClient
+                .getUserInfoAsync(
+                    this.state.binanceKeyIntegrationToken, this.state.binanceSecretIntegrationToken
+                )
+                .then(userInfo => {
+                    let accounts = binanceUserDataRepository.getLatest()?.accounts || {};
+                    let data = {
+                        accountType: userInfo.accountType, // "SPOT",
+                        balances: filterEmptyBalances(userInfo.balances), // [{asset,free,locked}],
+                        buyerCommission: userInfo.buyerCommission, // 0,
+                        canDeposit: userInfo.canDeposit, // true,
+                        canTrade: userInfo.canTrade, // true,
+                        canWithdraw: userInfo.canWithdraw, // true,
+                        makerCommission: userInfo.makerCommission, // 10,
+                        permissions: userInfo.permissions, // ["SPOT", "LEVERAGED"],
+                        sellerCommission: userInfo.sellerCommission, // 0,
+                        takerCommission: userInfo.takerCommission, // 10,
+                        updateTime: userInfo.updateTime, // 1613192140017
+                        accounts: accounts,
+                    };
+                    if (userInfo.accounts.marginIsolated) {
+                        data.accounts.marginIsolated = userInfo.accounts.marginIsolated
+                    }
+                    if (userInfo.accounts.marginCross) {
+                        data.accounts.marginCross = userInfo.accounts.marginCross
+                    }
+                    if (userInfo.accounts.futuresUsdM) {
+                        data.accounts.futuresUsdM = userInfo.accounts.futuresUsdM
+                    }
+                    if (userInfo.accounts.futuresCoinM) {
+                        data.accounts.futuresCoinM = userInfo.accounts.futuresCoinM
+                    }
+                    if (userInfo.accounts.funding) {
+                        data.accounts.funding = userInfo.accounts.funding
+                    }
+                    if (userInfo.accounts.lockedStaking) {
+                        data.accounts.lockedStaking = userInfo.accounts.lockedStaking
+                    }
+                    if (userInfo.accounts.lockedDeFiStaking) {
+                        data.accounts.lockedDeFiStaking = userInfo.accounts.lockedDeFiStaking
+                    }
+                    if (userInfo.accounts.flexibleDefiStaking) {
+                        data.accounts.flexibleDefiStaking = userInfo.accounts.flexibleDefiStaking
+                    }
+                    if (userInfo.accounts.liquidityFarming) {
+                        data.accounts.liquidityFarming = userInfo.accounts.liquidityFarming
+                    }
+                    if (userInfo.accounts.savingsFixed) {
+                        data.accounts.savingsFixed = userInfo.accounts.savingsFixed
+                    }
+                    if (userInfo.accounts.savingsFlexible) {
+                        data.accounts.savingsFlexible = userInfo.accounts.savingsFlexible
+                    }
+                    binanceUserDataRepository.save(data);
+                    return data
+                })
+                .catch(console.error)
         }
     }
 
@@ -198,28 +238,25 @@ export default class Settings extends React.Component {
             binanceLocker.save({
                 binanceIntegrationLock: Date.now(),
             });
-            try {
-                binanceApiClient.getUserInfo(
-                    bufferBinanceKeyIntegrationToken,
-                    bufferBinanceSecretIntegrationToken,
-                    userInfo => {
-                        this.saveBinanceSettings({
-                            binanceIntegrationEnabled: this.state.binanceIntegrationEnabled,
-                            binanceKeyIntegrationToken: bufferBinanceKeyIntegrationToken,
-                            binanceSecretIntegrationToken: bufferBinanceSecretIntegrationToken,
-                            binanceUserInfo: userInfo,
-                        });
-                    },
-                    e => {
-                        console.error(e);
-                        this.setState({
-                            saveSettingsRequested: false,
-                        });
-                        binanceLocker.save({});
+            binanceApiClient.getUserInfoAsync(
+                bufferBinanceKeyIntegrationToken,
+                bufferBinanceSecretIntegrationToken
+            ).then(
+                userInfo => {
+                    this.saveBinanceSettings({
+                        binanceIntegrationEnabled: this.state.binanceIntegrationEnabled,
+                        binanceKeyIntegrationToken: bufferBinanceKeyIntegrationToken,
+                        binanceSecretIntegrationToken: bufferBinanceSecretIntegrationToken,
+                        binanceUserInfo: userInfo,
                     });
-            } catch (e) {
-                binanceLocker.save({})
-            }
+                })
+                .catch(e => {
+                    console.warn(e);
+                    this.setState({
+                        saveSettingsRequested: false,
+                    });
+                    binanceLocker.save({});
+                })
         }
         return [
             <button title="Settings" key="settings-button" className="settings-button"

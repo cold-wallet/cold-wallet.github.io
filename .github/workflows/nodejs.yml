@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
 
 jobs:
   build:
@@ -15,6 +15,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 14
+      - name: Print npm version
+        run: npm -v
+      - name: Print node version
+        run: node -v
       - name: Install 🔧
         run: npm install
       - name: Build 🔧

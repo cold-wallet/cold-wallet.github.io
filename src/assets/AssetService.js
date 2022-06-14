@@ -47,16 +47,16 @@ function extractAssets(assets) {
                     const name = `monobank ${currency} ${account.maskedPan
                         ? (account.maskedPan[0] ? (account.maskedPan[0] + " ") : "")
                         : ""}${account.type}`;
-                    const asset = new AssetDTO(
+                    return new AssetDTO(
                         'fiat',
                         (account.balance || 0) / 100,
                         currency,
                         name,
                         name,
                         account.id,
-                    );
-                    asset.isMonobankAsset = true;
-                    return asset
+                        false,
+                        true
+                    )
                 });
             const monobankAssetIds = monobankAssets.reduce((a, b) => {
                 a[b.id] = true;
@@ -70,28 +70,36 @@ function extractAssets(assets) {
     if (settings?.integrations?.binance?.binanceIntegrationEnabled) {
         const binanceUserInfo = binanceUserDataRepository.getLatest();
         if (binanceUserInfo && binanceUserInfo.balances) {
-            let binanceAssets = binanceUserInfo.balances
+            let accountAssets = Object.values(binanceUserInfo.accounts)
+                .filter(arr => arr.length)
+                .reduce((arr, account) => {
+                    if (!account) {
+                        return arr;
+                    }
+                    account.forEach(element => arr.push(element))
+                    return arr;
+                }, [])
+                .sort((a, b) => compareStrings(a.asset, b.asset))
+            let spotAssets = binanceUserInfo.balances
+                .filter(balance => !(balance.asset.startsWith("LD") && balance.asset.length >= 5))
                 .sort((a, b) => compareStrings(a.asset, b.asset))
                 .map(balance => {
                     let currency = balance.asset;
                     let type = binanceUserInfo.accountType;
-                    if (currency.startsWith("LD") && currency.length >= 5) {
-                        // in case of earning asset, 'LD' prefix should be removed
-                        currency = currency.substr(2);
-                        type = `earn ${type}`;
-                    }
                     const name = `binance ${currency} ${type}`;
-                    const asset = new AssetDTO(
+                    return new AssetDTO(
                         ratesClient.getCurrencyType(balance.asset),
                         (+balance.free) + (+balance.locked),
                         currency,
                         name,
                         name,
                         name,
-                    );
-                    asset.isBinanceAsset = true;
-                    return asset
+                        true,
+                        false
+                    )
                 });
+            let binanceAssets = [].concat(spotAssets).concat(accountAssets)
+                .sort((a, b) => compareStrings(a.asset, b.asset))
             let binanceFiatAsset = binanceAssets.filter(asset => asset.type === "fiat");
             const binanceFiatAssetIds = binanceFiatAsset.reduce((a, b) => {
                 a[b.id] = true;
