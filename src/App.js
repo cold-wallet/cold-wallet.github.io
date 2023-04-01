@@ -10,11 +10,11 @@ import Settings from "./settings/Settings";
 
 export default function App() {
     return <div className="dashboard">
+        <ResultsWrapper/>
         <div className={"assets-wrapper"}>
-            <div translate="no" className={"assets-wrapper-title"}>{"So if you have:"}</div>
+            <div translate="no" className={"assets-wrapper-title"}>{"Your assets:"}</div>
             <AssetsGroupsWrapper/>
         </div>
-        <ResultsWrapper/>
         <Settings/>
     </div>
 }

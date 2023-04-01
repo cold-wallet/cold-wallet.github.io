@@ -14,6 +14,12 @@
   flex-flow: column;
 }
 
+@media only screen and (max-width: 800px) {
+  .new-asset-menu {
+    width: 95%;
+  }
+}
+
 .new-asset-menu-shadow {
   z-index: 100000;
   left: 0;

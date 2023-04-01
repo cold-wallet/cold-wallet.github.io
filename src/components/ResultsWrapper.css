@@ -6,16 +6,25 @@
   padding: 0.5% 1% 1% 0.5%;
 }
 
+@media only screen and (max-width: 800px) {
+  .results-wrapper {
+    width: 100%;
+    padding: 0;
+    min-width: 100px;
+  }
+}
+
 .results-title {
   background-color: #6F9F98;
   padding-left: 25%;
   height: 4%;
+  min-height: 20px;
 }
 
 .results-container {
   width: 100%;
   display: flex;
-  flex-flow: row;
+  flex-flow: row-reverse;
   height: 97%;
 }
 
@@ -74,16 +83,17 @@
 
 
 .balance-results-container {
-  overflow-y: auto;
   background-color: #6F9F98;
   height: 100%;
   min-width: 300px;
-  width: 60%;
+  width: 64%;
+  display: flex;
+  flex-flow: row;
 }
 
 .balance-circle-container {
   height: 100%;
-  padding: 0 0 0 5%;
+  width: 90%;
   display: flex;
   flex-flow: column;
   justify-content: space-evenly;
@@ -208,4 +218,31 @@
 .chart-currencies-switch-controls--container:hover,
 .chart-currencies-switch-controls--container__active {
   background: radial-gradient(at center center, rgb(236, 249, 31) 0%, rgba(64, 145, 108, 0) 60%);
+}
+
+@media only screen and (max-width: 800px) {
+  .results-container {
+    flex-flow: column;
+    align-items: center;
+    height: auto;
+  }
+  .balance-results-container {
+    width: 100%;
+    display: flex;
+  }
+  .results-one-more-wrap-layer {
+    height: auto;
+  }
+  .balance-circle-container {
+    width: 90%;
+    padding: 0;
+    flex-flow: column;
+  }
+  .balance-circle-chart {
+    height: 100%;
+  }
+  .total-amount-in-one-currency--container {
+    width: 80%;
+    padding: 0 10%;
+  }
 }
