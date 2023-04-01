@@ -1,8 +1,16 @@
 .dashboard {
   overflow-x: auto;
   display: flex;
+  flex-flow: row-reverse;
+  justify-content: flex-end;
   height: 100%;
   background-color: #6F9F98;
+}
+
+@media only screen and (max-width: 800px) {
+  .dashboard {
+    flex-flow: wrap;
+  }
 }
 
 .App {
