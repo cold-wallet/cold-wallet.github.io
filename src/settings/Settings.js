@@ -18,11 +18,6 @@ const monobankLocker = LocalStorageRepository.builder()
     .nullObject({})
     .build();
 
-const importLocker = LocalStorageRepository.builder()
-    .name('import-locker')
-    .nullObject({})
-    .build();
-
 export default class Settings extends React.Component {
 
     constructor(props, context) {
@@ -505,20 +500,12 @@ export default class Settings extends React.Component {
         if (this.state.saveSettingsRequested
             && this.state.importDataEnabled
             && bufferImportData
-            && !importLocker.getLatest().importDataLock
         ) {
-            importLocker.save({
-                importDataLock: Date.now(),
-            });
-            try {
-                this.readImportedData(bufferImportData);
-                this.setState({
-                    importDataEnabled: false,
-                    bufferImportData: undefined,
-                })
-            } finally {
-                importLocker.save({});
-            }
+            this.readImportedData(bufferImportData);
+            this.setState({
+                importDataEnabled: false,
+                bufferImportData: undefined,
+            })
         }
     }
 }
