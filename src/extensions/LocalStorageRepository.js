@@ -16,6 +16,10 @@ export default class LocalStorageRepository {
                 : this.nullObject);
     }
 
+    exist() {
+        return !!localStorage.getItem(this.name);
+    }
+
     save(data) {
         const newData = JSON.stringify(data);
         const oldData = localStorage.getItem(this.name) || "{}";

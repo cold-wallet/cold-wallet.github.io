@@ -6,6 +6,7 @@ import monobankUserDataRepository from "../integration/monobank/MonobankUserData
 import binanceUserDataRepository from "../integration/binance/BinanceUserDataRepository";
 import LocalStorageRepository from "../extensions/LocalStorageRepository";
 import binanceApiClient from "../integration/binance/binanceApiClient";
+import assetsRepository from "../assets/assetsRepository";
 
 const binanceLocker = LocalStorageRepository.builder()
     .name('binance-locker')
@@ -14,6 +15,11 @@ const binanceLocker = LocalStorageRepository.builder()
 
 const monobankLocker = LocalStorageRepository.builder()
     .name('monobank-locker')
+    .nullObject({})
+    .build();
+
+const importLocker = LocalStorageRepository.builder()
+    .name('import-locker')
     .nullObject({})
     .build();
 
@@ -357,6 +363,60 @@ export default class Settings extends React.Component {
                                 </div>
                             }
                         </div>
+                        <div id="export-data" className="integration-container">
+                            <label className="document--label"><input
+                                type="checkbox"
+                                checked={!!this.state.exportDataEnabled}
+                                onChange={event => {
+                                    this.setState({
+                                        exportDataEnabled: !this.state.exportDataEnabled,
+                                    })
+                                }}
+                            />&nbsp;<span>Export data</span></label>
+                            {
+                                !(this.state.exportDataEnabled) ? null : <div>
+                                    <div className="integration-container--export-data-input-wrapper">
+                                        <div>
+                                            <input type="text"
+                                                   readOnly={true}
+                                                   value={this.generateExportData()}
+                                                   className="integration-container--export-data-input"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div id="import-data" className="integration-container">
+                            <label className="document--label"><input
+                                type="checkbox"
+                                checked={!!this.state.importDataEnabled}
+                                onChange={event => {
+                                    this.setState({
+                                        importDataEnabled: !this.state.importDataEnabled,
+                                    })
+                                }}
+                            />&nbsp;<span>Import data</span></label>
+                            {
+                                !(this.state.importDataEnabled) ? null : <div>
+                                    <div className="integration-container--import-data-input-wrapper">
+                                        <div>
+                                            <input type="text"
+                                                   placeholder="import data"
+                                                   onChange={event => this.setState({
+                                                       bufferImportData: event.target.value,
+                                                   })}
+                                                   className="integration-container--import-data-input"/>
+                                            {
+                                                !this.state.saveSettingsRequested ? null : (
+                                                    <span>Checking...</span>
+                                                    //    todo: add loading animation
+                                                )
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                     <div className="settings--controls">
                         <button
@@ -371,6 +431,9 @@ export default class Settings extends React.Component {
                                     && !this.state.bufferBinanceKeyIntegrationToken) {
                                     state.bufferBinanceKeyIntegrationToken = this.state.binanceKeyIntegrationToken;
                                 }
+                                if (this.state.importDataEnabled && this.state.bufferImportData) {
+                                    state.bufferImportData = this.state.bufferImportData;
+                                }
                                 this.setState(state);
                             }}
                             title={"save"}
@@ -380,6 +443,39 @@ export default class Settings extends React.Component {
                 </div>
             </div>
         ]
+    }
+
+    generateExportData() {
+        let data = {};
+        settingsRepository.exist() && (data[settingsRepository.name] = settingsRepository.getLatest());
+        monobankUserDataRepository.exist() && (data[monobankUserDataRepository.name] = monobankUserDataRepository.getLatest());
+        binanceUserDataRepository.exist() && (data[binanceUserDataRepository.name] = binanceUserDataRepository.getLatest());
+        assetsRepository.exist() && (data[assetsRepository.name] = assetsRepository.getLatest());
+        return new Buffer(encodeURIComponent(JSON.stringify(data))).toString('base64');
+    }
+
+    readImportedData(data) {
+        try {
+            let text = new Buffer(data, 'base64').toString('ascii');
+            try {
+                let parsed = JSON.parse(decodeURIComponent(text));
+                this.storeData(parsed);
+                console.log("imported successfully")
+            } catch (e) {
+                console.error("error while parsing json string: ", text)
+                console.error(e)
+            }
+        } catch (e) {
+            console.error("error while decoding string: ", data)
+            console.error(e)
+        }
+    }
+
+    storeData(data) {
+        data[settingsRepository.name] && settingsRepository.save(data[settingsRepository.name]);
+        data[monobankUserDataRepository.name] && monobankUserDataRepository.save(data[monobankUserDataRepository.name]);
+        data[binanceUserDataRepository.name] && binanceUserDataRepository.save(data[binanceUserDataRepository.name]);
+        data[assetsRepository.name] && assetsRepository.save(data[assetsRepository.name]);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -404,5 +500,25 @@ export default class Settings extends React.Component {
             })
         }
 
+        const bufferImportData = this.state.bufferImportData;
+
+        if (this.state.saveSettingsRequested
+            && this.state.importDataEnabled
+            && bufferImportData
+            && !importLocker.getLatest().importDataLock
+        ) {
+            importLocker.save({
+                importDataLock: Date.now(),
+            });
+            try {
+                this.readImportedData(bufferImportData);
+                this.setState({
+                    importDataEnabled: false,
+                    bufferImportData: undefined,
+                })
+            } finally {
+                importLocker.save({});
+            }
+        }
     }
 }
