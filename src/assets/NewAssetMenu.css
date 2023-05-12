@@ -14,7 +14,7 @@
   flex-flow: column;
 }
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 970px) {
   .new-asset-menu {
     width: 95%;
   }

@@ -12,6 +12,7 @@ import highCharts3d from 'highcharts/highcharts-3d'
 import treemap from 'highcharts/modules/treemap'
 import historyService from "../history/historyService";
 import historyRepository from "../history/HistoryRepository";
+import nextPageIcon from '../resources/img/next-page.svg'
 import btcIcon from "../resources/currencies/btc.png";
 import ethIcon from "../resources/currencies/eth.png";
 import usdtIcon from "../resources/currencies/usdt.png";
@@ -95,7 +96,7 @@ export default class ResultsWrapper extends React.Component {
         return <div className={"results-wrapper"}>
             <div className="results-one-more-wrap-layer">
                 <div className={"results-title"}>Assets statistics:</div>
-                <div className={"results-container"}>{
+                <div className={"results-container" + (this.state.activeResultsTab === "first" ? "--wide" : "")}>{
                     this.getAnalyzers().map((analyzer, i) =>
                         analyzer.buildInnerResult(i, this.state.assets)
                     )
@@ -336,21 +337,6 @@ export default class ResultsWrapper extends React.Component {
                     "#d8f3dc",
                 ];
 
-                const buildGoToNext = () => this.state.activeResultsTab === "first"
-                    ? <div key={"go-to-next"}
-                           className="go-to-button-block--container">
-                        <img className={"go-to-next-block--button"}
-                             alt="go to next analysis block view"
-                             title={"go to next block"}
-                             src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"
-                             onClick={() => this.setState({
-                                 activeResultsTab: "timelapse",
-                             })}/>
-                        <span style={{display: "none",}}>
-                             <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
-                         </span>
-                    </div> : null;
-
                 return <div key={key} className={"balance-results-container"}>
                     <div className={"balance-circle-container"}>
                         <div className={"balance-circle-chart"}>
@@ -441,7 +427,11 @@ export default class ResultsWrapper extends React.Component {
                             </div>
                         </div>
                     </div>
-                    {buildGoToNext()}
+                    {this.state.activeResultsTab === "first"
+                        ? this.buildGoToNext(
+                            () => this.setState({activeResultsTab: "timelapse",}), true
+                        )
+                        : null}
                 </div>
             }
         }, {
@@ -904,7 +894,7 @@ export default class ResultsWrapper extends React.Component {
                     </div> : null;
 
                 return [
-                    this.buildButton_GoToNext("balance-treemap", "balance-treemap"),
+                    this.buildButton_GoToNext_Hidden(),
                     buildTotalTreemapChart(),
                     this.buildButton_GoToPrev("balance-treemap", "timelapse-total"),
                 ]
@@ -912,25 +902,39 @@ export default class ResultsWrapper extends React.Component {
         }]
     }
 
-    buildButton_GoToNext(activeTab, newTab) {
-        return (this.state.activeResultsTab === activeTab
-            ? <div key={"go-to-next"} className="go-to-button-block--container">
+    buildGoToNext(onClick, largeVersion) {
+        return (
+            <div key={"go-to-next"}
+                 className={"go-to-button-block--container" + (largeVersion
+                     ? " go-to-button-block--container--large" : "")}>
                 <img className={"go-to-next-block--button"}
                      alt="go to next analysis block view"
                      title={"go to next block"}
-                     src="https://img.icons8.com/carbon-copy/100/000000/double-left.png"
-                     onClick={() => {
-                         this.setState({
-                             activeResultsTab: newTab,
-                             chartsBufferActiveCurrency: this.state.chartsCurrencySelected
-                                 || this.state.chartsBufferActiveCurrency,
-                             chartsCurrencySelected: null,
-                         })
-                     }}/>
-                <span style={{display: "none",}}>
-                    <a href="https://icons8.com/icon/81122/double-left">Double Left icon by Icons8</a>
-                </span>
-            </div> : null)
+                     src={nextPageIcon}
+                     onClick={onClick}/>
+            </div>
+        );
+    }
+
+    buildButton_GoToNext(activeTab, newTab) {
+        return (this.state.activeResultsTab === activeTab
+            ? this.buildGoToNext(() => {
+                this.setState({
+                    activeResultsTab: newTab,
+                    chartsBufferActiveCurrency: this.state.chartsCurrencySelected
+                        || this.state.chartsBufferActiveCurrency,
+                    chartsCurrencySelected: null,
+                })
+            })
+            : null)
+    }
+
+    buildButton_GoToNext_Hidden() {
+        return (
+            <div key={"go-to-next"}
+                 className={"go-to-button-block--container"}>
+            </div>
+        );
     }
 
     buildButton_GoToPrev(activeTab, newTab) {
@@ -940,16 +944,13 @@ export default class ResultsWrapper extends React.Component {
                 <img className={"go-to-prev-block--button"}
                      alt="go to prev analysis block view"
                      title={"go to prev block"}
-                     src="https://img.icons8.com/carbon-copy/100/000000/double-right.png"
+                     src={nextPageIcon}
                      onClick={() => this.setState({
                          activeResultsTab: newTab,
                          chartsBufferActiveCurrency: this.state.chartsCurrencySelected
                              || this.state.chartsBufferActiveCurrency,
                          chartsCurrencySelected: null,
                      })}/>
-                <span style={{display: "none",}}>
-                             <a href="https://icons8.com/icon/81122/double-left">Double Right icon by Icons8</a>
-                         </span>
             </div> : null)
     }
 
