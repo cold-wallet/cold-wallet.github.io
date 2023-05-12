@@ -137,6 +137,10 @@
   display: flex;
   justify-content: center;
   flex-flow: column;
+  width: 6%;
+}
+
+.go-to-button-block--container--large {
   width: 9%;
 }
 
@@ -160,6 +164,10 @@
   background: radial-gradient(at center center, rgb(64, 145, 108) 0%, rgba(64, 145, 108, 0) 53%);
 }
 
+.go-to-prev-block--button {
+  transform: rotate(180deg);
+}
+
 .go-to-prev-block--button:hover,
 .go-to-next-block--button:hover {
   opacity: 1;
@@ -168,7 +176,7 @@
 .results-timelapse-percents--block,
 .results-timelapse--block {
   padding: 2% 0 0 0;
-  width: 82%;
+  width: 87%;
   display: flex;
   flex-flow: column;
 }
