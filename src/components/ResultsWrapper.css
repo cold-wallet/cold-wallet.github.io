@@ -6,7 +6,7 @@
   padding: 0.5% 1% 1% 0.5%;
 }
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 970px) {
   .results-wrapper {
     width: 100%;
     padding: 0;
@@ -21,6 +21,7 @@
   min-height: 20px;
 }
 
+.results-container--wide,
 .results-container {
   width: 100%;
   display: flex;
@@ -228,8 +229,16 @@
   background: radial-gradient(at center center, rgb(236, 249, 31) 0%, rgba(64, 145, 108, 0) 60%);
 }
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 700px) {
   .results-container {
+    flex-flow: column;
+    align-items: center;
+    height: auto;
+  }
+}
+
+@media only screen and (max-width: 970px) {
+  .results-container--wide {
     flex-flow: column;
     align-items: center;
     height: auto;

@@ -96,7 +96,7 @@ export default class ResultsWrapper extends React.Component {
         return <div className={"results-wrapper"}>
             <div className="results-one-more-wrap-layer">
                 <div className={"results-title"}>Assets statistics:</div>
-                <div className={"results-container"}>{
+                <div className={"results-container" + (this.state.activeResultsTab === "first" ? "--wide" : "")}>{
                     this.getAnalyzers().map((analyzer, i) =>
                         analyzer.buildInnerResult(i, this.state.assets)
                     )
