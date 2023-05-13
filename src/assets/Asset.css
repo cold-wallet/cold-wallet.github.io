@@ -1,108 +1,211 @@
 .asset-item--main-controls-row {
-  display: flex;
-  padding: 1%;
-  justify-content: space-between;
+    display: flex;
+    padding: 1%;
+    justify-content: space-between;
 }
 
 .asset-item--active,
 .asset-item {
-  flex-flow: column;
-  display: flex;
-  padding: 1%;
-  justify-content: space-between;
+    flex-flow: column;
+    display: flex;
+    padding: 1%;
+    justify-content: space-between;
 }
 
 .asset-item--active {
-  background-color: #BFD0DF;
+    background-color: #BFD0DF;
 }
 
 .asset-item:hover {
-  background-color: #BFD0DF;
+    background-color: #BFD0DF;
 }
 
 .asset-item-value {
-  width: 40%;
-  padding: 1%;
-  max-width: 50%;
+    width: 40%;
+    padding: 1%;
+    max-width: 50%;
+    min-width: 40%;
 }
 
 .asset-item-value-input,
 .asset-item-value input {
-  text-align: center;
-  border-style: solid;
-  border-color: #8da7be;
-  border-width: 2px;
-  outline: none;
-  width: 100%;
-  padding: 2% 0;
-  border-radius: 4px;
+    text-align: center;
+    border-style: solid;
+    border-color: #8da7be;
+    border-width: 2px;
+    outline: none;
+    width: 100%;
+    padding: 2% 0;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 .asset-item-value-input:disabled,
 .asset-item-value input:disabled {
-  background-color: #F0F8FF;
+    background-color: #F0F8FF;
 }
 
 .asset-item-value-input:focus,
 .asset-item-value input:focus {
-  border-style: dashed;
+    border-style: dashed;
 }
 
 .asset-item-value-input:active,
 .asset-item-value input:active {
-  border-style: solid;
-  border-color: #4f5a6b;
+    border-style: solid;
+    border-color: #4f5a6b;
 }
 
-.asset-item-currency {
-  padding: 1%;
-  width: 30%;
-  display: flex;
-  justify-content: center;
+.asset-item-name--container {
+    padding: 1%;
+    width: 50%;
+    min-width: 25%;
+    display: flex;
+    justify-content: center;
 }
 
-.asset-item-currency-name {
-  cursor: default;
+.asset-item-name {
+    cursor: default;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-top: 4px;
 }
 
 .asset-item-value-input--invalid {
-  border-color: #D00000;
-  background-color: rgba(208, 0, 0, 0.2);
+    border-color: #D00000;
+    background-color: rgba(208, 0, 0, 0.2);
 }
 
-.asset-item-buttons-container--integration-name {
-  width: 30%;
-  display: flex;
-  flex-flow: row;
-  justify-content: center;
-  cursor: default;
-  font-family: 'Lucida Console', monospace;
-  fill: #2D3142;
+.asset-item-buttons-container--integration-logo--wide {
+    width: 10%;
+    min-width: 10%;
+    display: flex;
+    flex-flow: row;
+    justify-content: flex-end;
+    cursor: default;
+    font-family: 'Lucida Console', monospace;
+    fill: #2D3142;
 }
 
-.asset-item-buttons-container--integration-name:hover {
-  fill: #f6f6f6;
+.asset-item-buttons-container--integration-logo--wide:hover {
+    width: 30%;
+    display: contents;
+}
+
+.asset-item-buttons-container--integration-logo--monobank:hover {
+    fill: #f6f6f6;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-radius: 5px;
+    padding: 0 1%;
+    display: flex;
+    width: 100%;
 }
 
 .asset-item-buttons-container--integration-binance {
-  width: 30%;
-  display: flex;
-  flex-flow: row;
-  justify-content: center;
-  cursor: default;
+    width: 30%;
+    min-width: 30%;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    cursor: default;
 }
 
-.asset-item-buttons-container--integration-binance:hover {
-  fill: #F0B90B;
+.asset-item-buttons-container--integration-logo--binance:hover {
+    fill: #F3BA2F;
 }
 
 .asset-item-buttons-container {
-  width: 30%;
-  display: flex;
-  flex-flow: row;
-  justify-content: flex-end;
+    width: 9%;
+    min-width: 9%;
+    display: flex;
+    flex-flow: row;
+    justify-content: flex-end;
+}
+
+.asset-item-buttons-container:hover {
+    width: 22%;
+    min-width: 22%;
 }
 
 .asset-item-buttons-container .button {
-  width: 50%;
+    width: 50%;
+}
+
+.asset-item-buttons-container--integration-logo--wide:hover .asset-item-buttons-container--integration-name {
+    display: block;
+    padding: 0 4%;
+}
+
+.asset-item-buttons-container--integration-name {
+    display: none;
+}
+
+.asset-item-buttons-container--integration-logo--container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.asset-item-buttons-container--integration-logo--short {
+    width: 88%;
+    border-radius: 15%;
+}
+
+.asset-item-buttons-container--integration-logo--wide:hover .asset-item-buttons-container--integration-logo--short {
+    display: none;
+}
+
+.asset-item-buttons-container--integration-logo--binance:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    border-radius: 5px;
+    padding: 0 1%;
+    display: flex;
+    width: 100%;
+}
+
+.asset-item-buttons-container .asset-item-buttons-placeholder {
+    font-weight: 900;
+    width: 100%;
+}
+
+.edit-asset-button,
+.delete-asset-button {
+    display: none;
+}
+
+.asset-item-buttons-container--edit-mode .edit-asset-button,
+.asset-item-buttons-container--edit-mode .delete-asset-button,
+.asset-item-buttons-container:hover .edit-asset-button,
+.asset-item-buttons-container:hover .delete-asset-button {
+    display: block;
+}
+
+.asset-item-buttons-container:hover .asset-item-buttons-placeholder {
+    display: none;
+}
+
+.asset-item-buttons-container--edit-mode {
+    width: 22%;
+    min-width: 22%;
+}
+
+.asset-item-currency {
+    display: flex;
+}
+
+@media only screen and (max-width: 970px) {
+
+    .asset-item-buttons-container--integration-logo--wide {
+        width: 7%;
+        min-width: 7%;
+    }
+
+}
+
+@media only screen and (max-width: 700px) {
+
+    .asset-item-buttons-container--integration-logo--wide {
+        width: 9%;
+        min-width: 9%;
+    }
+
 }

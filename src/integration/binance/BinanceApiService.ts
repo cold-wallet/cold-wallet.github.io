@@ -36,14 +36,15 @@ class BinanceApiService {
             }, [])
             .filter((p) => +p.netAsset)
             .map((balance) => {
-                let name = `binance ${balance.asset} Margin Isolated`
+                let name = `${balance.asset} Margin Isolated`
+                const id = `binance ${name}`;
                 return new AssetDTO(
                     ratesClient.getCurrencyType(balance.asset),
                     +balance.netAsset,
                     balance.asset,
                     name,
-                    name,
-                    name,
+                    id,
+                    id,
                     true,
                     false
                 )
@@ -55,14 +56,15 @@ class BinanceApiService {
         return marginAccount.data.userAssets
             .filter((p) => +p.netAsset)
             .map((balance) => {
-                let name = `binance ${balance.asset} Margin Cross`
+                let name = `${balance.asset} Margin Cross`
+                const id = `binance ${name}`;
                 return new AssetDTO(
                     ratesClient.getCurrencyType(balance.asset),
                     +balance.netAsset,
                     balance.asset,
                     name,
-                    name,
-                    name,
+                    id,
+                    id,
                     true,
                     false
                 )
@@ -73,14 +75,15 @@ class BinanceApiService {
         let balances = await this.spotClient.futuresAccountBalance();
         return balances.filter(f => +f.balance)
             .map((balance) => {
-                let name = `binance ${balance.asset} Futures USD-M`
+                let name = `${balance.asset} Futures USD-M`
+                const id = `binance ${name}`;
                 return new AssetDTO(
                     ratesClient.getCurrencyType(balance.asset),
                     +balance.balance,
                     balance.asset,
                     name,
-                    name,
-                    name,
+                    id,
+                    id,
                     true,
                     false
                 )
@@ -91,14 +94,15 @@ class BinanceApiService {
         let response: Response<FuturesAssetCoinM[]> = await this.futuresClient.futuresCoinMBalance();
         return response.data.filter((f: FuturesAssetCoinM) => +f.balance)
             .map((balance) => {
-                let name = `binance ${balance.asset} Futures COIN-M`
+                let name = `${balance.asset} Futures COIN-M`
+                const id = `binance ${name}`;
                 return new AssetDTO(
                     ratesClient.getCurrencyType(balance.asset),
                     +balance.balance,
                     balance.asset,
                     name,
-                    name,
-                    name,
+                    id,
+                    id,
                     true,
                     false
                 )
@@ -109,14 +113,15 @@ class BinanceApiService {
         let response: Response<FundingAsset[]> = await this.client.fundingWallet();
         return response.data.filter((asset) => +asset.free)
             .map((balance) => {
-                let name = `binance ${balance.asset} Funding`
+                let name = `${balance.asset} Funding`
+                const id = `binance ${name}`;
                 return new AssetDTO(
                     ratesClient.getCurrencyType(balance.asset),
                     +balance.free,
                     balance.asset,
                     name,
-                    name,
-                    name,
+                    id,
+                    id,
                     true,
                     false
                 )
@@ -127,14 +132,15 @@ class BinanceApiService {
         //`STAKING` - for Locked Staking
         let response: Response<StakingPosition[]> = await this.client.stakingProductPosition('STAKING');
         return response.data.map((balance) => {
-            let name = `binance ${balance.asset} Staking Locked`
+            let name = `${balance.asset} Staking Locked`
+            const id = `binance ${name}`;
             return new AssetDTO(
                 ratesClient.getCurrencyType(balance.asset),
                 +balance.amount,
                 balance.asset,
                 name,
-                name,
-                name,
+                id,
+                id,
                 true,
                 false
             )
@@ -145,14 +151,15 @@ class BinanceApiService {
         //`L_DEFI` - for locked DeFi Staking
         let response: Response<StakingPosition[]> = await this.client.stakingProductPosition('L_DEFI');
         return response.data.map((balance) => {
-            let name = `binance ${balance.asset} Staking Locked DeFi`
+            let name = `${balance.asset} Staking Locked DeFi`
+            const id = `binance ${name}`;
             return new AssetDTO(
                 ratesClient.getCurrencyType(balance.asset),
                 +balance.amount,
                 balance.asset,
                 name,
-                name,
-                name,
+                id,
+                id,
                 true,
                 false
             )
@@ -163,14 +170,15 @@ class BinanceApiService {
         //`F_DEFI` - for flexible DeFi Staking
         let response: Response<StakingPosition[]> = await this.client.stakingProductPosition('F_DEFI');
         return response.data.map((balance) => {
-            let name = `binance ${balance.asset} Staking Flexible DeFi`
+            let name = `${balance.asset} Staking Flexible DeFi`
+            const id = `binance ${name}`;
             return new AssetDTO(
                 ratesClient.getCurrencyType(balance.asset),
                 +balance.amount,
                 balance.asset,
                 name,
-                name,
-                name,
+                id,
+                id,
                 true,
                 false
             )
@@ -195,14 +203,15 @@ class BinanceApiService {
                 return arr;
             }, [])
             .map((balance) => {
-                let name = `binance ${balance.description} Liquidity Farming`
+                let name = `${balance.description} Liquidity Farming`
+                const id = `binance ${balance.description}`;
                 return new AssetDTO(
                     ratesClient.getCurrencyType(balance.symbol),
                     +balance.amount,
                     balance.symbol,
                     name,
                     balance.description,
-                    balance.description,
+                    id,
                     true,
                     false
                 )
@@ -229,14 +238,15 @@ class BinanceApiService {
                 return arr
             }, [])
             .map((balance: SavingFixedPosition) => {
-                let name = `binance ${balance.asset} Earning Fixed ${+balance.interestRate * 100}%`;
+                let name = `${balance.asset} Earning Fixed ${+balance.interestRate * 100}%`;
+                const id = `binance ${name}`;
                 return new AssetDTO(
                     ratesClient.getCurrencyType(balance.asset),
                     +balance.principal,
                     balance.asset,
                     name,
-                    name,
-                    name,
+                    id,
+                    id,
                     true,
                     false
                 )
@@ -263,14 +273,15 @@ class BinanceApiService {
                 return arr
             }, [])
             .map((balance: SavingFlexiblePosition) => {
-                let name = `binance ${balance.asset} Earning Flexible ${+balance.annualInterestRate * 100}%`;
+                let name = `${balance.asset} Earning Flexible ${+balance.annualInterestRate * 100}%`;
+                const id = `binance ${name}`;
                 return new AssetDTO(
                     ratesClient.getCurrencyType(balance.asset),
                     +balance.totalAmount,
                     balance.asset,
                     name,
-                    name,
-                    name,
+                    id,
+                    id,
                     true,
                     false
                 )
