@@ -44,15 +44,16 @@ function extractAssets(assets) {
                 .sort((a, b) => compareStrings(a.id, b.id))
                 .map(account => {
                     const currency = currencies.getByNumCode(account.currencyCode).code;
-                    const name = `monobank ${currency} ${account.maskedPan
+                    const name = `${currency} ${account.maskedPan
                         ? (account.maskedPan[0] ? (account.maskedPan[0] + " ") : "")
                         : ""}${account.type}`;
+                    const description = `monobank ${name}`;
                     return new AssetDTO(
                         'fiat',
                         (account.balance || 0) / 100,
                         currency,
                         name,
-                        name,
+                        description,
                         account.id,
                         false,
                         true
@@ -86,14 +87,15 @@ function extractAssets(assets) {
                 .map(balance => {
                     let currency = balance.asset;
                     let type = binanceUserInfo.accountType;
-                    const name = `binance ${currency} ${type}`;
+                    const name = `${currency} ${type}`;
+                    const id = `binance ${name}`;
                     return new AssetDTO(
                         ratesClient.getCurrencyType(balance.asset),
                         (+balance.free) + (+balance.locked),
                         currency,
                         name,
-                        name,
-                        name,
+                        id,
+                        id,
                         true,
                         false
                     )
