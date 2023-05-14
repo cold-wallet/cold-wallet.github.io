@@ -1,0 +1,332 @@
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
+
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <http://feross.org>
+ * @license  MIT
+ */
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+MERCHANTABLITY OR NON-INFRINGEMENT.
+
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
+***************************************************************************** */
+
+/*! ../cancel/isCancel */
+
+/*! ../core/buildFullPath */
+
+/*! ../core/createError */
+
+/*! ../defaults */
+
+/*! ../helpers/buildURL */
+
+/*! ../helpers/combineURLs */
+
+/*! ../helpers/isAbsoluteURL */
+
+/*! ../helpers/validator */
+
+/*! ../utils */
+
+/*! ./../../../../process/browser.js */
+
+/*! ./../../package.json */
+
+/*! ./../core/settle */
+
+/*! ./../defaults */
+
+/*! ./../helpers/buildURL */
+
+/*! ./../helpers/cookies */
+
+/*! ./../helpers/isURLSameOrigin */
+
+/*! ./../helpers/parseHeaders */
+
+/*! ./../utils */
+
+/*! ./Cancel */
+
+/*! ./InterceptorManager */
+
+/*! ./adapters/xhr */
+
+/*! ./cancel/Cancel */
+
+/*! ./cancel/CancelToken */
+
+/*! ./cancel/isCancel */
+
+/*! ./components/InMemoryRepository */
+
+/*! ./components/LocalStorageRepository */
+
+/*! ./components/binanceApiClient */
+
+/*! ./components/monobankApiClient */
+
+/*! ./core/Axios */
+
+/*! ./core/enhanceError */
+
+/*! ./core/mergeConfig */
+
+/*! ./createError */
+
+/*! ./defaults */
+
+/*! ./dispatchRequest */
+
+/*! ./enhanceError */
+
+/*! ./helpers/bind */
+
+/*! ./helpers/isAxiosError */
+
+/*! ./helpers/normalizeHeaderName */
+
+/*! ./helpers/spread */
+
+/*! ./lib/axios */
+
+/*! ./mergeConfig */
+
+/*! ./resources/currencies-iso-4217-code.json */
+
+/*! ./resources/currencies-iso-4217.json */
+
+/*! ./src/index */
+
+/*! ./transformData */
+
+/*! ./utils */
+
+/*! axios */
+
+/*! cross-rates */
+
+/*! exports provided: 104, 108, 116, 124, 132, 136, 144, 152, 156, 170, 174, 188, 191, 192, 203, 208, 214, 222, 230, 232, 238, 242, 262, 270, 292, 320, 324, 328, 332, 340, 344, 348, 352, 356, 360, 364, 368, 376, 388, 392, 398, 400, 404, 408, 410, 414, 417, 418, 422, 426, 430, 434, 446, 454, 458, 462, 478, 480, 484, 496, 498, 504, 512, 516, 524, 532, 533, 548, 554, 558, 566, 578, 586, 590, 598, 600, 604, 608, 634, 643, 646, 654, 682, 690, 694, 702, 704, 706, 710, 728, 748, 752, 756, 760, 764, 776, 780, 784, 788, 795, 800, 807, 818, 826, 834, 840, 858, 860, 882, 886, 894, 901, 927, 928, 929, 930, 931, 932, 933, 934, 936, 937, 938, 940, 941, 943, 944, 946, 947, 948, 949, 950, 951, 952, 953, 955, 956, 957, 958, 959, 960, 961, 962, 964, 965, 967, 968, 969, 970, 971, 972, 973, 975, 976, 977, 978, 979, 980, 981, 984, 985, 986, 990, 994, 996, 008, 051, 032, 036, 052, 050, 048, 060, 096, 068, 044, 064, 072, 084, 012, 090, default */
+
+/*! exports provided: InMemoryRepository */
+
+/*! exports provided: LocalStorageRepository */
+
+/*! exports provided: ZMK, TMM, MRO, AED, AFN, ALL, AMD, ANG, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYN, BZD, CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CUC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ESA, ETB, EUR, FJD, FKP, GBP, GEL, GHS, GIP, GMD, GNF, GTQ, GYD, HKD, HNL, HRK, HTG, HUF, IDR, ILS, INR, IQD, IRR, ISK, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD, KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MXV, MYR, MZN, NAD, NGN, NIO, NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SHP, SLL, SOS, SRD, SSP, STN, SVC, SYP, SZL, THB, TJS, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, UYI, UYU, UYW, UZS, VEF, VES, VND, VUV, WST, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XDR, XOF, XPD, XPF, XPT, XSU, XUA, YER, ZAR, ZMW, ZWL, default */
+
+/*! exports provided: _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _shasum, _spec, _where, author, browser, bugs, bundleDependencies, bundlesize, dependencies, deprecated, description, devDependencies, homepage, jsdelivr, keywords, license, main, name, repository, scripts, typings, unpkg, version, default */
+
+/*! exports provided: binanceApiClient */
+
+/*! exports provided: default */
+
+/*! exports provided: default, ratesWithStorage */
+
+/*! exports provided: monobankApiClient */
+
+/*! exports provided: rates */
+
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+/*! no static exports found */
+
+/*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+/*!******************!*\
+        !*** ./index.js ***!
+        \******************/
+
+/*!**********************!*\
+        !*** ./src/index.js ***!
+        \**********************/
+
+/*!*****************************************!*\
+        !*** ./node_modules/process/browser.js ***!
+        \*****************************************/
+
+/*!***********************************************!*\
+        !*** ./node_modules/cross-rates/src/index.js ***!
+        \***********************************************/
+
+/*!**************************************************!*\
+        !*** ./src/components/LocalStorageRepository.js ***!
+        \**************************************************/
+
+/*!**************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/index.js ***!
+        \**************************************************************/
+
+/*!******************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/axios.js ***!
+        \******************************************************************/
+
+/*!******************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/utils.js ***!
+        \******************************************************************/
+
+/*!******************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/package.json ***!
+        \******************************************************************/
+
+/*!*********************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/defaults.js ***!
+        \*********************************************************************/
+
+/*!*********************************************************************!*\
+        !*** ./node_modules/cross-rates/src/components/binanceApiClient.js ***!
+        \*********************************************************************/
+
+/*!**********************************************************************!*\
+        !*** ./node_modules/cross-rates/src/components/monobankApiClient.js ***!
+        \**********************************************************************/
+
+/*!***********************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/core/Axios.js ***!
+        \***********************************************************************/
+
+/*!***********************************************************************!*\
+        !*** ./node_modules/cross-rates/src/components/InMemoryRepository.js ***!
+        \***********************************************************************/
+
+/*!************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/core/settle.js ***!
+        \************************************************************************/
+
+/*!*************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/adapters/xhr.js ***!
+        \*************************************************************************/
+
+/*!*************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/bind.js ***!
+        \*************************************************************************/
+
+/*!*************************************************************************!*\
+        !*** ./node_modules/cross-rates/src/resources/currencies-iso-4217.json ***!
+        \*************************************************************************/
+
+/*!**************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/cancel/Cancel.js ***!
+        \**************************************************************************/
+
+/*!***************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/spread.js ***!
+        \***************************************************************************/
+
+/*!****************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/cancel/isCancel.js ***!
+        \****************************************************************************/
+
+/*!****************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/cookies.js ***!
+        \****************************************************************************/
+
+/*!*****************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/core/createError.js ***!
+        \*****************************************************************************/
+
+/*!*****************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/core/mergeConfig.js ***!
+        \*****************************************************************************/
+
+/*!*****************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/buildURL.js ***!
+        \*****************************************************************************/
+
+/*!******************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/core/enhanceError.js ***!
+        \******************************************************************************/
+
+/*!******************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/validator.js ***!
+        \******************************************************************************/
+
+/*!******************************************************************************!*\
+        !*** ./node_modules/cross-rates/src/resources/currencies-iso-4217-code.json ***!
+        \******************************************************************************/
+
+/*!*******************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/cancel/CancelToken.js ***!
+        \*******************************************************************************/
+
+/*!*******************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/core/buildFullPath.js ***!
+        \*******************************************************************************/
+
+/*!*******************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/core/transformData.js ***!
+        \*******************************************************************************/
+
+/*!********************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/combineURLs.js ***!
+        \********************************************************************************/
+
+/*!*********************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/core/dispatchRequest.js ***!
+        \*********************************************************************************/
+
+/*!*********************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/isAxiosError.js ***!
+        \*********************************************************************************/
+
+/*!*********************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/parseHeaders.js ***!
+        \*********************************************************************************/
+
+/*!**********************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/isAbsoluteURL.js ***!
+        \**********************************************************************************/
+
+/*!************************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/core/InterceptorManager.js ***!
+        \************************************************************************************/
+
+/*!************************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/isURLSameOrigin.js ***!
+        \************************************************************************************/
+
+/*!****************************************************************************************!*\
+        !*** ./node_modules/cross-rates/node_modules/axios/lib/helpers/normalizeHeaderName.js ***!
+        \****************************************************************************************/
+
+/** @license React v0.19.1
+ * scheduler.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/** @license React v16.13.1
+ * react-dom.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/** @license React v16.13.1
+ * react.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
