@@ -30,3 +30,61 @@ label {
     background-color: #BFD0DF;
 }
 
+.delete-asset-confirm--container {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.delete-asset-confirm--shadow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #103b34;
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+.delete-asset-confirm--window {
+    position: absolute;
+    display: flex;
+    flex-flow: column;
+    background-color: #6f9f98;
+    width: 25%;
+    height: 25%;
+    top: 10%;
+    left: 25%;
+    border: 2px solid #3e3e3e;
+    box-shadow: 5px 5px 20px 0;
+    border-radius: 5px;
+    padding: 2%;
+}
+
+.delete-asset-confirm--message {
+    padding: 10%;
+}
+
+.delete-asset-confirm--controls {
+    display: flex;
+    flex-flow: row;
+    padding: 5%;
+}
+
+@media only screen and (max-width: 970px) {
+    .delete-asset-confirm--window {
+        left: 20%;
+        width: 60%;
+        height: 50%;
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    .delete-asset-confirm--window {
+        left: 10%;
+        width: 80%;
+        height: 20%;
+    }
+}

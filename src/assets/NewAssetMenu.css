@@ -1,140 +1,140 @@
 .new-asset-menu {
-  z-index: 100001;
-  border-style: dashed;
-  border-color: #BFD0DF;
-  border-radius: 1%;
-  border-width: 6px;
-  top: 10%;
-  left: 2%;
-  position: absolute;
-  height: 70%;
-  width: 55%;
-  background-color: #F0F8FF;
-  display: flex;
-  flex-flow: column;
+    z-index: 100001;
+    border-style: dashed;
+    border-color: #BFD0DF;
+    border-radius: 1%;
+    border-width: 6px;
+    top: 10%;
+    left: 2%;
+    position: absolute;
+    height: 70%;
+    width: 55%;
+    background-color: #F0F8FF;
+    display: flex;
+    flex-flow: column;
 }
 
 @media only screen and (max-width: 970px) {
-  .new-asset-menu {
-    width: 95%;
-  }
+    .new-asset-menu {
+        width: 95%;
+    }
 }
 
 .new-asset-menu-shadow {
-  z-index: 100000;
-  left: 0;
-  top: 0;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: #5D6C80;
-  opacity: 0.4;
+    z-index: 100000;
+    left: 0;
+    top: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #5D6C80;
+    opacity: 0.4;
 }
 
 .new-asset-menu--header {
-  display: flex;
-  height: 7%;
-  margin-bottom: 2%;
-  justify-content: flex-end;
+    display: flex;
+    height: 7%;
+    margin-bottom: 2%;
+    justify-content: flex-end;
 }
 
 .new-asset-menu--body {
-  overflow-y: auto;
-  overflow-x: inherit;
-  height: 90%;
-  width: 98%;
-  padding: 0 1% 0 1%;
+    overflow-y: auto;
+    overflow-x: inherit;
+    height: 90%;
+    width: 98%;
+    padding: 0 1% 0 1%;
 }
 
 .asset-pics--container {
-  height: 80%;
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-  align-content: stretch;
+    height: 80%;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-content: stretch;
 }
 
 .asset-pic--container {
-  cursor: pointer;
-  padding-top: 2%;
-  border-style: solid;
-  border-radius: 5%;
-  border-color: #E8DDB5;
-  border-width: 3px;
-  background-color: #ECEBDA;
-  width: 30%;
-  text-align: center;
-  margin: 0 0 2% 0;
-  display: flex;
-  flex-flow: column;
+    cursor: pointer;
+    padding-top: 2%;
+    border-style: solid;
+    border-radius: 5%;
+    border-color: #E8DDB5;
+    border-width: 3px;
+    background-color: #ECEBDA;
+    width: 30%;
+    text-align: center;
+    margin: 0 0 2% 0;
+    display: flex;
+    flex-flow: column;
 }
 
 .asset-currency-icon {
-  width: 100%;
-  font-size: 72px;
-  background-color: #F6AE2D;
-  border-radius: 47%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  flex-flow: column;
+    width: 100%;
+    font-size: 72px;
+    background-color: #F6AE2D;
+    border-radius: 47%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    flex-flow: column;
 }
 
 .asset-pic--image {
-  height: 70%;
-  width: 50%;
-  padding: 0 25% 0 25%;
+    height: 70%;
+    width: 50%;
+    padding: 0 25% 0 25%;
 }
 
 .asset-pic--image-img {
-  width: 80%;
-  height: 100%;
+    width: 80%;
+    height: 100%;
 }
 
 .new-asset-menu--header-title {
-  cursor: default;
-  width: 90%;
-  text-align: center;
-  font-size: 18px;
-  padding: 1%;
+    cursor: default;
+    width: 90%;
+    text-align: center;
+    font-size: 18px;
+    padding: 1%;
 }
 
 .new-asset-menu--data-edit {
-  padding: 1% 5% 5% 5%;
-  display: flex;
-  flex-flow: column;
-  justify-content: space-evenly;
+    padding: 1% 5% 5% 5%;
+    display: flex;
+    flex-flow: column;
+    justify-content: space-evenly;
 }
 
 .new-asset-menu--data {
-  padding: 5%;
+    padding: 5%;
 }
 
 .cancel-editing-asset-button--image {
-  width: 80%;
+    width: 80%;
 }
 
 .new-asset-menu--data-description-input {
-  max-width: 90%;
-  min-width: 90%;
-  min-height: 100px;
+    max-width: 90%;
+    min-width: 90%;
+    min-height: 100px;
 }
 
 .new-asset-menu--data-name-input__disabled {
-  cursor: text;
+    cursor: text;
 }
 
 .new-asset-menu--data-description-input,
 .new-asset-menu--data-name-input {
-  width: 95%;
-  padding: 1%;
+    width: 95%;
+    padding: 1%;
 }
 
 .new-asset-menu--data-controls {
-  min-width: 20%;
-  padding: 2%;
-  margin: 1%;
+    min-width: 20%;
+    padding: 2%;
+    margin: 1%;
 }
 
 .new-asset-menu--data-confirm {
@@ -145,24 +145,29 @@
 
 .new-asset-menu--data-description-input-label,
 .new-asset-menu--data-name-input-label {
-  padding: 1%;
+    padding: 1%;
 }
 
 .new-asset-menu--data-description-input-label-wrapper {
-  padding: 5% 0;
+    padding: 5% 0;
 }
 
 .new-asset-menu--data-action-buttons-wrapper {
-  display: flex;
-  flex-flow: row;
-  justify-content: space-evenly;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-evenly;
 }
 
 .find-asset--container {
-  padding: 3%;
+    padding: 3%;
 }
 
 .find-asset--select {
-  padding: 1%;
+    padding: 1%;
 }
 
+@media only screen and (max-width: 970px) {
+    .cancel-editing-asset-button--image {
+        width: 50%;
+    }
+}

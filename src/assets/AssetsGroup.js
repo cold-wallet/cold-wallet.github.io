@@ -220,6 +220,19 @@ export default class AssetsGroup extends React.Component {
                     assets: this.state.assets,
                 })
             },
+            deleteModeEnabled: asset.deleteModeEnabled,
+            enableDeleteMode: () => {
+                asset.deleteModeEnabled = true;
+                this.setState({
+                    assets: this.state.assets,
+                })
+            },
+            disableDeleteMode: () => {
+                delete asset.deleteModeEnabled;
+                this.setState({
+                    assets: this.state.assets,
+                })
+            },
         })).map(props => {
             let amount = props.asset.amount;
             let nameInput;
@@ -330,10 +343,30 @@ export default class AssetsGroup extends React.Component {
                                         : <button
                                             key={"delete-asset-button"}
                                             title={"delete"}
-                                            onClick={() => props.onDelete()}
+                                            onClick={() => props.enableDeleteMode()}
                                             className={"delete-asset-button negative-button button"}>✖</button>,
                                     (props.editModeEnabled) ? null
-                                        : <button className={"asset-item-buttons-placeholder neutral-button button"}>⫶</button>
+                                        : <button className={"asset-item-buttons-placeholder neutral-button button"}>⫶</button>,
+                                    (props.deleteModeEnabled) ? (
+                                        <div className={"delete-asset-confirm--container"}>
+                                            <div className="delete-asset-confirm--shadow" onClick={event => props.disableDeleteMode()}/>
+                                            <div className="delete-asset-confirm--window">
+                                                <span className="delete-asset-confirm--message">Delete {props.asset.amount} {props.asset.name}?</span>
+                                                <div className="delete-asset-confirm--controls">
+                                                    <button
+                                                        key={"delete-asset-button"}
+                                                        title={"Yes"}
+                                                        onClick={() => props.onDelete()}
+                                                        className={"confirm-delete-asset-button positive-button button"}>✔</button>
+                                                    <button
+                                                        key={"delete-asset-button"}
+                                                        title={"Cancel"}
+                                                        onClick={() => props.disableDeleteMode()}
+                                                        className={"confirm-delete-asset-button neutral-button button"}>✖</button>
+                                                </div>
+                                            </div>
+                                        </div>)
+                                        : null
                                 ]}</div>}
                     </div>
                     {
