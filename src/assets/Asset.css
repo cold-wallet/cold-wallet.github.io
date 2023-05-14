@@ -199,6 +199,19 @@
         min-width: 7%;
     }
 
+    .asset-item-buttons-placeholder {
+        display: none;
+    }
+
+    .edit-asset-button,
+    .delete-asset-button {
+        display: block;
+    }
+
+    .asset-item-buttons-container {
+        width: 20%;
+        min-width: 20%;
+    }
 }
 
 @media only screen and (max-width: 700px) {
